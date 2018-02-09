@@ -1,0 +1,15 @@
+xception "vctDynamicConstVectorRef SetRef out of range"
+-W Class mtsIntuitiveResearchKitPSM: Task PSM1 caught run exception: vctDynamicConstVectorRef SetRef out of range
+E- cmnThrow with std::exception (vctDynamicConstVectorRef SetRef out of range)
+-W mtsMailbox "Robot[PSM1]": ExecuteNext for command "SetPositionJoint" caught exception "vctDynamicConstVectorRef SetRef out of range"
+-W Class mtsIntuitiveResearchKitPSM: Task PSM1 caught run exception: vctDynamicConstVectorRef SetRef out of range
+E- cmnThrow with std::exception (vctDynamicConstVectorRef SetRef out of range)
+-W mtsMailbox "Robot[PSM1]": ExecuteNext for command "SetPositionJoint" caught exception "vctDynamicConstVectorRef SetRef out of range"
+-W Class mtsIntuitiveResearchKitPSM: Task PSM1 caught run exception: vctDynamicConstVectorRef SetRef out of range
+E- cmnThrow with std::exception (vctDynamicConstVectorRef SetRef out of range)
+-W mtsMailbox "Robot[PSM1]": ExecuteNext for command "SetPositionJoint" caught exception "vctDynamicConstVectorRef SetRef out of range"
+-W Class mtsIntuitiveResearchKitPSM: Task PSM1 caught run exception: vctDynamicConstVectorRef SetRef out of range
+E- cmnThrow with std::exception (vctDynamicConstVectorRef SetRef out of range)
+-W mtsMailbox "Robot[PSM1]": ExecuteNext for command "SetPositionJoint" caught exception "vctDynamicConstVectorRef SetRef out of range"
+-W Class mtsIntuitiveResearchKitPSM: Task PSM1 caught run exception: vctDynamicConstVectorRef SetRef out of range
+

@@ -299,7 +299,7 @@ check(end+1:end+length(qdd)) = qdd;
 %% Lumping Parameters
 
 %finding the linear combinations
-%[Ys1, Ys2, Par1, Par2]=lumping_parameters(Par);
+[Ys1, Ys2, Par1, Par2]=lumping_parameters_new(Y,Par);
 
 % %% Trajectory Optimization 
 % 

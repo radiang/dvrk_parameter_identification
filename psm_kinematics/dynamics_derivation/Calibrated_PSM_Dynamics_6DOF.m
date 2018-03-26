@@ -149,7 +149,7 @@ C=sym(zeros(dof,dof));
     end
 
     
-%%Potential Energy
+%% Potential Energy
 P(1)= m1*lc1*cos(thet1)*cos(q1);
 P(2)= m2*lc2*cos(q2)*cos(q1);
 P(3)= m3*l2*cos(q2)*cos(q1);
@@ -170,10 +170,8 @@ end
 
 Psi=sym(zeros(dof,1));
 
-for i=1:dof
-    
+for i=1:dof 
 Psi(i,1)=diff(P_tog,Q(i));
-
 end
 
 

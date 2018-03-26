@@ -12,8 +12,22 @@ Qd = [qd1 qd2 qd3 qd4 qd5 qd6]';
 Qdd = [qdd1 qdd2 qdd3 qdd4 qdd5 qdd6]';
 Tau = [tau1 tau2 tau3 tau4 tau5 tau6]';
 
+M=[m1 m2 m3 m4 m5 m6 m7 m8 m9];
+Lc=[lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9];
+
 %% Options 
+%Degrees of Freedom of robot
 dof = 6; 
+
+%calculate dynamics?? 
+dynamic = 1;
+
+%Joint Angles
+q_n = [0, 0, 0, 0, 0, 0];  %Put your numeric values here
+
+%Mass Locations
+lc_n = [-.03, .150/2, .516/2, .2881/2, .4162/2, .001, .001, .001]; %Put numeric values of Cg locations
+
 %% DH Paremeters and Transforms of PSM 
 p = sym(pi()); 
 %My own DH from RViz and DH Paper
@@ -86,8 +100,6 @@ end
 %T_cg 5 does not have any mass and doesnt contribute to anything
 
 %% Plot Joint Angles Test
-q_n = [0, 0, 0, 0, 0, 0];  %Put your numeric values here
-lc_n = [-.03, .150/2, .516/2, .2881/2, .4162/2, .001, .001, .001]; %Put numeric values of Cg locations
 
 figure()
 for i = 1:length(T)
@@ -116,11 +128,12 @@ zlabel('z');
 T_num = double(T_num);
 
 
+
 %% Calculate Dynamic Jacobians 
 
 %Linear Jacobian
 for i=1:length(T_cg)
-    Jv(1:3,1:6,i)=[diff(T_cg(1:3,4,i),q1),diff(T_cg(1:3,4,i),q2),diff(T_cg(1:3,4,i),q3),diff(T_cg(1:3,4,i),q4),diff(T_cg(1:3,4,i),q5),diff(T_cg(1:3,4,i),q6)];
+    Jv_cg(1:3,1:6,i)=[diff(T_cg(1:3,4,i),q1),diff(T_cg(1:3,4,i),q2),diff(T_cg(1:3,4,i),q3),diff(T_cg(1:3,4,i),q4),diff(T_cg(1:3,4,i),q5),diff(T_cg(1:3,4,i),q6)];
 end 
 
 %Angular Jacobian
@@ -151,7 +164,18 @@ end
 
 %Jw_num(:,:,:)=double((subs(Jw(:,:,:),[q1 q2 q3 q4 q5 q6],q_n)));
 
+%% Calculate End Link Jacobians
+%Linear Jacobian
+
+for i=1:length(T)
+    Jv(1:3,1:6,i)=[diff(T(1:3,4,i),q1),diff(T(1:3,4,i),q2),diff(T(1:3,4,i),q3),diff(T(1:3,4,i),q4),diff(T(1:3,4,i),q5),diff(T(1:3,4,i),q6)];
+end 
+
+
 %% Calculate D Matrix 
+
+
+if dynamic==1
 
 %Inertia Matrix notation
 Ixx = sym('I%d_xx', [9 1]);
@@ -168,15 +192,13 @@ for i=1:1:length(Ixx)
               Ixz(i),Iyz(i),Izz(i);]; 
 end
 
-%Inertial Frame Rotation
-M=[m1 m2 m3 m4 m5 m6 m7 m8 m9];
 
-for i=1:length(Jv)
+for i=1:length(Jv_cg)
    %B(1:9,1:6,i)=M(i)*Jv(:,:,i)'*Jv(:,:,i)+Jw(:,:,i)'*I(1:3,1:3,i)*Jw(:,:,i);
    if i==5
    B(1:6,1:6,i) = zeros(6);
    else
-       B(1:6,1:6,i)=M(i)*Jv(:,:,i)'*Jv(:,:,i)+Jw(:,:,i)'*T(1:3,1:3,i)*I(1:3,1:3,i)*T(1:3,1:3,i)'*Jw(:,:,i); %Not sure about transformations
+       B(1:6,1:6,i)=M(i)*Jv_cg(:,:,i)'*Jv_cg(:,:,i)+Jw(:,:,i)'*T(1:3,1:3,i)*I(1:3,1:3,i)*T(1:3,1:3,i)'*Jw(:,:,i); %Not sure about transformations
    end 
 end
 
@@ -191,12 +213,103 @@ D = D + B(1:dof,1:dof,9);
 D = simplify(D);
 D = combine(D);
 
+%% Crystoffel Symbols
+for i=1:dof
+    for j=1:dof
+        for k=1:dof
+            c(i,j,k)=diff(D(k,j),Q(i))+diff(D(k,i),Q(j))-diff(D(i,j),Q(k));
+        end
+    end
+end
+
+C=sym(zeros(dof,dof));
+    for j=1:dof
+        for k=1:dof
+            for i=1:dof
+                C(k,j)= C(k,j) + c(i,j,k)*Qd(i);
+                %C(k,j)=(c(1,j,k)*Qd(1)+c(2,j,k)*Qd(2)+c(3,j,k)*Qd(3)+c(4,j,k)*Qd(4)+c(5,j,k)*Qd(5)+c(6,j,k)*Qd(6));
+            end
+        end
+    end
+    
+%%  Potential Energy
+  P=sym(zeros(1,length(T_cg)));
+  P_tog=sym(zeros(1));
+  Psi = sym(zeros(dof,1));
+  
+  for i=1:length(T_cg)
+  P(i) = M(i)*T_cg(3,4,i);
+  P_tog = P_tog + P(i);
+  end 
+  
+for i=1:dof 
+Psi(i,1)=diff(P_tog,Q(i));
+end
+
+%% Put together
+Dt=D*Qdd(1:dof)+C*Qd(1:dof)+Psi;
+Dt=simplify(Dt);
+%T=combine(T,'sincos');
+Dt=collect(Dt,[Ixx,Ixy,Ixz,Iyy,Iyz,Izz, lc1, lc2, lc3, lc4, lc5, lc6, lc7, lc8, lc9,m1, m2, m3, m4, m5, m6, m7, m8, m9]);
+  
+end 
+
+lcX_2_mX = sym('lc%d_2_m%d', [9 9]);
+lcX_2_mX = reshape(lcX_2_mX,1,[]);
+
+lcX_mX = sym('lc%d_m%d', [9 9]);
+lcX_mX = reshape(lcX_mX,1,[]);
+
+
+for i = 1:length(M)
+    if i==1
+    LcX_mX_mult = Lc*M(i);
+    LcX2_mX_mult = (Lc.^2)*M(i);
+    else
+    LcX_mX_mult = [LcX_mX_mult, Lc*M(i)];
+    LcX2_mX_mult = [LcX2_mX_mult, (Lc.^2)*M(i)];
+    end 
+ end 
+
+Dt = subs(Dt, LcX2_mX_mult,lcX_2_mX);
+
+Dt = subs(Dt, LcX_mX_mult ,lcX_mX);
 
 
 
+%% Regressor Matrix Form
+Par=symvar(Dt);
+
+%Delete q's from Par
+check=q;
+check(end+1:end+length(qd)) = qd;
+check(end+1:end+length(qdd)) = qdd;
+[bullshit,ind]=ismember(check,Par);
+
+ for k=length(ind):-1:1
+       if ind(k)~= 0
+       Par(ind(k))=[];
+       end
+ end
+ 
+ 
+%Par(end-17:end)=[]; 
+[Y, tau]=equationsToMatrix(Dt == Tau(1:dof), Par);
+
+%% Lumping Parameters
+
+%finding the linear combinations
+%[Ys1, Ys2, Par1, Par2]=lumping_parameters(Par);
+
+% %% Trajectory Optimization 
+% 
+% [x, v, cond_save]=traj_opt_rand(Ys2,size(Ys2,2));
 
 
+%Show the Results
+disp('Resulting Regressor Matrix: ')
+%Ys2
 
-
-
+disp('Resulting Identifiable Parameters: ')
+%Par2
 

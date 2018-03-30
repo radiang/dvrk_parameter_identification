@@ -84,21 +84,31 @@ end
 
 %% Center of Gravity of Each Link location with DH 
 
-%lc(i) is along common normal of frame i+1 (x_a) or along z of frame i(x_d). 
-a_cg      =    [lc1, lc2, lc3, lc4, 0,   0,   0, lc8, lc9] ;
-d_cg      =    [0,     0,   0,   0, 0, lc6, lc7,   0,   0];
+% %lc(i) is along common normal of frame i+1 (x_a) or along z of frame i(x_d). 
+% a_cg      =    [lc1, lc2, lc3, lc4, 0,   0,   0, lc8, lc9] ;
+% d_cg      =    [0,     0,   0,   0, 0, lc6, lc7,   0,   0];
+% 
+% for i=1:length(a_cg)
+%     alpha_cg(i)=alpha(i+1);
+%     tet_cg(i)=tet(i+1);
+% end 
+% 
+% for i = 1:length(a_cg)
+% Ti_cg(:,:,i) = DH(tet_cg(i),a_cg(i),d_cg(i),alpha_cg(i)); 
+% T_cg(:,:,i)  = T(:,:,i)*Ti_cg(:,:,i);
+% end 
+% 
+% %T_cg 5 does not have any mass and doesnt contribute to anything
+% 
 
-for i=1:length(a_cg)
-    alpha_cg(i)=alpha(i+1);
-    tet_cg(i)=tet(i+1);
+%% Let's try a new Center of Mass 
+l_cg = sym('l_cg%d_%d', [9 3]);
+
+map = [q1,q2,-q2,q2,0,q3,q4,q5,q6];
+for i = 1:length(l_cg) 
+p_cg(i,:)  = T(:,:,i)*DH(map(i),0,0,0)*transpose([l_cg(i,:), 1]);
 end 
 
-for i = 1:length(a_cg)
-Ti_cg(:,:,i) = DH(tet_cg(i),a_cg(i),d_cg(i),alpha_cg(i)); 
-T_cg(:,:,i)  = T(:,:,i)*Ti_cg(:,:,i);
-end 
-
-%T_cg 5 does not have any mass and doesnt contribute to anything
 
 %% Plot Joint Angles Test
 
@@ -112,16 +122,25 @@ for i = 1:length(T)
         hold on
 end
 
-for i = 1:length(T_cg)
-        T_cg_num(:,:,i)=subs(T_cg(:,:,i),[q1 q2 q3 q4 q5 q6 lc1 lc2 lc3 lc4 lc6 lc7 lc8 lc9], [q_n lc_n]);
-        
-        scatter3(T_cg_num(1,4,i),T_cg_num(2,4,i),T_cg_num(3,4,i),'*');
-        marker_id = sprintf('cg_%d',i);
-        text(T_cg_num(1,4,i),T_cg_num(2,4,i),T_cg_num(3,4,i),marker_id);
-        hold on
-end
 
+% 
+% for i = 1:length(T_cg)
+%         T_cg_num(:,:,i)=subs(T_cg(:,:,i),[q1 q2 q3 q4 q5 q6 lc1 lc2 lc3 lc4 lc6 lc7 lc8 lc9], [q_n lc_n]);
+%         
+%         scatter3(T_cg_num(1,4,i),T_cg_num(2,4,i),T_cg_num(3,4,i),'*');
+%         marker_id = sprintf('cg_%d',i);
+%         text(T_cg_num(1,4,i),T_cg_num(2,4,i),T_cg_num(3,4,i),marker_id);
+%         hold on
+% end
 
+ for i = 1:length(p_cg)
+         p_cg_num(i,:)=subs(p_cg(i,:),[q l_cg(i,:)], [q_n, 0, 0, .1]);
+%         
+         scatter3(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),'*');
+         marker_id = sprintf('cg_%d',i);
+         text(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),marker_id);
+         hold on
+ end
 title('Plot transform Frames');
 xlabel('x');
 ylabel('y');
@@ -133,9 +152,13 @@ T_num = double(T_num);
 %% Calculate Dynamic Jacobians 
 
 %Linear Jacobian
-for i=1:length(T_cg)
-    Jv_cg(1:3,1:6,i)=[diff(T_cg(1:3,4,i),q1),diff(T_cg(1:3,4,i),q2),diff(T_cg(1:3,4,i),q3),diff(T_cg(1:3,4,i),q4),diff(T_cg(1:3,4,i),q5),diff(T_cg(1:3,4,i),q6)];
-end 
+% for i=1:length(T_cg)
+%     Jv_cg(1:3,1:6,i)=[diff(T_cg(1:3,4,i),q1),diff(T_cg(1:3,4,i),q2),diff(T_cg(1:3,4,i),q3),diff(T_cg(1:3,4,i),q4),diff(T_cg(1:3,4,i),q5),diff(T_cg(1:3,4,i),q6)];
+% end 
+
+ for i=1:length(p_cg)
+     Jv_cg(1:3,1:6,i)=[diff(transpose(p_cg(i,1:3)),q1),diff(transpose(p_cg(i,1:3)),q2),diff(transpose(p_cg(i,1:3)),q3),diff(transpose(p_cg(i,1:3)),q4),diff(transpose(p_cg(i,1:3)),q5),diff(transpose(p_cg(i,1:3)),q6)];
+ end 
 
 %Angular Jacobian
 k=[0;0;1];
@@ -238,12 +261,12 @@ C=sym(zeros(dof,dof));
     end
     
 %%  Potential Energy
-  P=sym(zeros(1,length(T_cg)));
+  P=sym(zeros(1,length(p_cg)));
   P_tog=sym(zeros(1));
   Psi = sym(zeros(dof,1));
   
-  for i=1:length(T_cg)
-  P(i) = M(i)*T_cg(3,4,i);
+  for i=1:length(p_cg)
+  P(i) = M(i)*p_cg(i,3);
   
   if (i==5)
       P(i)=0;
@@ -253,6 +276,22 @@ C=sym(zeros(dof,dof));
   
   end 
   
+%     P=sym(zeros(1,length(T_cg)));
+%   P_tog=sym(zeros(1));
+%   Psi = sym(zeros(dof,1));
+%   
+%   for i=1:length(T_cg)
+%   P(i) = M(i)*T_cg(3,4,i);
+%   
+%   if (i==5)
+%       P(i)=0;
+%   end
+%   
+%   P_tog = P_tog + P(i);
+%   
+%   end 
+  
+  
 for i=1:dof 
 Psi(i,1)=diff(P_tog,Q(i));
 end
@@ -260,57 +299,60 @@ end
 %% Put together
 Dt=D*Qdd(1:dof)+C*Qd(1:dof)+Psi;
 Dt=simplify(Dt);
+
+save('temp.mat')
 %T=combine(T,'sincos');
-Dt=collect(Dt,[Ixx,Ixy,Ixz,Iyy,Iyz,Izz, lc1, lc2, lc3, lc4, lc5, lc6, lc7, lc8, lc9,m1, m2, m3, m4, m5, m6, m7, m8, m9]);
+
+%Dt=collect(Dt,[Ixx,Ixy,Ixz,Iyy,Iyz,Izz, lc1, lc2, lc3, lc4, lc5, lc6, lc7, lc8, lc9,m1, m2, m3, m4, m5, m6, m7, m8, m9]);
   
-end 
-
-lcX_2_mX = sym('lc%d_2_m%d', [9 9]);
-lcX_2_mX = reshape(lcX_2_mX,1,[]);
-
-lcX_mX = sym('lc%d_m%d', [9 9]);
-lcX_mX = reshape(lcX_mX,1,[]);
-
-
-for i = 1:length(M)
-    if i==1
-    LcX_mX_mult = Lc*M(i);
-    LcX2_mX_mult = (Lc.^2)*M(i);
-    else
-    LcX_mX_mult = [LcX_mX_mult, Lc*M(i)];
-    LcX2_mX_mult = [LcX2_mX_mult, (Lc.^2)*M(i)];
-    end 
- end 
-
-Dt = subs(Dt, LcX2_mX_mult,lcX_2_mX);
-
-Dt = subs(Dt, LcX_mX_mult ,lcX_mX);
-
-
-
-%% Regressor Matrix Form
-Par=symvar(Dt);
-
-%Delete q's from Par
-check=q;
-check(end+1:end+length(qd)) = qd;
-check(end+1:end+length(qdd)) = qdd;
-[bullshit,ind]=ismember(check,Par);
-
- for k=length(ind):-1:1
-       if ind(k)~= 0
-       Par(ind(k))=[];
-       end
- end
  
- 
-%Par(end-17:end)=[]; 
-[Y, tau]=equationsToMatrix(Dt == Tau(1:dof), Par);
+% 
+% lcX_2_mX = sym('lc%d_2_m%d', [9 9]);
+% lcX_2_mX = reshape(lcX_2_mX,1,[]);
+% 
+% lcX_mX = sym('lc%d_m%d', [9 9]);
+% lcX_mX = reshape(lcX_mX,1,[]);
+% 
+% 
+% for i = 1:length(M)
+%     if i==1
+%     LcX_mX_mult = Lc*M(i);
+%     LcX2_mX_mult = (Lc.^2)*M(i);
+%     else
+%     LcX_mX_mult = [LcX_mX_mult, Lc*M(i)];
+%     LcX2_mX_mult = [LcX2_mX_mult, (Lc.^2)*M(i)];
+%     end 
+%  end 
+% 
+% Dt = subs(Dt, LcX2_mX_mult,lcX_2_mX);
+% 
+% Dt = subs(Dt, LcX_mX_mult ,lcX_mX);
+% 
+% 
+% 
+% %% Regressor Matrix Form
+% Par=symvar(Dt);
+% 
+% %Delete q's from Par
+% check=q;
+% check(end+1:end+length(qd)) = qd;
+% check(end+1:end+length(qdd)) = qdd;
+% [bullshit,ind]=ismember(check,Par);
+% 
+%  for k=length(ind):-1:1
+%        if ind(k)~= 0
+%        Par(ind(k))=[];
+%        end
+%  end
+%  
+%  
+% %Par(end-17:end)=[]; 
+% [Y, tau]=equationsToMatrix(Dt == Tau(1:dof), Par);
 
 %% Lumping Parameters
 
 %finding the linear combinations
-[Ys1, Ys2, Par1, Par2]=lumping_parameters_new(Y,Par);
+%[Ys1, Ys2, Par1, Par2]=lumping_parameters_new(Y,Par);
 
 % %% Trajectory Optimization 
 % 
@@ -324,4 +366,5 @@ disp('Resulting Regressor Matrix: ')
 disp('Resulting Identifiable Parameters: ')
 %Par2
 
-save('psm_new_dynamics.mat')
+%save('psm_new_dynamics.mat')
+end

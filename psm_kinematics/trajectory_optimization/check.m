@@ -6,7 +6,7 @@ ts=0.1;
 g=9.8;
 par_num=length(Par2);
 dof_num = 6;
-point_num=10;
+point_num=7;
 
 %Joint Limits
 limit_min(1)=-1.54; %rad
@@ -23,8 +23,8 @@ limit_min(6)=-1.54; %rad
 limit_max(6)=1.54;
 
 %Maximum Velocity 
-velocity_min(1)= -0.5 ;%rad/s
-velocity_max(1)= 0.5 ;%rad/s
+velocity_min(1)= -0.7 ;%rad/s
+velocity_max(1)= 0.7 ;%rad/s
 velocity_min(2)= -0.06;
 velocity_max(2)= 0.06; %m/s
 
@@ -49,7 +49,7 @@ Conf=zeros(1,length(B));
 
 
 
-for j=1:10
+for j=1:20
 
 for dof=1:dof_num
 array = [0];

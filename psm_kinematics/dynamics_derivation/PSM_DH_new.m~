@@ -176,7 +176,7 @@ for i=1:length(T)
     Jv(1:3,1:6,i)=[diff(T(1:3,4,i),q1),diff(T(1:3,4,i),q2),diff(T(1:3,4,i),q3),diff(T(1:3,4,i),q4),diff(T(1:3,4,i),q5),diff(T(1:3,4,i),q6)];
 end 
 
-J_end = [Jv(:,:,11);Jw(:,:,11)]; %End Effector Jacobian
+
 %% Calculate D Matrix 
 
 
@@ -244,13 +244,10 @@ C=sym(zeros(dof,dof));
   
   for i=1:length(T_cg)
   P(i) = M(i)*T_cg(3,4,i);
-  
+  P_tog = P_tog + P(i);
   if (i==5)
       P(i)=0;
   end
-  
-  P_tog = P_tog + P(i);
-  
   end 
   
 for i=1:dof 

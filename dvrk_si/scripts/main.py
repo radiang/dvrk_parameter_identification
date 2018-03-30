@@ -33,7 +33,6 @@ for i in range(len(states[6][:])):
 	data[i][3:6] = p.get_current_joint_velocity()[0:3]
 	data[i][6:9] = p.get_current_joint_effort()[0:3]
 
-
 #Print Code
 with open(foldername+'data.csv', 'wb') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_NONE)

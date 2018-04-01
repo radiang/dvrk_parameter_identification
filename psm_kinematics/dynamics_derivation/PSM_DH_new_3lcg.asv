@@ -1,7 +1,7 @@
 clear all 
 close all
 
-syms T Jw lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9 l2 l3 l4 l5 l6 l7 l8 l9 m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11 q1 q2 q3 q4 q5 q6 qd1 qd2 qd3 qd4 qd5 qd6  qdd1 qdd2 qdd3 qdd4 qdd5 qdd6 thet1 psi  tau1 tau2 tau3 tau4 tau5 tau6 real; 
+syms T Jw lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9 l2 l3 l4 l5 l6 l7 l8 l9 m1 m2 m3 m4 m5 m6 m7 m8 m9 q1 q2 q3 q4 q5 q6 qd1 qd2 qd3 qd4 qd5 qd6  qdd1 qdd2 qdd3 qdd4 qdd5 qdd6 thet1 psi  tau1 tau2 tau3 tau4 tau5 tau6 real; 
 
 q   = [q1 q2 q3 q4 q5 q6];
 qd  = [qd1 qd2 qd3 qd4 qd5 qd6];
@@ -12,7 +12,7 @@ Qd = [qd1 qd2 qd3 qd4 qd5 qd6]';
 Qdd = [qdd1 qdd2 qdd3 qdd4 qdd5 qdd6]';
 Tau = [tau1 tau2 tau3 tau4 tau5 tau6]';
 
-M=[m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11];
+M=[m1 m2 m3 m4 m5 m6 m7 m8 m9];
 Lc=[lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9];
 
 %% Options 
@@ -113,11 +113,8 @@ end
 
 counter_num = 2;
 
-Tee_cg(:,:,1)= T(:,:,2)*DH(map(2),0,0,0);
-Tee_cg(:,:,2)= T(:,:,2)*DH(-p/2-beta+q2,l_cg(11,1),0,-p/2)*DH(0,0,map(6),0);
-
- p_cg(end+1,:) = Tee_cg(:,:,1)*transpose([l_cg(10,:),1]); %Pitch Counterweight 
- p_cg(end+1,:) = Tee_cg(:,:,2)*transpose([0,l_cg(11,2:3),1]); %Insertion Counterweight 
+ p_cg(end+1,:) = T(:,:,2)*DH(map(2),0,0,0)*transpose([l_cg(10,:),1]); %Pitch Counterweight 
+ p_cg(end+1,:) = T(:,:,2)*DH(-p/2-beta+q2,l_cg(11,1),0,-p/2)*DH(0,0,map(6),0)*transpose([0,l_cg(11,2:3),1]); %Insertion Counterweight 
 
 %% Plot Joint Angles Test
 
@@ -144,12 +141,12 @@ end
 
  for i = 1:length(p_cg)
          p_cg_num(i,:)=subs(p_cg(i,:),[q l_cg(i,:)], [q_n, 0, 0, .1]);
-         %if(i>9)
+         if(i>9)
          scatter3(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),'*');
          marker_id = sprintf('cg_%d',i);
          text(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),marker_id);
          hold on
-         %end
+         end
  end
 title('Plot transform Frames');
 xlabel('x');
@@ -236,12 +233,9 @@ end
 
 for i=1:length(Jv_cg)
    %B(1:9,1:6,i)=M(i)*Jv(:,:,i)'*Jv(:,:,i)+Jw(:,:,i)'*I(1:3,1:3,i)*Jw(:,:,i);
-   if (i==5)
+   if i==5
    B(1:6,1:6,i) = zeros(6);
-   elseif(i==10)
-      B(1:6,1:6,i)=M(i)*Jv_cg(:,:,i)'*Jv_cg(:,:,i)+Jw(:,:,i)'*Tee_cg(1:3,1:3,1)*I(1:3,1:3,i)*Tee_cg(1:3,1:3,1)'*Jw(:,:,i);     
-   elseif(i==11)
-      B(1:6,1:6,i)=M(i)*Jv_cg(:,:,i)'*Jv_cg(:,:,i)+Jw(:,:,i)'*Tee_cg(1:3,1:3,2)*I(1:3,1:3,i)*Tee_cg(1:3,1:3,2)'*Jw(:,:,i);     
+   elseif(
    else
        B(1:6,1:6,i)=M(i)*Jv_cg(:,:,i)'*Jv_cg(:,:,i)+Jw(:,:,i)'*T(1:3,1:3,i)*I(1:3,1:3,i)*T(1:3,1:3,i)'*Jw(:,:,i); %Not sure about transformations
    end 

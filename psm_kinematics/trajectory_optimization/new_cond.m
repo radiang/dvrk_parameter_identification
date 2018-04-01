@@ -33,7 +33,7 @@ W(1+(i-1)*6:6+(i-1)*6,:)=subs(Ys2, [q qd qdd],[transpose(Q(1:6,i)), transpose(Qd
 end
 
 
-Cond = cond(W);
+Cond = double(cond(W));
 
 
 end

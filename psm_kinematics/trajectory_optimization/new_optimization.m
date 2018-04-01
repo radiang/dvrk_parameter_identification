@@ -34,23 +34,25 @@ Ae=[];
 be=[];
 
 %Bounds
-for data = 1:data_max
 for dof = 1:dof_max
-lb((dof-1)*6+data)=[limit_min(dof)];
-ub((dof-1)*6+data)=[limit_max(dof)];
+for data = 1:data_max
+
+lb((dof-1)*data_max+data)=[limit_min(dof)];
+ub((dof-1)*data_max+data)=[limit_max(dof)];
 end
 end
 
-for data = 1:data_max
 for dof = 1:dof_max
-lb(n+(dof-1)*6+data)=[velocity_min(1)];
-ub(n+(dof-1)*6+data)=[velocity_max(1)];
+for data = 1:data_max
+
+lb(n+(dof-1)*data_max+data)=[velocity_min(1)];
+ub(n+(dof-1)*data_max+data)=[velocity_max(1)];
 if(dof==3)
-    lb(n+(dof-1)*6+data)=[velocity_min(2)];
-    ub(n+(dof-1)*6+data)=[velocity_max(2)];
+    lb(n+(dof-1)*data_max+data)=[velocity_min(2)];
+    ub(n+(dof-1)*data_max+data)=[velocity_max(2)];
 end
 end
 end
 
-[vars Fin]=fmincon(f,[x0 xv0,A,b,Ae,be,lb,ub);
+[vars, Fin]=fmincon(@new_cond,[x0 xv0],A,b,Ae,be,lb,ub);
 

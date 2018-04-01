@@ -102,7 +102,7 @@ end
 % 
 
 %% Let's try a new Center of Mass 
-l_cg = sym('l_cg%d_%d', [9 3]);
+l_cg = sym('l_cg%d_%d', [9 3], 'real');
 
 map = [q1,q2,-q2,q2,0,q3,q4,q5,q6];
 for i = 1:length(l_cg) 
@@ -112,15 +112,15 @@ end
 
 %% Plot Joint Angles Test
 
-figure()
-for i = 1:length(T)
-        T_num(:,:,i)=subs(T(:,:,i),[q1 q2 q3 q4 q5 q6],q_n);
-        
-        scatter3(T_num(1,4,i),T_num(2,4,i),T_num(3,4,i));
-        marker_id = sprintf('%d',i);
-        text(T_num(1,4,i),T_num(2,4,i),T_num(3,4,i),marker_id);     
-        hold on
-end
+% figure()
+% for i = 1:length(T)
+%         T_num(:,:,i)=subs(T(:,:,i),[q1 q2 q3 q4 q5 q6],q_n);
+%         
+%         scatter3(T_num(1,4,i),T_num(2,4,i),T_num(3,4,i));
+%         marker_id = sprintf('%d',i);
+%         text(T_num(1,4,i),T_num(2,4,i),T_num(3,4,i),marker_id);     
+%         hold on
+% end
 
 
 % 
@@ -133,19 +133,19 @@ end
 %         hold on
 % end
 
- for i = 1:length(p_cg)
-         p_cg_num(i,:)=subs(p_cg(i,:),[q l_cg(i,:)], [q_n, 0, 0, .1]);
-%         
-         scatter3(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),'*');
-         marker_id = sprintf('cg_%d',i);
-         text(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),marker_id);
-         hold on
- end
-title('Plot transform Frames');
-xlabel('x');
-ylabel('y');
-zlabel('z');
-T_num = double(T_num);
+%  for i = 1:length(p_cg)
+%          p_cg_num(i,:)=subs(p_cg(i,:),[q l_cg(i,:)], [q_n, 0, 0, .1]);
+% %         
+%          scatter3(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),'*');
+%          marker_id = sprintf('cg_%d',i);
+%          text(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),marker_id);
+%          hold on
+%  end
+% title('Plot transform Frames');
+% xlabel('x');
+% ylabel('y');
+% zlabel('z');
+% T_num = double(T_num);
 
 
 
@@ -206,12 +206,12 @@ J_end = [Jv(:,:,11);Jw(:,:,11)]; %End Effector Jacobian
 if dynamic==1
 
 %Inertia Matrix notation
-Ixx = sym('I%d_xx', [9 1]);
-Iyy = sym('I%d_yy', [9 1]);
-Izz = sym('I%d_zz', [9 1]);
-Ixy = sym('I%d_xy', [9 1]);
-Ixz = sym('I%d_xz', [9 1]);
-Iyz = sym('I%d_yz', [9 1]);
+Ixx = sym('I%d_xx', [9 1],'real');
+Iyy = sym('I%d_yy', [9 1],'real');
+Izz = sym('I%d_zz', [9 1],'real');
+Ixy = sym('I%d_xy', [9 1],'real');
+Ixz = sym('I%d_xz', [9 1],'real');
+Iyz = sym('I%d_yz', [9 1],'real');
 
 for i=1:1:length(Ixx)
     

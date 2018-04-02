@@ -4,8 +4,7 @@ load('Ys2.mat');
 
 ts=0.1;
 tf=2;
-t=0:ts:tf;
-%r=length(Q)-1;
+
 
 array(1,:) = [0 x(1) x(2) x(3) x(4) x(5)];
 array(2,:) = [0 x(6) x(7) x(8) x(9) x(10)];

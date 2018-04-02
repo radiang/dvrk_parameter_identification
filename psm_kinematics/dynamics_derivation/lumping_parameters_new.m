@@ -1,4 +1,4 @@
-function [Ys1, Ys2, Par1, Par2]=lumping_parameters_new(Y, Par)
+function [Ys1, Ys2, Par1, Par2,Cond]=lumping_parameters_new(Y, Par)
 Yn=Y;
 
 q_num = rand(1,length(symvar(Y)));
@@ -223,7 +223,7 @@ y=[];
 end
 
 [null, nullA]=null_find(W)
-cond(W)
+Cond=cond(W)
 cond(W,2)
 Par2
 

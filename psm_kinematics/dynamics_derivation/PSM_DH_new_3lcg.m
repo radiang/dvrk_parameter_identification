@@ -15,7 +15,7 @@ Tau = [tau1 tau2 tau3 tau4 tau5 tau6]';
 M=[m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11];
 Lc=[lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9];
 
-filename='lcg3_inaxis';
+filename='lcg3_inplane';
 
 
 %% Options 
@@ -107,12 +107,53 @@ end
 % 
 % %T_cg 5 does not have any mass and doesnt contribute to anything
 % 
+%% Syms Stuff
 
-%% Let's try a new Center of Mass 
 num = 11;
 
 l_cg = sym('l_cg%d_%d', [num 3], 'real');
+%Inertia Matrix notation
+Ixx = sym('I%d_xx', [11 1],'real');
+Iyy = sym('I%d_yy', [11 1],'real');
+Izz = sym('I%d_zz', [11 1],'real');
+Ixy = sym('I%d_xy', [11 1],'real');
+Ixz = sym('I%d_xz', [11 1],'real');
+Iyz = sym('I%d_yz', [11 1],'real');
 
+for i=1:1:length(Ixx)
+    
+    I(1:3,1:3,i)=[Ixx(i),Ixy(i),Ixz(i); 
+              Ixy(i),Iyy(i),Iyz(i);
+              Ixz(i),Iyz(i),Izz(i);]; 
+end
+
+%% Make Stuff Zero
+
+%Assume counterweight pitch goes to zero 
+M(10)=0;
+I(1:3,1:3,10) = zeros(3);
+l_cg(10,:) = zeros(1,3);
+
+% M(11)=0;
+% I(1:3,1:3,11) = zeros(3);
+% l_cg(11,:) = zeros(1,3);
+
+%In Plane Masses
+l_cg(1,1) = 0;
+l_cg(2,3) = 0;
+l_cg(3,3) = 0;
+l_cg(4,3) = 0;
+l_cg(6,2) = 0;
+l_cg(7,1) = 0;
+l_cg(8,3) = 0;
+l_cg(9,2) = 0;
+l_cg(11,2) = 0;
+
+%In Axis Masses
+
+
+
+%% Let's try a new Center of Mass 
 map = [q1,q2,-q2,q2,0,q3,q4,q5,q6];
 for i = 1:length(l_cg)-2 
 p_cg(i,:)  = T(:,:,i)*DH(map(i),0,0,0)*transpose([l_cg(i,:), 1]);
@@ -226,45 +267,7 @@ J_end = [Jv(:,:,11);Jw(:,:,11)]; %End Effector Jacobian
 
 if dynamic==1
 
-%Inertia Matrix notation
-Ixx = sym('I%d_xx', [11 1],'real');
-Iyy = sym('I%d_yy', [11 1],'real');
-Izz = sym('I%d_zz', [11 1],'real');
-Ixy = sym('I%d_xy', [11 1],'real');
-Ixz = sym('I%d_xz', [11 1],'real');
-Iyz = sym('I%d_yz', [11 1],'real');
 
-for i=1:1:length(Ixx)
-    
-    I(1:3,1:3,i)=[Ixx(i),Ixy(i),Ixz(i); 
-              Ixy(i),Iyy(i),Iyz(i);
-              Ixz(i),Iyz(i),Izz(i);]; 
-end
-
-
-%% Make Stuff Zero
-
-%Assume counterweight pitch goes to zero 
-M(10)=0;
-I(1:3,1:3,10) = zeros(3);
-l_cg(10,:) = zeros(1,3);
-
-% M(11)=0;
-% I(1:3,1:3,11) = zeros(3);
-% l_cg(11,:) = zeros(1,3);
-
-%In Plane Masses
-l_cg(1,1) = 0;
-l_cg(2,3) = 0;
-l_cg(3,3) = 0;
-l_cg(4,3) = 0;
-l_cg(6,2) = 0;
-l_cg(7,1) = 0;
-l_cg(8,3) = 0;
-l_cg(9,2) = 0;
-l_cg(11,2) = 0;
-
-%In Axis Masses
 
 %%
 for i=1:length(Jv_cg)

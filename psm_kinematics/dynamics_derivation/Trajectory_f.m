@@ -1,4 +1,13 @@
-function [x,v,ac,T]=Trajectory_f(theta,dtheta,tf,ts)
+function [x,v,ac,T]=Trajectory_f(theta,dtheta,tf,ts,plot_set)% theta = [qa, qb, ... qn] , dtheta = [ qa', qb', ..., qc'] , minimal 2 values. 
+
+if nargin > 4
+    plot_on = plot_set; 
+else 
+    plot_on = 0;
+end 
+    
+%plot_on = 1;
+
 Q=[theta;
    dtheta];
 
@@ -11,6 +20,7 @@ qb=Q(1,i+1);
 dqa=Q(2,i);
 dqb=Q(2,i+1);
 
+%Fifth Polynomial trajectory based on paper
 A= qb-qa;
 a(1,i)=qa;
 a(2,i)=dqa;
@@ -30,26 +40,32 @@ ac(k+length(t)*(i-1))=2*a(3,i) +6*a(4,i)*t(k)+12*a(5,i)*t(k).^2+20*a(6,i)*t(k).^
 end
 end
 
-for i=1:1:r-1
-x(length(t)*(i))=[];
-v(length(t)*(i))=[];
-ac(length(t)*(i))=[];
-end
+%Deleting extra value at interval
+ for i=r-1:-1:1
+ x(length(t)*(i))=[];
+ v(length(t)*(i))=[];
+ ac(length(t)*(i))=[];
+ end
+
+%Plotting
 
 T=0:ts:tf*r;
-% figure('Name','Position (degree)');
-% plot(T,x,'LineWidth',3);
-% title('Position (degree)')
-% grid
-% 
-% figure('Name','Velocity (degree/s)');
-% plot(T,v,'LineWidth',3);
-% title('Velocity (degree/s)')
-%  grid
-% 
-% figure('Name','Acceleration (degree/s^2)');
-% plot(T,ac,'LineWidth',3);
-% title('Acceleration (degree/s^2)')
-% grid
+if plot_on == 1
+
+ figure('Name','Position (degree)');
+ plot(T,x,'LineWidth',3);
+ title('Position (degree)')
+ grid
+ 
+ figure('Name','Velocity (degree/s)');
+ plot(T,v,'LineWidth',3);
+ title('Velocity (degree/s)')
+  grid
+ 
+ figure('Name','Acceleration (degree/s^2)');
+ plot(T,ac,'LineWidth',3);
+ title('Acceleration (degree/s^2)')
+ grid
+end 
 
 end

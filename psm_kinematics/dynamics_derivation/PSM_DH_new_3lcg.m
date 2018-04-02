@@ -22,6 +22,8 @@ dof = 6;
 %calculate dynamics?? 
 dynamic = 1;
 
+%Gravity 
+g =9.8; %m/s^2
 %Joint Angles
 q_n = [0, .5, .02, 0, 0, 0];  %Put your numeric values here
 
@@ -282,7 +284,7 @@ C=sym(zeros(dof,dof));
   Psi = sym(zeros(dof,1));
   
   for i=1:length(p_cg)
-  P(i) = M(i)*p_cg(i,3);
+  P(i) = g*M(i)*p_cg(i,3);
   
   if (i==5)
       P(i)=0;
@@ -320,32 +322,59 @@ Dt=simplify(Dt);
 %T=combine(T,'sincos');
 
 %Dt=collect(Dt,[Ixx,Ixy,Ixz,Iyy,Iyz,Izz, lc1, lc2, lc3, lc4, lc5, lc6, lc7, lc8, lc9,m1, m2, m3, m4, m5, m6, m7, m8, m9]);
-  
 Dt=collect(Dt,[Ixx,Ixy,Ixz,Iyy,Iyz,Izz,reshape(l_cg,[1,numel(l_cg)]),M]);
 
-for i=1:length(p_cg)
-    X1_X2_mX(i) = sprintf('l%d_1_l%d_2_m%d',[i i i]);
-    X2_X3_mX(i) = sprintf('l%d_2_l%d_3_m%d',[i i i]);
-    X1_X3_mX(i) = sprintf('l%d_1_l%d_3_m%d',[i i i]);
-    X1_X1_mX(i) = sprintf('l%d_1_l%d_1_m%d',[i i i]);
-end
+% for i=1:length(p_cg)
+%     X1_X2_mX(i) = sprintf('l%d_1_l%d_2_m%d',[i i i]);
+%     X2_X3_mX(i) = sprintf('l%d_2_l%d_3_m%d',[i i i]);
+%     X1_X3_mX(i) = sprintf('l%d_1_l%d_3_m%d',[i i i]);
+%     X1_X1_mX(i) = sprintf('l%d_1_l%d_1_m%d',[i i i]);
+% end
 % 
-lcX_2_mX = sym('lc%d_%d_lc%d_%d_m%d', [11 3 11 3 11]);
-
 num = length(p_cg);
-lcX_2_mX_sym= sym(zeros(11,3,11,3,11));
+lclcm = sym('lc%d_%d_lc%d_%d_m%d', [11 3 11 3 11]);
+lclcm_sym= sym(zeros(num,3,num,3,num));
 
 for i=1:num
     for j=1:3
-        for l=1:num
-            for k=1:3
+        for k=1:num
+            for l=1:3
                 for m=1:num
-   lcX_2_mX_sym(i,j,k,l,m)=l_cg(i,j)*l_cg(k,l)*M(m);
+                    if(k<i||l<j)
+                        lclcm(i,j,k,l,m) = 0;
+%                     elseif(l>j)
+%                         lclcm_sym(i,j,k,l,m) = 0;
+                    else
+                    lclcm_sym(i,j,k,l,m)=l_cg(i,j)*l_cg(k,l)*M(m);
+                    end
                 end
             end
         end
     end
 end
+
+lcm = sym('lc%d_%d_m%d', [11 3 11]);
+lcm_sym= sym(zeros(num,3,num));
+
+for i=1:num
+    for j=1:3
+        for m=1:num
+            lcm_sym(i,j,m)=l_cg(i,j)*M(m);
+        end
+    end
+end
+
+
+lclcm = reshape(lclcm,1,[]);
+lclcm_sym = reshape(lclcm_sym,1,[]);
+
+lcm = reshape(lcm,1,[]);
+lcm_sym = reshape(lcm_sym,1,[]);
+
+
+Dt = subs(Dt, lclcm_sym,lclcm);
+Dt = subs(Dt, lcm_sym,lcm);
+
 
 % lcX_2_mX = reshape(lcX_2_mX,1,[]);
 % 
@@ -353,20 +382,20 @@ end
 % lcX_mX = reshape(lcX_mX,1,[]);
 
 
-for i = 1:length(M)
-    if i==1
-    LcX_mX_mult = Lc*M(i);
-    LcX2_mX_mult = (Lc.^2)*M(i);
-    else
-    LcX_mX_mult = [LcX_mX_mult, Lc*M(i)];
-    LcX2_mX_mult = [LcX2_mX_mult, (Lc.^2)*M(i)];
-    end 
- end 
+% for i = 1:length(M)
+%     if i==1
+%     LcX_mX_mult = Lc*M(i);
+%     LcX2_mX_mult = (Lc.^2)*M(i);
+%     else
+%     LcX_mX_mult = [LcX_mX_mult, Lc*M(i)];
+%     LcX2_mX_mult = [LcX2_mX_mult, (Lc.^2)*M(i)];
+%     end 
+%  end 
 
-Dt = subs(Dt, LcX2_mX_mult,lcX_2_mX);
-
-Dt = subs(Dt, LcX_mX_mult ,lcX_mX);
-
+% Dt = subs(Dt, LcX2_mX_mult,lcX_2_mX);
+% 
+% Dt = subs(Dt, LcX_mX_mult ,lcX_mX);
+save('temp3.mat')
 
 
 %% Regressor Matrix Form
@@ -390,8 +419,11 @@ check(end+1:end+length(qdd)) = qdd;
 
 %% Lumping Parameters
 
+
+
+
 %finding the linear combinations
-%[Ys1, Ys2, Par1, Par2]=lumping_parameters_new(Y,Par);
+[Ys1, Ys2, Par1, Par2]=lumping_parameters_new(Y,Par);
 
 % %% Trajectory Optimization 
 % 
@@ -405,5 +437,5 @@ disp('Resulting Regressor Matrix: ')
 disp('Resulting Identifiable Parameters: ')
 %Par2
 
-%save('psm_new_dynamics.mat')
+save('psm_new_dynamics_lcg3.mat')
 end

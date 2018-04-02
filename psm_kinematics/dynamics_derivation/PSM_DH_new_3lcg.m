@@ -106,7 +106,9 @@ end
 % 
 
 %% Let's try a new Center of Mass 
-l_cg = sym('l_cg%d_%d', [11 3], 'real');
+num = 11;
+
+l_cg = sym('l_cg%d_%d', [num 3], 'real');
 
 map = [q1,q2,-q2,q2,0,q3,q4,q5,q6];
 for i = 1:length(l_cg)-2 
@@ -121,6 +123,7 @@ Tee_cg(:,:,2)= T(:,:,2)*DH(-p/2-beta+q2,l_cg(11,1),0,-p/2)*DH(0,0,map(6),0);
  p_cg(end+1,:) = Tee_cg(:,:,1)*transpose([l_cg(10,:),1]); %Pitch Counterweight 
  p_cg(end+1,:) = Tee_cg(:,:,2)*transpose([0,l_cg(11,2:3),1]); %Insertion Counterweight 
 
+ 
 %% Plot Joint Angles Test
 
 figure()
@@ -236,6 +239,14 @@ for i=1:1:length(Ixx)
 end
 
 
+%% Make Stuff Zero
+
+%Assume counterweight pitch goes to zero 
+M(10)=0;
+I(1:3,1:3,10) = zeros(3);
+l_cg(10,:) = zeros(1,3);
+
+%%
 for i=1:length(Jv_cg)
    %B(1:9,1:6,i)=M(i)*Jv(:,:,i)'*Jv(:,:,i)+Jw(:,:,i)'*I(1:3,1:3,i)*Jw(:,:,i);
    if (i==5)
@@ -314,11 +325,15 @@ for i=1:dof
 Psi(i,1)=diff(P_tog,Q(i));
 end
 
+
+
+
 %% Put together
 Dt=D*Qdd(1:dof)+C*Qd(1:dof)+Psi;
+
 Dt=simplify(Dt);
 
-% save('temp2.mat')
+save('l_cg_temp2.mat')
 %T=combine(T,'sincos');
 
 %Dt=collect(Dt,[Ixx,Ixy,Ixz,Iyy,Iyz,Izz, lc1, lc2, lc3, lc4, lc5, lc6, lc7, lc8, lc9,m1, m2, m3, m4, m5, m6, m7, m8, m9]);
@@ -331,8 +346,8 @@ Dt=collect(Dt,[Ixx,Ixy,Ixz,Iyy,Iyz,Izz,reshape(l_cg,[1,numel(l_cg)]),M]);
 %     X1_X1_mX(i) = sprintf('l%d_1_l%d_1_m%d',[i i i]);
 % end
 % 
-num = length(p_cg);
-lclcm = sym('lc%d_%d_lc%d_%d_m%d', [11 3 11 3 11]);
+
+lclcm = sym('lc%d_%d_lc%d_%d_m%d', [num 3 num 3 num]);
 lclcm_sym= sym(zeros(num,3,num,3,num));
 
 for i=1:num
@@ -353,7 +368,7 @@ for i=1:num
     end
 end
 
-lcm = sym('lc%d_%d_m%d', [11 3 11]);
+lcm = sym('lc%d_%d_m%d', [num 3 num]);
 lcm_sym= sym(zeros(num,3,num));
 
 for i=1:num
@@ -395,7 +410,7 @@ Dt = subs(Dt, lcm_sym,lcm);
 % Dt = subs(Dt, LcX2_mX_mult,lcX_2_mX);
 % 
 % Dt = subs(Dt, LcX_mX_mult ,lcX_mX);
-save('temp3.mat')
+save('l_cg_temp3.mat')
 
 
 %% Regressor Matrix Form

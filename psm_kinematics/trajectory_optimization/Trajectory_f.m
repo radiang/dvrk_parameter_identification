@@ -6,6 +6,8 @@ else
     plot_on = 0;
 end 
     
+%plot_on = 1;
+
 Q=[theta;
    dtheta];
 

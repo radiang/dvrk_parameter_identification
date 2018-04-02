@@ -1,13 +1,13 @@
 clear all 
 close all
 
+load('Brute_2.mat')
+
 data_max = 5;
 dof_max = 6;
 n= data_max*dof_max;
-%Initial Guess
-x0=0.1*ones(1,n);
-xv0=0.05*ones(1,n);
 
+%% limits
 limit_min(1)=-1.54; %rad
 limit_max(1)=1.54;
 limit_min(2)=-0.84; %rad
@@ -54,5 +54,37 @@ end
 end
 end
 
+%% Initial Guess
+
+%Chosen Trajectories
+% options=7;
+% for i=1:6
+% C(i,:)=linspace(limit_min(i),limit_max(i),options); 
+% end
+% 
+% for i=1:6
+% Cd(i,:)=linspace(velocity_min(1),velocity_max(1),options);
+%     if i==3
+%         Cd(i,:)=linspace(velocity_min(2),velocity_max(2),options);
+%     end
+% end
+% 
+% 
+% 
+% for dof = 1:dof_max
+% for data = 1:data_max
+% 
+%     
+% x0((dof-1)*data_max+data)=C(dof,randi(options));
+% xv0((dof-1)*data_max+data)=Cd(dof,randi(options));
+% 
+% end
+% end
+
+x0 = reshape(good(:,2:end)',1,[]);
+xv0 = reshape(goodv(:,2:end)',1,[]);
+
+%% Run fmincon
 [vars, Fin]=fmincon(@new_cond,[x0 xv0],A,b,Ae,be,lb,ub);
 
+save('Optimized_Brute_2.mat')

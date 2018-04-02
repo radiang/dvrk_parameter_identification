@@ -6,7 +6,7 @@ ts=0.1;
 g=9.8;
 par_num=length(Par2);
 dof_num = 6;
-point_num=7;
+point_num=5;
 
 %Joint Limits
 limit_min(1)=-1.54; %rad
@@ -49,7 +49,7 @@ Conf=zeros(1,length(B));
 
 
 
-for j=1:20
+for j=1:50
 
 for dof=1:dof_num
 array = [0];
@@ -65,6 +65,8 @@ rd(n) = Cd(dof,temp);
 array(n+1) = r(n);
 array_v(n+1) = rd(n);
 end
+save_array(dof,:,j)=array(:);
+save_arrayv(dof,:,j)=array_v(:);
 
 [Q(dof,:),Qd(dof,:),Qdd(dof,:),T]=Trajectory_f(array,array_v,tf,ts);
 
@@ -115,11 +117,14 @@ qdd6=Qdd(6,i);
 end
 
 
-save_array(j,:)=array(:);
-save_arrayv(j,:)=array_v(:);
-
 
 Cond(j)=cond(W,2);
 Condf(j)=cond(W'*W,'fro');
 
 end 
+
+[x ind]=min(Cond(1:50))
+good =save_array(:,:,ind)
+goodv = save_arrayv(:,:,ind)
+
+save('Brute_2.mat')

@@ -2,8 +2,8 @@ function [Cond]=new_cond(x)
 
 load('Ys2.mat');
 
-ts=0.5;
-tf=ts*(10-1);
+ts=0.1;
+tf=2;
 t=0:ts:tf;
 %r=length(Q)-1;
 

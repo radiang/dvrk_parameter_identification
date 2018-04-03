@@ -15,7 +15,8 @@ Tau = [tau1 tau2 tau3 tau4 tau5 tau6]';
 M=[m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11];
 Lc=[lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9];
 
-filename='lcg3_inplane_lumped6to11';
+
+filename='data/lcg3_inplane_lumped6to2';
 
 
 %% Options 

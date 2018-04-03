@@ -16,12 +16,12 @@ M=[m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11];
 Lc=[lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9];
 
 
-filename='data/lcg3_inplane_lumped6to2';
+filename='data/lcg3_inplane_1to3';
 
 
 %% Options 
 %Degrees of Freedom of robot
-dof = 6; 
+dof = 3; 
 
 %calculate dynamics?? 
 dynamic = 1;
@@ -131,10 +131,6 @@ end
 
 %% Make Stuff Zero
 
-%Assume counterweight pitch goes to zero 
-M(10)=0;
-I(1:3,1:3,10) = zeros(3);
-l_cg(10,:) = zeros(1,4);
 
 % M(11)=0;
 % I(1:3,1:3,11) = zeros(3);
@@ -145,11 +141,11 @@ l_cg(1,1) = 0;
 l_cg(2,3) = 0;
 l_cg(3,3) = 0;
 l_cg(4,3) = 0;
-%l_cg(6,2) = 0;
+l_cg(6,2) = 0;
 %l_cg(7,1) = 0;
 %l_cg(8,3) = 0;
-l_cg(9,2) = 0;
-%l_cg(11,2) = 0;
+%l_cg(9,2) = 0;
+l_cg(11,2) = 0;
 
 %Lump Gripper stuff 
 M(7)=0;
@@ -161,13 +157,23 @@ I(1:3,1:3,8) = zeros(3);
 l_cg(8,:) = zeros(1,4);
 
 %Lump More Stuff
-M(6)=0;
-I(1:3,1:3,6) = zeros(3);
-l_cg(6,:) = zeros(1,4);
+% M(6)=0;
+% I(1:3,1:3,6) = zeros(3);
+% l_cg(6,:) = zeros(1,4);
 
-M(11)=0;
-I(1:3,1:3,11) = zeros(3);
-l_cg(11,:) = zeros(1,4);
+M(9)=0;
+I(1:3,1:3,9) = zeros(3);
+l_cg(9,:) = zeros(1,4);
+
+
+%Assume counterweight pitch goes to zero 
+M(10)=0;
+I(1:3,1:3,10) = zeros(3);
+l_cg(10,:) = zeros(1,4);
+
+% M(11)=0;
+% I(1:3,1:3,11) = zeros(3);
+% l_cg(11,:) = zeros(1,4);
 
 %In Axis Masses
 % l_cg(1,3) = 0;
@@ -180,7 +186,7 @@ l_cg(11,:) = zeros(1,4);
 % l_cg(7,3) = 0;
 % l_cg(8,2:3) = 0;
 % l_cg(9,2:3) = 0;
-% l_cg(11,1:2) = 0;
+%l_cg(11,1:2) = 0;
 
 
 %% Let's try a new Center of Mass 
@@ -320,7 +326,7 @@ for i=1:length(Jv_cg)
 end
 
 D = zeros(dof);
-for i=1:(dof+5)
+for i=1:(11)
     D = D + B(1:dof,1:dof,i);
 end 
 
@@ -388,7 +394,7 @@ end
 
 
 %% Put together
-Dt=D*Qdd(1:dof)+C*Qd(1:dof)+Psi;
+Dt=D(1:dof,1:dof)*Qdd(1:dof)+C(1:dof,1:dof)*Qd(1:dof)+Psi(1:dof,:);
 
 Dt=simplify(Dt);
 
@@ -494,9 +500,13 @@ check(end+1:end+length(qdd)) = qdd;
 [Y, tau]=equationsToMatrix(Dt == Tau(1:dof), Par);
 
 %% Lumping Parameters
+cond_ys2=100000;
+ old = cond_ys2;
+while cond_ys2>200
+    
 
 %finding the linear combinations
-[Ys1, Ys2, Par1, Par2, cond_ys2]=lumping_parameters_new(Y,Par);
+[Ys1, Ys2, Par1, Par2, cond_ys2, W]=lumping_parameters_new(Y,Par,dof);
 
 % %% Trajectory Optimization 
 % 
@@ -509,10 +519,16 @@ disp('Resulting Regressor Matrix: ')
 
 disp('Resulting Identifiable Parameters: ')
 length(Par2)
-
+if old>cond_ys2
 temp=strcat(filename,'_all.mat');
 save(temp)
 
 temp2=strcat(filename,'_Y.mat');
 save(temp2,'Ys2','Par2','Q','Qd','Qdd')
+ old = cond_ys2;
+end
+end
+
+
+
 end

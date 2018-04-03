@@ -1,4 +1,10 @@
-function [Ys1, Ys2, Par1, Par2,Cond]=lumping_parameters_new(Y, Par)
+function [Ys1, Ys2, Par1, Par2,Cond, W]=lumping_parameters_new(Y, Par,dof_num)
+ syms q1 q2 q3 q4 q5 q6 qd1 qd2 qd3 qd4 qd5 qd6  qdd1 qdd2 qdd3 qdd4 qdd5 qdd6
+ 
+q   = [q1 q2 q3 q4 q5 q6];
+qd  = [qd1 qd2 qd3 qd4 qd5 qd6];
+qdd = [qdd1 qdd2 qdd3 qdd4 qdd5 qdd6];
+
 Yn=Y;
 
 q_num = rand(1,length(symvar(Y)));
@@ -19,7 +25,7 @@ for i=1:length(Yn)
     A=Yn(:,i);
     for j=i+1:length(Yn)
         B=Yn(:,j);
-       if sum(A==B)== 6
+       if sum(A==B)== dof_num
            if ~any(dep(2,:)==j)
              dep(1,flag)=i;
              dep(2,flag)=j;
@@ -87,7 +93,7 @@ tf=2;
 ts=0.1;
 g=9.8;
 par_num=length(Par1);
-dof_num = 6;
+
 point_num=5;
 
 %Joint Limits
@@ -111,7 +117,7 @@ velocity_min(2)= -0.06;
 velocity_max(2)= 0.06; %m/s
 
 %Chosen Trajectories
-options=7;
+options=15;
 for i=1:6
 C(i,:)=linspace(limit_min(i),limit_max(i),options); 
 end
@@ -130,9 +136,10 @@ array_v = [0];
 for n = 1:point_num
     
 temp = randi(options);
+temp2 = randi(options);
    
 r(n) = C(dof,temp);
-rd(n) = Cd(dof,temp);
+rd(n) = Cd(dof,temp2);
 
 array(n+1) = r(n);
 array_v(n+1) = rd(n);
@@ -147,33 +154,20 @@ end
 
 
 %Enlarge the matrix with random numbers
-W=zeros(2*length(Q),par_num);
+W=zeros(dof_num*length(Q),par_num);
+xx=zeros(1,dof_num);
+xxd = zeros(1,dof_num);
+xxdd = zeros(1,dof_num);
 
 for i=1:length(Q(1,:))
- q1=Q(1,i);
-q2=Q(2,i);
-q3=Q(3,i);
-q4=Q(4,i);
-q5=Q(5,i);
-q6=Q(6,i);
+    for j = 1:dof_num
+        xx(1,j)=Q(j,i);
+        xxd(1,j)=Qd(j,i);
+        xxdd(1,j)=Qdd(j,i);
+    end
 
+W(1+(i-1)*dof_num:dof_num+(i-1)*dof_num,:)=double(subs(Ys1,[q(1:dof_num), qd(1:dof_num), qdd(1:dof_num)],[xx(1,:),xxd(1,:),xxdd(1,:)]));
 
-qd1=Qd(1,i);
-qd2=Qd(2,i);
-qd3=Qd(3,i);
-qd4=Qd(4,i);
-qd5=Qd(5,i);
-qd6=Qd(6,i);
-
-qdd1=Qdd(1,i);
-qdd2=Qdd(2,i);
-qdd3=Qdd(3,i);
-qdd4=Qdd(4,i);
-qdd5=Qdd(5,i);
-qdd6=Qdd(6,i);
-
-
-W(1+(i-1)*6:6+(i-1)*6,:)=double(subs(Ys1,symvar(Ys1),[q1,q2,q3,q4,q5,q6,qd1,qd2,qd3,qd4,qd5,qd6,qdd1,qdd2,qdd3,qdd4,qdd5,qdd6]));
 end
 
 for i = 1:size(W,2)
@@ -182,6 +176,7 @@ end
 beta = sym(beta, 'real');
 % Recursive Lumping based on Null 
 Par2=Par1;
+Par_temp=Par1;
 Ys2=Ys1;
 [y, A]=null_find(W);
 
@@ -213,13 +208,17 @@ W(:,m(2))=[];
 Ys2(:,m(1))=Ys2(:,m(1))+Ys2(:,m(2));
 Ys2(:,m(2))=[]; 
 
-Par2(m(1))=Par2(m(1))+beta(counter)*Par(m(2));
+Par2(m(1))=Par2(m(1))+beta(counter)*Par2(m(2));
 Par2(m(2))=[];
 
 counter=counter+1;
 
+% Par_temp=[];
+% Par_temp=Par2;
+
 y=[]; 
 [y, A]=null_find(W);
+
 end
 
 [null, nullA]=null_find(W)

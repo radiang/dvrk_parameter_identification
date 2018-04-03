@@ -15,7 +15,7 @@ Tau = [tau1 tau2 tau3 tau4 tau5 tau6]';
 M=[m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11];
 Lc=[lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9];
 
-filename='lcg3_xxxx';
+filename='lcg3_inplane_lumped6to11';
 
 
 %% Options 
@@ -112,6 +112,7 @@ end
 num = 11;
 
 l_cg = sym('l_cg%d_%d', [num 3], 'real');
+l_cg = [l_cg,ones(num,1)];
 %Inertia Matrix notation
 Ixx = sym('I%d_xx', [11 1],'real');
 Iyy = sym('I%d_yy', [11 1],'real');
@@ -132,22 +133,40 @@ end
 %Assume counterweight pitch goes to zero 
 M(10)=0;
 I(1:3,1:3,10) = zeros(3);
-l_cg(10,:) = zeros(1,3);
+l_cg(10,:) = zeros(1,4);
 
 % M(11)=0;
 % I(1:3,1:3,11) = zeros(3);
 % l_cg(11,:) = zeros(1,3);
 
 %In Plane Masses
-% l_cg(1,1) = 0;
-% l_cg(2,3) = 0;
-% l_cg(3,3) = 0;
-% l_cg(4,3) = 0;
-% l_cg(6,2) = 0;
-% l_cg(7,1) = 0;
-% l_cg(8,3) = 0;
-% l_cg(9,2) = 0;
-% l_cg(11,2) = 0;
+l_cg(1,1) = 0;
+l_cg(2,3) = 0;
+l_cg(3,3) = 0;
+l_cg(4,3) = 0;
+%l_cg(6,2) = 0;
+%l_cg(7,1) = 0;
+%l_cg(8,3) = 0;
+l_cg(9,2) = 0;
+%l_cg(11,2) = 0;
+
+%Lump Gripper stuff 
+M(7)=0;
+I(1:3,1:3,7) = zeros(3);
+l_cg(7,:) = zeros(1,4);
+
+M(8)=0;
+I(1:3,1:3,8) = zeros(3);
+l_cg(8,:) = zeros(1,4);
+
+%Lump More Stuff
+M(6)=0;
+I(1:3,1:3,6) = zeros(3);
+l_cg(6,:) = zeros(1,4);
+
+M(11)=0;
+I(1:3,1:3,11) = zeros(3);
+l_cg(11,:) = zeros(1,4);
 
 %In Axis Masses
 % l_cg(1,3) = 0;
@@ -163,13 +182,12 @@ l_cg(10,:) = zeros(1,3);
 % l_cg(11,1:2) = 0;
 
 
-
-
 %% Let's try a new Center of Mass 
+
 map = [q1,q2,-q2,q2,0,q3,q4,q5,q6];
 %INPLANE
 for i = 1:length(l_cg)-2 
-p_cg(i,:)  = T(:,:,i)*DH(map(i),0,0,0)*transpose([l_cg(i,:), 1]);
+p_cg(i,:)  = T(:,:,i)*DH(map(i),0,0,0)*transpose(l_cg(i,:));
 end 
 
 %INAXIS
@@ -178,12 +196,11 @@ end
 % end 
 
 counter_num = 2;
-
 Tee_cg(:,:,1)= T(:,:,2)*DH(map(2),0,0,0);
 Tee_cg(:,:,2)= T(:,:,2)*DH(-p/2-beta+q2,l_cg(11,1),0,-p/2)*DH(0,0,map(6),0);
 
- p_cg(end+1,:) = Tee_cg(:,:,1)*transpose([l_cg(10,:),1]); %Pitch Counterweight 
- p_cg(end+1,:) = Tee_cg(:,:,2)*transpose([l_cg(11,1:3),1]); %Insertion Counterweight 
+ p_cg(end+1,:) = Tee_cg(:,:,1)*transpose(l_cg(10,:)); %Pitch Counterweight 
+ p_cg(end+1,:) = Tee_cg(:,:,2)*transpose(l_cg(11,:)); %Insertion Counterweight 
 
  
 %% Plot Joint Angles Test

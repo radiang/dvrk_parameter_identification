@@ -16,7 +16,7 @@ M=[m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11];
 Lc=[lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9];
 
 
-filename='data/lcg3_inplane_1to3';
+filename='data/lcg3_inplane_1to3_try5';
 
 
 %% Options 

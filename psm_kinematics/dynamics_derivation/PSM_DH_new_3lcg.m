@@ -16,7 +16,7 @@ M=[m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11];
 Lc=[lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9];
 
 
-filename='data/lcg3_inplane_1to3_try5';
+filename='data/3dof_inplanepitch_svd';
 
 
 %% Options 
@@ -28,6 +28,8 @@ dynamic = 1;
 
 %Gravity 
 g =9.8; %m/s^2
+
+%% Try Plotting to check transformations
 %Joint Angles
 q_n = [0, .5, .02, 0, 0, 0];  %Put your numeric values here
 
@@ -147,6 +149,9 @@ l_cg(6,2) = 0;
 %l_cg(9,2) = 0;
 l_cg(11,2) = 0;
 
+
+l_cg(6,1)=0;
+l_cg(1,2)=0;
 %Lump Gripper stuff 
 M(7)=0;
 I(1:3,1:3,7) = zeros(3);
@@ -176,17 +181,17 @@ l_cg(10,:) = zeros(1,4);
 % l_cg(11,:) = zeros(1,4);
 
 %In Axis Masses
-% l_cg(1,3) = 0;
-% l_cg(1,2) = d(2);
-% l_cg(2,2:3) = 0;
-% l_cg(3,2:3) = 0;
-% l_cg(4,2:3) = 0;
-% l_cg(6,1:2) = 0;
-% l_cg(7,1) = 0;
-% l_cg(7,3) = 0;
-% l_cg(8,2:3) = 0;
-% l_cg(9,2:3) = 0;
-%l_cg(11,1:2) = 0;
+%  l_cg(1,3) = 0;
+%  l_cg(1,2) = d(2)/2;
+%  l_cg(2,2:3) = 0;
+%  l_cg(3,2:3) = 0;
+%  l_cg(4,2:3) = 0;
+%  l_cg(6,1:2) = 0;
+%  l_cg(7,1) = 0; 
+%  l_cg(7,3) = 0; 
+%  l_cg(8,2:3) = 0;
+%  l_cg(9,2:3) = 0;
+% l_cg(11,1:2) = 0;
 
 
 %% Let's try a new Center of Mass 
@@ -197,9 +202,9 @@ for i = 1:length(l_cg)-2
 p_cg(i,:)  = T(:,:,i)*DH(map(i),0,0,0)*transpose(l_cg(i,:));
 end 
 
-%INAXIS
+% INAXIS
 % for i = 1:length(l_cg)-2 
-% p_cg(i,:)  = T(:,:,i+1)*transpose([l_cg(i,:), 1]);
+% p_cg(i,:)  = T(:,:,i+1)*transpose([l_cg(i,:)]);
 % end 
 
 counter_num = 2;
@@ -327,7 +332,11 @@ end
 
 D = zeros(dof);
 for i=1:(11)
+    if 6<i&&i<10 %%%DONT FORGET THIS RADIAN, turning off wrist dynamics
+        boo=0;
+    else
     D = D + B(1:dof,1:dof,i);
+    end
 end 
 
 
@@ -390,12 +399,28 @@ for i=1:dof
 Psi(i,1)=diff(P_tog,Q(i));
 end
 
+%% Frictiones 
+Fv=sym('Fv_%d',[6 1],'real');
+Fvl=sym('Fvl_%d%d',[2 2],'real');
 
+M_Fv = diag(Fv);
+M_Fv(5:6,5:6)=Fvl;
 
+Fs = sym('Fs_%d',[6 1],'real');
+M_Fs = diag(Fs);
+
+Ke = sym('Ke_%d',[6 1], 'real');
+
+M_Ke = diag(Ke);
+M_Ke(3,3)= 0;
+M_Ke(5,5)= 0;
+M_Ke(6,6)= 0;
 
 %% Put together
+
 Dt=D(1:dof,1:dof)*Qdd(1:dof)+C(1:dof,1:dof)*Qd(1:dof)+Psi(1:dof,:);
 
+Dt=Dt-M_Fv(1:dof,1:dof)*Qd(1:dof)-M_Fs(1:dof,1:dof)*sign(Qd(1:dof))-M_Ke(1:dof,1:dof)*Q(1:dof);
 Dt=simplify(Dt);
 
 temp=strcat(filename,'_temp_sim.mat');
@@ -403,7 +428,7 @@ save(temp);
 %T=combine(T,'sincos');
 
 %Dt=collect(Dt,[Ixx,Ixy,Ixz,Iyy,Iyz,Izz, lc1, lc2, lc3, lc4, lc5, lc6, lc7, lc8, lc9,m1, m2, m3, m4, m5, m6, m7, m8, m9]);
-Dt=collect(Dt,[Ixx,Ixy,Ixz,Iyy,Iyz,Izz,reshape(l_cg,[1,numel(l_cg)]),M]);
+Dt=collect(Dt,[Ixx,Ixy,Ixz,Iyy,Iyz,Izz,reshape(l_cg,[1,numel(l_cg)]),M,Fv,reshape(Fvl,1,[]),Fs,Ke]);
 
 % for i=1:length(p_cg)
 %     X1_X2_mX(i) = sprintf('l%d_1_l%d_2_m%d',[i i i]);
@@ -479,6 +504,9 @@ Dt = subs(Dt, lcm_sym,lcm);
 temp=strcat(filename,'_temp_subs.mat');
 save(temp)
 
+if dof<6
+Dt = subs(Dt, q(dof+1:6),zeros(1,6-dof));
+end
 
 %% Regressor Matrix Form
 Par=symvar(Dt);
@@ -506,8 +534,8 @@ while cond_ys2>200
     
 
 %finding the linear combinations
-[Ys1, Ys2, Par1, Par2, cond_ys2, W]=lumping_parameters_new(Y,Par,dof);
-
+%[Ys1, Ys2, Par1, Par2, cond_ys2, W]=lumping_parameters_new(Y,Par,dof);
+[Ys2,Par2,cond_ys2,W]=svd_reduction(Y,Par,dof);
 % %% Trajectory Optimization 
 % 
 % [x, v, cond_save]=traj_opt_rand(Ys2,size(Ys2,2));

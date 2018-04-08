@@ -117,7 +117,7 @@ velocity_min(2)= -0.06;
 velocity_max(2)= 0.06; %m/s
 
 %Chosen Trajectories
-options=15;
+options=7;
 for i=1:6
 C(i,:)=linspace(limit_min(i),limit_max(i),options); 
 end
@@ -202,10 +202,10 @@ end
 m=[y(x(1),j,i) y(x(2),j,i)];
 sort(m)
 
-W(:,m(1))=W(:,m(1))+W(:,m(2));
+%W(:,m(1))=W(:,m(1))+W(:,m(2)); Old and depreciated, its wrong
 W(:,m(2))=[]; 
 
-Ys2(:,m(1))=Ys2(:,m(1))+Ys2(:,m(2));
+%Ys2(:,m(1))=Ys2(:,m(1))+Ys2(:,m(2)); wrong also
 Ys2(:,m(2))=[]; 
 
 Par2(m(1))=Par2(m(1))+beta(counter)*Par2(m(2));

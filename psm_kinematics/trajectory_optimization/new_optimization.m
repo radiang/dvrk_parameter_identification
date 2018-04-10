@@ -1,7 +1,9 @@
 clear all 
 close all
 
-load('data/3dof_inplanepitch_svd_try2_trajectory.mat')
+filename = '3dof_inplanepitch_svd_try2';
+loadname = strcat('data/',filename,'_trajectory.mat');
+load(loadname)
 
 %global Y dof_max n
 Y=Ys2;
@@ -91,8 +93,15 @@ xv0 = reshape(best_vel(:,2:end)',1,[]);
 
 %% Run fmincon
 fun = @(z) new_cond(z,Ys2,n,dof_max,transpose(Q),transpose(Qd),transpose(Qdd));
+
+options = optimoptions('fmincon','MaxIterations',6000);
 [vars, Fin]=fmincon(fun,[x0, xv0],A,b,Ae,be,lb,ub);
 
+
+%% Save
+
+savename = strcat('data/',filename,'_optimized.mat');
+save(savename)
 %g=10;
 %fun = @(x) try_cond(x,g);
 

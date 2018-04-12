@@ -100,6 +100,9 @@ options = optimoptions('fmincon','MaxIterations',6000);
 
 %% Save
 
+traj_p= reshape(vars(1:end/2),dof_max,[]);
+traj_v= reshape(vars((end/2+1):end),dof_max,[]);
+
 savename = strcat('data/',filename,'_optimized.mat');
 save(savename)
 %g=10;

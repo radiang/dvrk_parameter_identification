@@ -13,7 +13,7 @@ qdt = diff(qt,t);
 qddt = diff(qdt,t);
 
 %% Options
-debug = 1;
+debug = 0;
 
 %% Jacobian End Effector and it's Derivative
 J_end_t = subs(J_end, symvar(J_end), qt);
@@ -133,7 +133,7 @@ Psi_t = subs(Psi, [q, qd, qdd], [qt, qdt, qddt]);
 
 %Fill up Inertias and Masses (From Solidworks)
 m_num = 0.5*ones(1,11);
-lc_num = 0.01 *ones(1,9);
+lc_num = 0.02 *ones(1,9);
 Ic_num = 0.01 * ones(1,11*6);
 l_cg_num = 0.02*ones(1,numel(l_cg));
 
@@ -171,9 +171,9 @@ Xd = sym('Xd_%d',[3 1]);
 
 % Set up Controllers
 Md = eye(3);
-Kd = eye(3);
-Kp = eye(3);
-Cf = eye(3);
+Kd = 30*eye(3);
+Kp = 100*eye(3);
+Cf = 40*eye(3);
 Ci = eye(3);
 
 
@@ -196,29 +196,76 @@ save('temp2.mat');
 
 if (debug==0)
 %% Make ODE Function 
-qd0 = [0 ;0 ;0;0;0;0];
+qd0 = [0.1 ;0.1 ;0.1;0;0;0];
 q0 = [0 ;0 ;0.1;0;0;0];
 
 x0n = double(subs(T(1:3,4,11), q, q0.'));
-xd = [0 0.1 0]'-x0n;
-fd = [0, 0, 0]';
+xdn = [0 0.1 0]'+x0n;
+fd = [0.1, 0, 0]';
 
-u = subs(u,[Fd.', Xd.', X0.'], [fd.',xd.',x0n.']);
+u = subs(u,[Fd.', Xd.', X0.'], [fd.',xdn.',x0n.']);
+dyn_eqn=u-eqn;
 
-dyn_eqn = eqn==u;
-[eqs,vars] = reduceDifferentialOrder(dyn_eqn,[q1t,q2t,q3t]);
+dyn_eqn=simplify(dyn_eqn);
+%dyn_eqn = eqn==u;
+
+[eqs,vars] = reduceDifferentialOrder(dyn_eqn==0,[q1t,q2t,q3t]);
 [M,F] = massMatrixForm(eqs,vars);
 
+% 
+% F = vpa(F,2);
+% M = vpa(M,2);
 
-F = vpa(F,2);
-M = vpa(M,2);
-
-%F=simplify(F);
+F=simplify(F);
+M=simplify(M);
 %f = M\F;
 
 Mfun = odeFunction(M,vars,'File','myfileM','Comments','Version: 1.1');
 Ffun = odeFunction(F,vars,'File','myfileF','Comments','Version: 1.1');
-opt = odeset('mass', Mfun, 'InitialSlope', qd0);
+opt = odeset('mass', Mfun, 'InitialSlope', qd0(1:3));
 
-ode45(Ffun, [0 7], q0, opt)
+[time, q_out] = ode45(Ffun, [0 7], [q0(1:3);qd0(1:3)], opt);
+
+
+%% Plot Output
+beg = 1;
+ends = length(q_out);
+
+T_out = subs(T(1:3,4,11),[q4 q5 q6],[0 0 0]);
+
+for i = beg:ends
+        %output(1:3,i)=subs(T(1:3,4,11),[q1 q2 q3 q4 q5 q6],[q_out(i,1:3) 0 0 0]);
+        q1 = q_out(i,1);
+        q2 = q_out(i,2);
+        q3 = q_out(i,3);
+        
+        output(1,i)=               0.15*sin(q2 - 0.29) + 0.043*cos(q2) - 0.15*sin(q2) - 1.0*q3*sin(q2) + 0.49;
+        output(2,i)=-2.0e-4*sin(q1)*(744.0*cos(q2) - 755.0*cos(q2 - 0.29) + 222.0*sin(q2) + 5.0e3*q3*cos(q2));
+        output(3,i)=          1.3e-5*cos(q1)*sin(q2) - 3.7e-3*cos(q1)*cos(q2) - 1.0*q3*cos(q1)*cos(q2) + 0.15;
+ 
+%         scatter3(output(1),output(2),output(3));
+%         marker_id = sprintf('%d',i);
+        %text(output(1),output(2),output(3),marker_id);     
+        hold on
+end
+
+
+figure()
+        scatter3(output(1,beg:ends),output(2,beg:ends),output(3,beg:ends));
+        line(output(1,beg:ends),output(2,beg:ends),output(3,beg:ends));
+        hold on
+%         
+        scatter3(output(1,beg),output(2,beg),output(3,beg),'r');     
+        hold on
+%         output(1:3)=subs(T(1:3,4,11),[q1 q2 q3 q4 q5 q6],[q_out(end,1:3) 0 0 0]);
+%         scatter3(output(1),output(2),output(3));
+%         marker_id = sprintf('%d',i);
+%         text(output(1),output(2),output(3),marker_id);     
+%         hold on
+
+title('Plot PSM Force output');
+xlabel('x');
+ylabel('y');
+zlabel('z');
+
 end

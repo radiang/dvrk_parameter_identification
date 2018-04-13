@@ -6,14 +6,14 @@ filename='3dof_inplanepitch_svd';
 loadname = strcat('data/',filename,'_all.mat');
 load(loadname);
 
-syms  q1t(t) q2t(t) q3t(t) q4t(t) q5t(t) q6t(t) 
+syms  q1t(t) q2t(t) q3t(t) q4t(t) q5t(t) q6t(t)
 
 qt = [q1t(t) q2t(t) q3t(t) 0 0 0];
 qdt = diff(qt,t);
 qddt = diff(qdt,t);
 
 %% Options
-debug = 1;
+debug = 0;
 
 %% Jacobian End Effector and it's Derivative
 J_end_t = subs(J_end, symvar(J_end), qt);
@@ -29,7 +29,7 @@ J3_diff = subs(J3_diff, q3t, Q(3));
 
 
 %% Check Jacobian in plot 
-q_n = [0, p/4, .1, 0, 0, 0];
+q_n = [0, 0, 0, 0, 0, 0];
 
 J3_num = subs(J_end_t(1:6,1:3),q1t,q_n(1));
 J3_num = subs(J3_num,q2t,q_n(2));
@@ -74,8 +74,8 @@ plot3([xd(1),T_num(1,4,11)],[xd(2),T_num(2,4,11)],[xd(3),T_num(3,4,11)],'b');
 
 
 title('Plot transform Frames');
-xlabel('x');
-ylabel('y');
+xlabel('y');
+ylabel('x');
 zlabel('z');
 s=1;
 xlim([-s/2 s])
@@ -111,6 +111,7 @@ zlim([-s/2 s])
 Mt3 = subs(Mt(1:3,1:3),[transpose(Q(4:6))], [0 0 0]);
 Nu3 = subs(Nu(1:3,1),[transpose(Q(4:6)),transpose(Qd(4:6))],[0, 0, 0, 0, 0, 0]);
 %% Generate Ccode
+% 
 % stringname = strcat('ccode/',filename,'_J_ccode.c');
 % ccode(J3,'File',stringname,'Comments','V1.2');
 % 
@@ -125,6 +126,10 @@ Nu3 = subs(Nu(1:3,1),[transpose(Q(4:6)),transpose(Qd(4:6))],[0, 0, 0, 0, 0, 0]);
 % 
 % stringname = strcat('ccode/',filename,'_Ys2_ccode.c');
 % ccode(Ys2,'File',stringname,'Comments','V1.2');
+
+
+
+if (debug==0)
 %% Substitute to continuous time
 D_t = subs(D, [q, qd, qdd], [qt, qdt, qddt]);
 C_t = subs(C, [q, qd, qdd], [qt, qdt, qddt]);
@@ -136,38 +141,35 @@ m_num = 0.5*ones(1,11);
 lc_num = 0.01 *ones(1,9);
 Ic_num = 0.01 * ones(1,11*6);
 l_cg_num = 0.02*ones(1,numel(l_cg));
+% 
+% eqn = D_t(1:3,1:3) * qddt(1:3)' + C_t(1:3,1:3)*qdt(1:3)'+ Psi_t(1:3);
+% temp = symvar(eqn);
+% 
+% D_t = subs(D_t, [transpose(Ixx), transpose(Ixy), transpose(Ixz), transpose(Iyy), transpose(Iyz), transpose(Izz),Lc, M ] ,[Ic_num, lc_num, m_num]);
+% C_t = subs(C_t, [transpose(Ixx), transpose(Ixy), transpose(Ixz), transpose(Iyy), transpose(Iyz), transpose(Izz),Lc, M ] ,[Ic_num, lc_num, m_num]);
+% Psi_t = subs(Psi_t, [transpose(Ixx), transpose(Ixy), transpose(Ixz), transpose(Iyy), transpose(Iyz), transpose(Izz),Lc, M ] ,[Ic_num, lc_num, m_num]);
+% 
+% %eqn = D_t(1:3,1:3) * qddt(1:3)' + C_t(1:3,1:3)*qdt(1:3)'+ Psi_t(1:3);
+% 
+% eqn = D_t(1:3,1:3) * qddt(1:3)';
 
-%eqn = D_t(1:3,1:3) * qddt(1:3)' + C_t(1:3,1:3)*qdt(1:3)'+ Psi_t(1:3);
-%temp = symvar(eqn);
+D_m = subs(D, [reshape(l_cg,1,[]),transpose(Ixx), transpose(Ixy), transpose(Ixz), transpose(Iyy), transpose(Iyz), transpose(Izz),Lc, M ] ,[l_cg_num,Ic_num, lc_num, m_num]);
 
-
-D_t = subs(D_t, [reshape(l_cg,1,[]),transpose(Ixx), transpose(Ixy), transpose(Ixz), transpose(Iyy), transpose(Iyz), transpose(Izz),Lc, M ] ,[l_cg_num, Ic_num, lc_num, m_num]);
-C_t = subs(C_t, [reshape(l_cg,1,[]),transpose(Ixx), transpose(Ixy), transpose(Ixz), transpose(Iyy), transpose(Iyz), transpose(Izz),Lc, M ] ,[l_cg_num, Ic_num, lc_num, m_num]);
-Psi_t = subs(Psi_t, [reshape(l_cg,1,[]),transpose(Ixx), transpose(Ixy), transpose(Ixz), transpose(Iyy), transpose(Iyz), transpose(Izz),Lc, M ] ,[l_cg_num, Ic_num, lc_num, m_num]);
-
-%eqn = D_t(1:3,1:3) * qddt(1:3)' + C_t(1:3,1:3)*qdt(1:3)'+ Psi_t(1:3);
-
-eqn = D_t(1:3,1:3) * transpose(qddt(1:3));
-
-xe = subs(T(1:3,4,11), q, qt);
-xe_d = diff(xe,t);
 
 
 %% Force Controller in x || R^3
-
+clear saveu
+clear save
 
 %Set up Environment
 %Initial Condition
-
+x0 = double(subs(T(1:3,4,11), q, [0 0 0.1 0 0 0]));
+xe_d0=[0, 0 , 0].';
 
 %Elastic Modulus of Object [N/m]
 K = 10000; 
 
-%Desired Set Position
-syms xd fd
-X0 = sym('x0_%d',[3 1]);
-Fd = sym('Fd_%d',[3 1]);
-Xd = sym('Xd_%d',[3 1]);
+
 
 % Set up Controllers
 Md = eye(3);
@@ -176,49 +178,81 @@ Kp = eye(3);
 Cf = eye(3);
 Ci = eye(3);
 
-
-fe = sym(zeros(3,1));
 %elastic forces in object 
-fe(1) = K*(xe(1) - X0(1));
 
-fe = simplify(fe);
 he=0; %<This is also elastic force weird mann
 %equation 9.30 
 
-xd = Xd -X0;
-xf=Cf*(Fd-fe);
 
-y = inv(J_end_t(1:3,1:3)) * inv(Md)*(-Kd*xe_d + Kp *(xd-xe + xf) - Md*J_diff_t(1:3,1:3)*qdt(1:3)');
-y=simplify(y);
-u = D_t(1:3,1:3) * y + J_end_t(1:3,1:3)'*fe;
-u = simplify(u);
-save('temp2.mat');
 
-if (debug==0)
-%% Make ODE Function 
-qd0 = [0 ;0 ;0;0;0;0];
-q0 = [0 ;0 ;0.1;0;0;0];
 
-x0n = double(subs(T(1:3,4,11), q, q0.'));
-xd = [0 0.1 0]'-x0n;
+% y = inv(J_end_t(1:3,1:3)) * inv(Md)*(-Kd*xe_d + Kp *(xd-xe + xf) - Md*J_diff_t(1:3,1:3)*qdt(1:3)');
+% u = D_t(1:3,1:3) * y + J_end_t(1:3,1:3)'*fe;
+
+
+
+
+xe = x0;
+qn = [0,0,0].';
+qnv = [0,0,0].';
+xe_d = subs(J3(1:3,1:3),symvar(J3),qn.')*qn;
+fe = [0,0,0].';
+
+
+%Desired Set Position
+xd = [0.00 0.01 0.00]'+x0;
 fd = [0, 0, 0]';
+save(:,1)=x0;
+saveu(:,1)=zeros(3,1);
+%% Test Loop
+for i=1:20
 
-u = subs(u,[Fd.', Xd.', X0.'], [fd.',xd.',x0n.']);
+%fe(1) = K*(xe(1) - x0(1));
+xf=Cf*(fd-fe);
+y = inv(J3(1:3,1:3)) * inv(Md)*(-Kd*xe_d + Kp *(xd-xe + xf) - Md*J3_diff(1:3,1:3)*qnv(1:3));
+u = D_m(1:3,1:3) * y + J3(1:3,1:3)'*fe;
 
-dyn_eqn = eqn==u;
-[eqs,vars] = reduceDifferentialOrder(dyn_eqn,[q1t,q2t,q3t]);
-[M,F] = massMatrixForm(eqs,vars);
+u = double(subs(u,[q(1:3) qd(1:3)], [qn.' qnv.']));
+
+scale = 0.01;
+qn=scale*u+qn;
+qnv=scale/4*u+qnv;
+
+xe = double(subs(T(1:3,4,11), q, [qn.' 0 0 0]));
+xe_d = double(subs(J3(1:3,1:3),symvar(J3),qn.')*qn);
+
+save(:,end+1)=xe;
+saveu(:,end+1)=u;
+end
 
 
-F = vpa(F,2);
-M = vpa(M,2);
+%ode15s(F, [0 7], q0, opt)
+figure()
+ for i = 1:length(save)
+        scatter3(save(1,i),save(2,i),save(3,i));
+        marker_id = sprintf('%d',i);
+        text(save(1,i),save(2,i),save(3,i),marker_id);     
+        hold on
+ end
 
-%F=simplify(F);
-%f = M\F;
+title('Plot xe');
+xlabel('x');
+ylabel('y');
+zlabel('z');
+hold off
+%ode15s(F, [0 7], q0, opt)
+figure()
+ for i = 1:length(saveu)
+        scatter3(saveu(1,i),saveu(2,i),saveu(3,i));
+        marker_id = sprintf('%d',i);
+        text(saveu(1,i),saveu(2,i),saveu(3,i),marker_id);     
+        hold on
+ end
 
-Mfun = odeFunction(M,vars,'File','myfileM','Comments','Version: 1.1');
-Ffun = odeFunction(F,vars,'File','myfileF','Comments','Version: 1.1');
-opt = odeset('mass', Mfun, 'InitialSlope', qd0);
+title('Plot u');
+xlabel('x');
+ylabel('y');
+zlabel('z');
 
-ode45(Ffun, [0 7], q0, opt)
+
 end

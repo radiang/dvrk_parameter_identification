@@ -10,8 +10,6 @@ Y=Ys2;
 
 n = length(best_pos)-1; %Data points
 dof_max=dof_num;
-
-
 data_max= n*dof_max;
 
 %% limits
@@ -19,7 +17,7 @@ limit_min(1)=-1.541; %rad
 limit_max(1)=1.541;
 limit_min(2)=-0.841; %rad
 limit_max(2)=0.841;  
-limit_min(3)=-0.1;     %m
+limit_min(3)=0.03;     %m
 limit_max(3)=0.241; 
 limit_min(4)=-1.541; %rad
 limit_max(4)=1.541;
@@ -29,8 +27,8 @@ limit_min(6)=-1.541; %rad
 limit_max(6)=1.541;
 
 %Maximum Velocity 
-velocity_min(1)= -0.71 ;%rad/s
-velocity_max(1)= 0.71 ;%rad/s
+velocity_min(1)= -0.5 ;%rad/s
+velocity_max(1)= 0.5 ;%rad/s
 velocity_min(2)= -0.101;
 velocity_max(2)= 0.101; %m/s
 
@@ -60,6 +58,10 @@ if(dof==3)
 end
 end
 end
+
+scale = 0.95;
+lb = scale*lb;
+ub = scale*ub;
 
 %% Initial Guess
 
@@ -100,8 +102,15 @@ options = optimoptions('fmincon','MaxIterations',6000);
 
 %% Save
 
-traj_p= reshape(vars(1:end/2),dof_max,[]);
-traj_v= reshape(vars((end/2+1):end),dof_max,[]);
+traj_p= reshape(vars(1:end/2),[],dof_max)';
+traj_v= reshape(vars((end/2+1):end),[],dof_max)';
+
+traj_p = [zeros(dof_max,1),traj_p];
+traj_v = [zeros(dof_max,1),traj_v];
+for i=1:dof_num
+   [opt(i,:),optd(i,:),optdd(i,:)]=Trajectory_f(traj_p(i,:),traj_v(i,:),tf,ts,1);
+end
+
 
 savename = strcat('data/',filename,'_optimized.mat');
 save(savename)

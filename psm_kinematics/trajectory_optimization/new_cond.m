@@ -24,6 +24,7 @@ for dof=1:dof_max
 [Q_data(dof,:),Qd_data(dof,:),Qdd_data(dof,:),T]=Trajectory_f(array(dof,:),array_v(dof,:),tf,ts);
 end
 
+
 W = zeros(length(Q_data(1,:))*dof_max,21);
 
 for i=1:length(Q_data(1,:))

@@ -197,12 +197,12 @@ l_cg(10,:) = zeros(1,4);
 %% Let's try a new Center of Mass 
 
 map = [q1,q2,-q2,q2,0,q3,q4,q5,q6];
-%INPLANE
+%INPLANE cg_i from frame i
 for i = 1:length(l_cg)-2 
 p_cg(i,:)  = T(:,:,i)*DH(map(i),0,0,0)*transpose(l_cg(i,:));
 end 
 
-% INAXIS
+% %INAXIS cg_i from frame i+1
 % for i = 1:length(l_cg)-2 
 % p_cg(i,:)  = T(:,:,i+1)*transpose([l_cg(i,:)]);
 % end 

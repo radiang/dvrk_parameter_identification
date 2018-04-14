@@ -135,15 +135,51 @@ Psi_t = subs(Psi, [q, qd, qdd], [qt, qdt, qddt]);
 m_num = 0.5*ones(1,11);
 lc_num = 0.02 *ones(1,9);
 Ic_num = 0.01 * ones(1,11*6);
-l_cg_num = 0.02*ones(1,numel(l_cg));
+l_cg_num = 0.02*ones(1,numel(l_cg(:,1:3)));
 
 %eqn = D_t(1:3,1:3) * qddt(1:3)' + C_t(1:3,1:3)*qdt(1:3)'+ Psi_t(1:3);
 %temp = symvar(eqn);
 
+%% Actual values of the PSM from Solidworks
+psm.m = [1.47048, 0.995109+0.0744253, 0.178407+0.445695, 2.09102, 0, 0.0311806 + 0.193728, 0.000342894,0.000249121,6.63661e-06, 0.995109+0.0744253, 0.0311806 + 0.193728 ]; %Kg
+psm.I(:,:,1) = [ 0.01571450, 0.0000043 , 0.00000728; 0, 0.01814321, -0.00048589; 0, 0, 0.00824930];  %kg m^2 
+psm.I(:,:,2) = [ 0.00202417+0.00000876, 0.00047511 , 0.00000043-0.00001711; 0, 0.00564963+0.00022654, 0.00000129; 0, 0, 0.00564716+0.00022322];  %pitch back and front added together
+psm.I(:,:,3) = [ 0.00463460+0.01127103, 0.00001128-0.00031801 , 0.00000003; 0,0.00014989+0.00045979, -0.00000040; 0, 0, 0.00449516+0.01110239];  %pitch top and bottom added together
+psm.I(:,:,4) = [ 0.00156905, -0.00123970, 0.00000002; 0, 0.04284466, 0.0000; 0, 0, 0.04227453];  %kg m^2 
+psm.I(:,:,5) = zeros(3);  
+psm.I(:,:,6) = [ 0.00006363 + 0.00139739, 0.00000014, -0.00000018-0.00000957; 0, 000004346+0.00135923, 0.00000157; 0, 0, 0.00002063+0.00006656];  %kg m^2 
+psm.I(:,:,7) = zeros(3);  %kg m^2 
+psm.I(:,:,8) = zeros(3);  %kg m^2 
+psm.I(:,:,9) = zeros(3);  %kg m^2 
+psm.I(:,:,10) = psm.I(:,:,2); %Asumptions
+psm.I(:,:,11) = psm.I(:,:,6); %Asumptions
 
-D_t = subs(D_t, [reshape(l_cg,1,[]),transpose(Ixx), transpose(Ixy), transpose(Ixz), transpose(Iyy), transpose(Iyz), transpose(Izz),Lc, M ] ,[l_cg_num, Ic_num, lc_num, m_num]);
-C_t = subs(C_t, [reshape(l_cg,1,[]),transpose(Ixx), transpose(Ixy), transpose(Ixz), transpose(Iyy), transpose(Iyz), transpose(Izz),Lc, M ] ,[l_cg_num, Ic_num, lc_num, m_num]);
-Psi_t = subs(Psi_t, [reshape(l_cg,1,[]),transpose(Ixx), transpose(Ixy), transpose(Ixz), transpose(Iyy), transpose(Iyz), transpose(Izz),Lc, M ] ,[l_cg_num, Ic_num, lc_num, m_num]);
+%Still assumption
+psm.l_cg(1,:) = [   0   ,  0.038769    ,0.158996 ]; %x -y -z
+psm.l_cg(2,:) = [   -0.012175*cos(beta)-0.036897*sin(beta)  ,  +0.012175*sin(beta)-0.036897*cos(beta)    ,0]; %
+psm.l_cg(3,:) = [   0.010348*cos(beta)+0.256832*sin(beta)  ,-0.010348*sin(beta)+0.256832*cos(beta), 0 ]; %
+psm.l_cg(4,:) = [ -0.001929  ,-0.136127 , 0 ]; %
+psm.l_cg(5,:) = [   0  , 0 , 0 ]; %
+psm.l_cg(6,:) = [   0.001528 ,-0.000127 , 0.013848]; %
+
+psm.l_cg(11,:) = [   0 ,0 , 0]; %
+
+%Make a Symmetric Matrix 
+% psm.I=(psm.I + psm.I.')/2;
+
+for i = 1:length(psm.I)
+psm.Ixx(i)=psm.I(1,1,i);
+psm.Ixy(i)=psm.I(1,2,i);
+psm.Ixz(i)=psm.I(1,3,i);
+psm.Iyy(i)=psm.I(2,2,i);
+psm.Iyz(i)=psm.I(2,3,i);
+psm.Izz(i)=psm.I(3,3,i);
+end
+
+%% Substitution
+D_t = subs(D_t, [ reshape(l_cg(:,1:3),1,[]),transpose(Ixx), transpose(Ixy), transpose(Ixz), transpose(Iyy), transpose(Iyz), transpose(Izz), M ] ,[reshape(psm.l_cg(:,1:3),1,[]),psm.Ixx,psm.Ixy,psm.Ixz,psm.Iyy,psm.Iyz,psm.Izz, psm.m]);
+C_t = subs(C_t, [ reshape(l_cg(:,1:3),1,[]),transpose(Ixx), transpose(Ixy), transpose(Ixz), transpose(Iyy), transpose(Iyz), transpose(Izz), M ] ,[reshape(psm.l_cg(:,1:3),1,[]),psm.Ixx,psm.Ixy,psm.Ixz,psm.Iyy,psm.Iyz,psm.Izz, psm.m]);
+Psi_t = subs(Psi_t, [ reshape(l_cg(:,1:3),1,[]),transpose(Ixx), transpose(Ixy), transpose(Ixz), transpose(Iyy), transpose(Iyz), transpose(Izz), M ] ,[reshape(psm.l_cg(:,1:3),1,[]),psm.Ixx,psm.Ixy,psm.Ixz,psm.Iyy,psm.Iyz,psm.Izz, psm.m]);
 
 %eqn = D_t(1:3,1:3) * qddt(1:3)' + C_t(1:3,1:3)*qdt(1:3)'+ Psi_t(1:3);
 
@@ -196,10 +232,12 @@ save('temp2.mat');
 
 if (debug==0)
 %% Make ODE Function 
+%Initial Conditions
 qd0 = [0.1 ;0.1 ;0.1;0;0;0];
 q0 = [0 ;0 ;0.1;0;0;0];
-
 x0n = double(subs(T(1:3,4,11), q, q0.'));
+
+%Set Desired Position and Force (Cartesian)
 xdn = [0 0.1 0]'+x0n;
 fd = [0.1, 0, 0]';
 
@@ -210,17 +248,18 @@ dyn_eqn=simplify(dyn_eqn);
 %dyn_eqn = eqn==u;
 
 [eqs,vars] = reduceDifferentialOrder(dyn_eqn==0,[q1t,q2t,q3t]);
-[M,F] = massMatrixForm(eqs,vars);
+[Mass,F] = massMatrixForm(eqs,vars);
 
 % 
 % F = vpa(F,2);
 % M = vpa(M,2);
 
 F=simplify(F);
-M=simplify(M);
-%f = M\F;
+Mass=simplify(Mass);
 
-Mfun = odeFunction(M,vars,'File','myfileM','Comments','Version: 1.1');
+%f = M\F; too slow doesnt work
+
+Mfun = odeFunction(Mass,vars,'File','myfileM','Comments','Version: 1.1');
 Ffun = odeFunction(F,vars,'File','myfileF','Comments','Version: 1.1');
 opt = odeset('mass', Mfun, 'InitialSlope', qd0(1:3));
 

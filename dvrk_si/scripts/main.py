@@ -3,10 +3,10 @@ from numpy import genfromtxt
 import numpy as np
 import dvrk
 
-foldername = './test/6dof_31par_test1/'
+foldername = './data/'
 testname =  'Test.csv'
 
-q= genfromtxt(foldername+tesname, delimiter=',')
+q= genfromtxt(foldername+testname, delimiter=',')
 qt= q.transpose()
 
 p=dvrk.psm('PSM2')
@@ -26,12 +26,12 @@ for i in range(len(q[1][:])):
 rospy.sleep(10)
 data = np.zeroes(len(states[6][:]),3*3)
 
-for i in range(len(states[6][:])):
-	p.set_effort_joint(np.array([states[6][i], states[7][i], states[8][i], 0.0, 0.0, 0.0]))
+# for i in range(len(states[6][:])):
+# 	p.set_effort_joint(np.array([states[6][i], states[7][i], states[8][i], 0.0, 0.0, 0.0]))
 	
-	data[i][0:3] = p.get_current_joint_position()[0:3]
-	data[i][3:6] = p.get_current_joint_velocity()[0:3]
-	data[i][6:9] = p.get_current_joint_effort()[0:3]
+# 	data[i][0:3] = p.get_current_joint_position()[0:3]
+# 	data[i][3:6] = p.get_current_joint_velocity()[0:3]
+# 	data[i][6:9] = p.get_current_joint_effort()[0:3]
 
 #Print Code
 with open(foldername+'data.csv', 'wb') as myfile:

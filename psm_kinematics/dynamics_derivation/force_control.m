@@ -290,7 +290,7 @@ end
 
 
 figure()
-        scatter3(output(1,beg:ends),output(2,beg:ends),output(3,beg:ends));
+        %scatter3(output(1,beg:ends),output(2,beg:ends),output(3,beg:ends));
         line(output(1,beg:ends),output(2,beg:ends),output(3,beg:ends));
         hold on
 %         

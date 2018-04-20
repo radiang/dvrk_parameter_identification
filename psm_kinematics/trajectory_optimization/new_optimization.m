@@ -27,8 +27,8 @@ limit_min(6)=-1.541; %rad
 limit_max(6)=1.541;
 
 %Maximum Velocity 
-velocity_min(1)= -0.5 ;%rad/s
-velocity_max(1)= 0.5 ;%rad/s
+velocity_min(1)= -0.4 ;%rad/s
+velocity_max(1)= 0.4 ;%rad/s
 velocity_min(2)= -0.101;
 velocity_max(2)= 0.101; %m/s
 
@@ -101,12 +101,14 @@ options = optimoptions('fmincon','MaxIterations',6000);
 
 
 %% Save
+tf = 2;
+ts = 0.01;
 
 traj_p= reshape(vars(1:end/2),[],dof_max)';
 traj_v= reshape(vars((end/2+1):end),[],dof_max)';
 
-traj_p = [zeros(dof_max,1),traj_p];
-traj_v = [zeros(dof_max,1),traj_v];
+traj_p = [zeros(dof_max,1),traj_p,zeros(dof_max,1)];
+traj_v = [zeros(dof_max,1),traj_v,zeros(dof_max,1)];
 for i=1:dof_num
    [opt(i,:),optd(i,:),optdd(i,:)]=Trajectory_f(traj_p(i,:),traj_v(i,:),tf,ts,1);
 end

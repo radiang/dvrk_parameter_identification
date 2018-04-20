@@ -2,7 +2,7 @@ function [Cond]=new_cond(z,Y,n,dof_max,q,qd,qdd)
 
 Ys2=Y;
 
-ts=0.1;
+ts=0.01;
 tf=2;
 
 for j = 1:dof_max

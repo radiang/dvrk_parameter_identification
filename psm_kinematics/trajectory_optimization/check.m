@@ -1,7 +1,7 @@
 %%Parameter Idenitification
 clear all
-filename='3dof_inplanepitch_svd';
-savename= strcat(filename,'_5point');
+filename='new_3dof_inaxis_svd';
+savename= strcat(filename);
 loadname = strcat('../dynamics_derivation/data/',filename,'_Y.mat');
 load(loadname);
 
@@ -11,7 +11,7 @@ ts=0.1;
 g=9.8;
 par_num=length(Par2);
 dof_num = 3;
-point_num=5;
+point_num=12;
 
 iter = 100;
 
@@ -30,8 +30,8 @@ limit_min(6)=-1.54; %rad
 limit_max(6)=1.54;
 
 %Maximum Velocity 
-velocity_min(1)= -0.7 ;%rad/s
-velocity_max(1)= 0.7 ;%rad/s
+velocity_min(1)= -0.5 ;%rad/s
+velocity_max(1)= 0.5 ;%rad/s
 velocity_min(2)= -0.06;
 velocity_max(2)= 0.06; %m/s
 

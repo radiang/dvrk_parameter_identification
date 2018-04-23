@@ -1,7 +1,7 @@
 clear all 
 close all
 
-filename = '3dof_inplanepitch_svd_try2';
+filename = 'new_3dof_inaxis_svd';
 loadname = strcat('data/',filename,'_trajectory.mat');
 load(loadname)
 
@@ -59,7 +59,7 @@ end
 end
 end
 
-scale = 0.95;
+scale = 0.8;
 lb = scale*lb;
 ub = scale*ub;
 
@@ -97,7 +97,7 @@ xv0 = reshape(best_vel(:,2:end)',1,[]);
 fun = @(z) new_cond(z,Ys2,n,dof_max,transpose(Q),transpose(Qd),transpose(Qdd));
 
 options = optimoptions('fmincon','MaxIterations',6000);
-[vars, Fin]=fmincon(fun,[x0, xv0],A,b,Ae,be,lb,ub);
+[vars, Fin]=fmincon(fun,[x0, xv0],A,b,Ae,be,lb,ub,[],options);
 
 
 %% Save
@@ -109,6 +109,7 @@ traj_v= reshape(vars((end/2+1):end),[],dof_max)';
 
 traj_p = [zeros(dof_max,1),traj_p,zeros(dof_max,1)];
 traj_v = [zeros(dof_max,1),traj_v,zeros(dof_max,1)];
+
 for i=1:dof_num
    [opt(i,:),optd(i,:),optdd(i,:)]=Trajectory_f(traj_p(i,:),traj_v(i,:),tf,ts,1);
 end
@@ -121,3 +122,11 @@ save(savename)
 
 %[vars, Fin]=fmincon(fun,[.1 .5 .3400 .123],A,b,Ae,be,[-1 -1 -1 -1],[1 1 1 1]);
 %save('Optimized_Brute_2.mat')
+
+%% Make csv
+for dof=1:dof_num
+[traj(dof,:),traj(dof+dof_num,:),traj(dof+dof_num*2,:),T]=Trajectory_f(traj_p(dof,:),traj_v(dof,:),tf,ts,0);
+end
+
+csvname=strcat('data/',filename,'_traj.csv');
+csvwrite(csvname,traj);

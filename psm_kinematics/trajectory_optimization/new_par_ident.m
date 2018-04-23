@@ -5,7 +5,7 @@ filename = '3dof_inplanepitch_svd';
 loadname = strcat('data/',filename,'_optimized.mat');
 load(loadname);
 
-q=csvread('data/PID_data_.75speed_try2.csv');
+q=csvread('data/PID_data_twice_.75speed.csv');
 t = linspace(1,length(q(:,1)'),length(q(:,1)')); 
 
 %% Plot looksee
@@ -67,7 +67,7 @@ Par_num = pinv(W)*tau(1:length(W)).'
 
 %% Save
 
-savename=strcat('data/',filename,'_results.mat');
+savename=strcat('data/',filename,'_results_twice.mat');
 save(savename,'W','Q','Qd','Qdd','Ys2','q','acc','tau');
 
 

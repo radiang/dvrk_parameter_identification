@@ -16,7 +16,7 @@ M=[m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11];
 Lc=[lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9];
 
 
-filename='data/3dof_inplanepitch_svd';
+filename='data/new_3dof_inaxis_svd';
 
 
 %% Options 
@@ -139,19 +139,19 @@ end
 % l_cg(11,:) = zeros(1,3);
 
 %In Plane Masses
-l_cg(1,1) = 0;
-l_cg(2,3) = 0;
-l_cg(3,3) = 0;
-l_cg(4,3) = 0;
-l_cg(6,2) = 0;
-%l_cg(7,1) = 0;
-%l_cg(8,3) = 0;
-%l_cg(9,2) = 0;
-l_cg(11,2) = 0;
-
-
-l_cg(6,1)=0;
-l_cg(1,2)=0;
+% l_cg(1,1) = 0;
+% l_cg(2,3) = 0;
+% l_cg(3,3) = 0;
+% l_cg(4,3) = 0;
+% l_cg(6,2) = 0;
+% l_cg(7,1) = 0;
+% l_cg(8,3) = 0;
+% l_cg(9,2) = 0;
+% l_cg(11,2) = 0;
+% 
+% 
+% l_cg(6,1)=0;
+% l_cg(1,2)=0;
 %Lump Gripper stuff 
 M(7)=0;
 I(1:3,1:3,7) = zeros(3);
@@ -181,31 +181,31 @@ l_cg(10,:) = zeros(1,4);
 % l_cg(11,:) = zeros(1,4);
 
 %In Axis Masses
-%  l_cg(1,3) = 0;
-%  l_cg(1,2) = d(2)/2;
-%  l_cg(2,2:3) = 0;
-%  l_cg(3,2:3) = 0;
-%  l_cg(4,2:3) = 0;
-%  l_cg(6,1:2) = 0;
-%  l_cg(7,1) = 0; 
-%  l_cg(7,3) = 0; 
-%  l_cg(8,2:3) = 0;
-%  l_cg(9,2:3) = 0;
-% l_cg(11,1:2) = 0;
+ l_cg(1,3) = 0;
+ l_cg(1,2) = d(2)/2;
+ l_cg(2,2:3) = 0;
+ l_cg(3,2:3) = 0;
+ l_cg(4,2:3) = 0;
+ l_cg(6,1:2) = 0;
+ l_cg(7,1) = 0; 
+ l_cg(7,3) = 0; 
+ l_cg(8,2:3) = 0;
+ l_cg(9,2:3) = 0;
+ l_cg(11,1:2) = 0;
 
 
 %% Let's try a new Center of Mass 
 
 map = [q1,q2,-q2,q2,0,q3,q4,q5,q6];
-%INPLANE cg_i from frame i
-for i = 1:length(l_cg)-2 
-p_cg(i,:)  = T(:,:,i)*DH(map(i),0,0,0)*transpose(l_cg(i,:));
-end 
-
-% %INAXIS cg_i from frame i+1
+% %INPLANE cg_i from frame i
 % for i = 1:length(l_cg)-2 
-% p_cg(i,:)  = T(:,:,i+1)*transpose([l_cg(i,:)]);
+% p_cg(i,:)  = T(:,:,i)*DH(map(i),0,0,0)*transpose(l_cg(i,:));
 % end 
+
+%INAXIS cg_i from frame i+1
+for i = 1:length(l_cg)-2 
+p_cg(i,:)  = T(:,:,i+1)*transpose([l_cg(i,:)]);
+end 
 
 counter_num = 2;
 Tee_cg(:,:,1)= T(:,:,2)*DH(map(2),0,0,0);

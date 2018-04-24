@@ -1,7 +1,7 @@
 clear all 
 close all
 
-filename = 'new_3dof_inaxis_svd';
+filename = 'new_6dof_inaxis_svd';
 loadname = strcat('data/',filename,'_trajectory.mat');
 load(loadname)
 
@@ -94,9 +94,11 @@ x0 = reshape(best_pos(:,2:end)',1,[]);
 xv0 = reshape(best_vel(:,2:end)',1,[]);
 
 %% Run fmincon
-fun = @(z) new_cond(z,Ys2,n,dof_max,transpose(Q),transpose(Qd),transpose(Qdd));
+size = length(Par2);
+condfun=matlabFunction(Ys2);
+fun = @(z) new_cond(z,Ys2,n,dof_max,transpose(Q),transpose(Qd),transpose(Qdd),condfun,size);
 
-options = optimoptions('fmincon','MaxIterations',6000);
+options = optimoptions('fmincon','MaxIterations',3000,'MaxFunctionEvaluations',3000);
 [vars, Fin]=fmincon(fun,[x0, xv0],A,b,Ae,be,lb,ub,[],options);
 
 

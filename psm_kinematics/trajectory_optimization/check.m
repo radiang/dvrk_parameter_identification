@@ -1,6 +1,6 @@
 %%Parameter Idenitification
 clear all
-filename='new_3dof_inaxis_svd';
+filename='new_6dof_inaxis_svd';
 savename= strcat(filename);
 loadname = strcat('../dynamics_derivation/data/',filename,'_Y.mat');
 load(loadname);
@@ -10,10 +10,10 @@ tf=2;
 ts=0.1;
 g=9.8;
 par_num=length(Par2);
-dof_num = 3;
-point_num=12;
+dof_num = 6;
+point_num=20;
 
-iter = 100;
+iter = 80;
 
 %% Joint Limits
 limit_min(1)=-1.54; %rad
@@ -122,5 +122,5 @@ end
 best_pos =save_array(:,:,ind)
 best_vel = save_arrayv(:,:,ind)
 
-savename= strcat('data/',savename,'_trajectory.mat');
+savename= strcat('data/',savename,'_trajectory2.mat');
 save(savename)

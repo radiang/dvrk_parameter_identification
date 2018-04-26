@@ -1,11 +1,15 @@
 clear all 
 close all
 
-filename = '3dof_inplanepitch_svd';
+filename = 'new_3dof_inaxis_svd';
 loadname = strcat('data/',filename,'_optimized.mat');
 load(loadname);
 
-q=csvread('data/PID_data_twice_.75speed.csv');
+foldername='data/new_3dof_inaxis_svd_traj/';
+testname = 'PID_data2';
+csvname = strcat(foldername,testname,'.csv');
+
+q=csvread(csvname);
 t = linspace(1,length(q(:,1)'),length(q(:,1)')); 
 
 %% Plot looksee
@@ -42,7 +46,7 @@ qdf(:,3) = filter(b,a,x3)';
 %% Get Derivative
 
 for i=1:length(qdf(:,1)')-1
-   acc(i,1:3) = qdf(i+1,1:3)-qdf(i,1:3); 
+   acc(i,1:3) = (qdf(i+1,1:3)-qdf(i,1:3))/ts; 
 
 end
 %% Plot Acceleration  
@@ -63,11 +67,12 @@ end
 pinv(W);
 
 tau = reshape(q(:,7:9).',1,[]);
+cond(W)
 Par_num = pinv(W)*tau(1:length(W)).'
 
 %% Save
 
-savename=strcat('data/',filename,'_results_twice.mat');
+savename=strcat(foldername,testname,'_results.mat');
 save(savename,'W','Q','Qd','Qdd','Ys2','q','acc','tau','Par_num');
 
 

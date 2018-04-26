@@ -7,13 +7,15 @@ import csv
 import numpy as np
 import dvrk
 
-foldername = './data/3dof_inplanepitch_svd_traj/'
+foldername = './data/new_3dof_inaxis_svd_traj/'
 testname =  'test_position'
 
 q  = genfromtxt(foldername+testname+'.csv', delimiter=',')
 qt = q.transpose()
 
 times = 1
+speedscale=0.9
+scale = 0.92
 
 if times ==1: 
 	a = q;
@@ -25,14 +27,14 @@ else:
 		a[i][:]=np.append(q[i][:],q[i][:])
 
 p=dvrk.psm('PSM1')
-r=rospy.Rate(2/0.01*0.75)
+r=rospy.Rate(2/0.01*speedscale)
 p.home()
 p.move_joint_some(np.array([0.0,0.0,0.0]),np.array([0,1,2]))
 
 states = np.zeros((len(a[1][:]),3*3))
 
 i = 0
-scale = 0.92
+
 
 while  i<len(a[1][:]) and not rospy.is_shutdown():
 #for i in range(len(q[1][:])):
@@ -45,7 +47,7 @@ while  i<len(a[1][:]) and not rospy.is_shutdown():
 
 	i = i +1
 	
-with open(foldername+'PID_data_.75speed_try2.csv', 'wb') as myfile:
+with open(foldername+'PID_data_0.9.csv', 'wb') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_NONE)
     for i in range(np.size(states,0)-10):
       wr.writerow(states[i])

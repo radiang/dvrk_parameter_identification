@@ -68,7 +68,7 @@ Par_num = pinv(W)*tau(1:length(W)).'
 %% Save
 
 savename=strcat('data/',filename,'_results_twice.mat');
-save(savename,'W','Q','Qd','Qdd','Ys2','q','acc','tau');
+save(savename,'W','Q','Qd','Qdd','Ys2','q','acc','tau','Par_num');
 
 
 

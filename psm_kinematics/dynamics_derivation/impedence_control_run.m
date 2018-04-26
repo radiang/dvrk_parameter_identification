@@ -2,8 +2,11 @@ clear all
 close all
 
 %% 3DOF FORCE Controller 
-filename='3dof_inplanepitch_svd';
-loadname = strcat('data/',filename,'_all.mat');
+filename='new_3dof_inaxis_svd';
+foldername = strcat('../trajectory_optimization/data/','new_3dof_inaxis_svd_traj/');
+%loadname = strcat('data/',filename,'_all.mat');
+loadname = strcat(foldername,'PID_data_0.9_results.mat');
+
 load(loadname);
 
 syms  q1t(t) q2t(t) q3t(t) q4t(t) q5t(t) q6t(t) 
@@ -105,7 +108,7 @@ zlim([-s/2 s])
 
 %% Seperate Variables to Par2 Force Controller 
 
-[Mt, Nu, can]=seperate_f(Ys2,Par2,Qdd);
+[Mt, Nu, can]=seperate_f(Ys2,Par_num,Qdd);
 
 %% Make into 3 DOF
 Mt3 = subs(Mt(1:3,1:3),[transpose(Q(4:6))], [0 0 0]);

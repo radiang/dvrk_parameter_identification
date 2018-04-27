@@ -3,7 +3,7 @@ function [Mt, Nu, can] = seperate_f(Ys2,Par2,Qdd)
 
 %% Start Seperation of Parameters
 %can = sym('can%d', [1 length(Par2)],'real'); %Lumped parameters expressed as a single variable
-can = Par_num;
+can = Par2;
 can_Y = Ys2; %Lumped 6x32observation matrix
 
 Mult = can_Y*can; %Equals the manipulator equation

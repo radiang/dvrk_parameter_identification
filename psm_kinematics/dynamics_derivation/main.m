@@ -33,4 +33,4 @@ savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
 save(savename);
 
 %% Make force Controllers 
-
+[gen,traj,dyn,ctrl]=impedance_control_run(gen,traj,dyn);

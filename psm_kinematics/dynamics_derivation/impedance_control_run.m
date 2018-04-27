@@ -1,13 +1,12 @@
-clear all 
-close all
 
+function [gen,traj,dyn,ctrl]=impedance_control_run(gen,traj,dyn)
 %% 3DOF FORCE Controller 
-filename='new_3dof_inaxis_svd';
-foldername = strcat('../trajectory_optimization/data/','new_3dof_inaxis_svd_traj/');
-%loadname = strcat('data/',filename,'_all.mat');
-loadname = strcat(foldername,'PID_data_0.9_results.mat');
-
-load(loadname);
+% filename='new_3dof_inaxis_svd';
+% foldername = strcat('../trajectory_optimization/data/','new_3dof_inaxis_svd_traj/');
+% %loadname = strcat('data/',filename,'_all.mat');
+% loadname = strcat(foldername,'PID_data_0.9_results.mat');
+% 
+% load(loadname);
 
 syms  q1t(t) q2t(t) q3t(t) q4t(t) q5t(t) q6t(t) 
 
@@ -16,22 +15,23 @@ qdt = diff(qt,t);
 qddt = diff(qdt,t);
 
 %% Options
-debug = 0;
+debug = 1;
 
 %% Jacobian End Effector and it's Derivative
-J_end_t = subs(J_end, symvar(J_end), qt);
-J_diff_t = diff(J_end_t,t);
+J_end_t = subs(gen.J_end, symvar(gen.J_end), qt);
+ctrl.J_diff_t = diff(J_end_t,t);
 
 %Make 3dof Jacobian 
-J3 = subs(J_end(1:6,1:3),[q4, q5, q6],[0 0 0]);
+ctrl.J3 = subs(gen.J_end(1:6,1:3),[gen.q(4), gen.q(5), gen.q(6)],[0 0 0]);
 
-J3_diff = subs(J_diff_t(1:6,1:3), [diff(q1t,t),diff(q2t,t),diff(q3t,t)],transpose(Qd(1:3)));
-J3_diff = subs(J3_diff, q1t, Q(1));
-J3_diff = subs(J3_diff, q2t, Q(2));
-J3_diff = subs(J3_diff, q3t, Q(3));
+J3_diff = subs(ctrl.J_diff_t(1:6,1:3), [diff(q1t,t),diff(q2t,t),diff(q3t,t)],transpose(gen.Qd(1:3)));
+J3_diff = subs(J3_diff, q1t, gen.Q(1));
+J3_diff = subs(J3_diff, q2t, gen.Q(2));
+ctrl.J3_diff = subs(J3_diff, q3t, gen.Q(3));
 
 
-%% Check Jacobian in plot 
+%% Check Jacobian in plot
+p = pi();
 q_n = [0, p/4, .1, 0, 0, 0];
 
 J3_num = subs(J_end_t(1:6,1:3),q1t,q_n(1));
@@ -52,7 +52,7 @@ figure()
 % end
 
 
-T_num(:,:,:)=double(subs(T(:,:,:),[q1 q2 q3 q4 q5 q6],q_n));
+T_num(:,:,:)=double(subs(dyn.T(:,:,:),[gen.q(1:6)],q_n));
 a(1,:) = reshape(T_num(1,4,:),1,[]);
 a(2,:) = reshape(T_num(2,4,:),1,[]);
 a(3,:) = reshape(T_num(3,4,:),1,[]);
@@ -60,7 +60,7 @@ scatter3(a(1,:),a(2,:),a(3,:));
 line(a(1,:),a(2,:),a(3,:));
 hold on
 
-x0 = double(subs(T(1:3,4,11), q, q_n));
+x0 = double(subs(dyn.T(1:3,4,11), gen.q, q_n));
 
 xv=J3_num*transpose([10 0 0]);
 xvx=xv
@@ -108,33 +108,33 @@ zlim([-s/2 s])
 
 %% Seperate Variables to Par2 Force Controller 
 
-[Mt, Nu, can]=seperate_f(Ys2,Par_num,Qdd);
+[Mt, Nu, gen.can]=seperate_f(gen.Ys2,gen.par_num,gen.Qdd);
 
 %% Make into 3 DOF
-Mt3 = subs(Mt(1:3,1:3),[transpose(Q(4:6))], [0 0 0]);
-Nu3 = subs(Nu(1:3,1),[transpose(Q(4:6)),transpose(Qd(4:6))],[0, 0, 0, 0, 0, 0]);
+ctrl.Mt3 = subs(Mt(1:3,1:3),[transpose(gen.Q(4:6))], [0 0 0]);
+ctrl.Nu3 = subs(Nu(1:3,1),[transpose(gen.Q(4:6)),transpose(gen.Qd(4:6))],[0, 0, 0, 0, 0, 0]);
 %% Generate Ccode
-% stringname = strcat('ccode/',filename,'_J_ccode.c');
-% ccode(J3,'File',stringname,'Comments','V1.2');
+ stringname = strcat('ccode/',gen.filename,'_J_ccode.c');
+ ccode(ctrl.J3,'File',stringname,'Comments','V1.2');
 % 
-% stringname = strcat('ccode/',filename,'_Jd_ccode.c');
-% ccode(J3_diff,'File',stringname,'Comments','V1.2');
+ stringname = strcat('ccode/',gen.filename,'_Jd_ccode.c');
+ ccode(ctrl.J3_diff,'File',stringname,'Comments','V1.2');
 % 
-% stringname = strcat('ccode/',filename,'_Mt_ccode.c');
-% ccode(Mt3,'File',stringname,'Comments','V1.2');
+ stringname = strcat('ccode/',gen.filename,'_Mt_ccode.c');
+ ccode(ctrl.Mt3,'File',stringname,'Comments','V1.2');
 % 
-% stringname = strcat('ccode/',filename,'_Nu_ccode.c');
-% ccode(Nu3,'File',stringname,'Comments','V1.2');
+ stringname = strcat('ccode/',gen.filename,'_Nu_ccode.c');
+ ccode(ctrl.Nu3,'File',stringname,'Comments','V1.2');
 % 
-% stringname = strcat('ccode/',filename,'_Ys2_ccode.c');
-% ccode(Ys2,'File',stringname,'Comments','V1.2');
+ stringname = strcat('ccode/',gen.filename,'_Ys2_ccode.c');
+ ccode(gen.Ys2,'File',stringname,'Comments','V1.2');
 %% Substitute to continuous time
-D_t = subs(D, [q, qd, qdd], [qt, qdt, qddt]);
-C_t = subs(C, [q, qd, qdd], [qt, qdt, qddt]);
-Psi_t = subs(Psi, [q, qd, qdd], [qt, qdt, qddt]);
+D_t = subs(dyn.D, [q, qd, qdd], [qt, qdt, qddt]);
+C_t = subs(dyn.C, [q, qd, qdd], [qt, qdt, qddt]);
+Psi_t = subs(dyn.Psi, [q, qd, qdd], [qt, qdt, qddt]);
 
 
-%Fill up Inertias and Masses (From Solidworks)
+%% Fill up Inertias and Masses (From Solidworks)
 m_num = 0.5*ones(1,11);
 lc_num = 0.02 *ones(1,9);
 Ic_num = 0.01 * ones(1,11*6);
@@ -143,41 +143,41 @@ l_cg_num = 0.02*ones(1,numel(l_cg(:,1:3)));
 %eqn = D_t(1:3,1:3) * qddt(1:3)' + C_t(1:3,1:3)*qdt(1:3)'+ Psi_t(1:3);
 %temp = symvar(eqn);
 
-%% Actual values of the PSM from Solidworks
-psm.m = [1.47048, 0.995109+0.0744253, 0.178407+0.445695, 2.09102, 0, 0.0311806 + 0.193728, 0.000342894,0.000249121,6.63661e-06, 0.995109+0.0744253, 0.0311806 + 0.193728 ]; %Kg
-psm.I(:,:,1) = [ 0.01571450, 0.0000043 , 0.00000728; 0, 0.01814321, -0.00048589; 0, 0, 0.00824930];  %kg m^2 
-psm.I(:,:,2) = [ 0.00202417+0.00000876, 0.00047511 , 0.00000043-0.00001711; 0, 0.00564963+0.00022654, 0.00000129; 0, 0, 0.00564716+0.00022322];  %pitch back and front added together
-psm.I(:,:,3) = [ 0.00463460+0.01127103, 0.00001128-0.00031801 , 0.00000003; 0,0.00014989+0.00045979, -0.00000040; 0, 0, 0.00449516+0.01110239];  %pitch top and bottom added together
-psm.I(:,:,4) = [ 0.00156905, -0.00123970, 0.00000002; 0, 0.04284466, 0.0000; 0, 0, 0.04227453];  %kg m^2 
-psm.I(:,:,5) = zeros(3);  
-psm.I(:,:,6) = [ 0.00006363 + 0.00139739, 0.00000014, -0.00000018-0.00000957; 0, 000004346+0.00135923, 0.00000157; 0, 0, 0.00002063+0.00006656];  %kg m^2 
-psm.I(:,:,7) = zeros(3);  %kg m^2 
-psm.I(:,:,8) = zeros(3);  %kg m^2 
-psm.I(:,:,9) = zeros(3);  %kg m^2 
-psm.I(:,:,10) = psm.I(:,:,2); %Asumptions
-psm.I(:,:,11) = psm.I(:,:,6); %Asumptions
-
-%Still assumption
-psm.l_cg(1,:) = [   0   ,  0.038769    ,0.158996 ]; %x -y -z
-psm.l_cg(2,:) = [   -0.012175*cos(beta)-0.036897*sin(beta)  ,  +0.012175*sin(beta)-0.036897*cos(beta)    ,0]; %
-psm.l_cg(3,:) = [   0.010348*cos(beta)+0.256832*sin(beta)  ,-0.010348*sin(beta)+0.256832*cos(beta), 0 ]; %
-psm.l_cg(4,:) = [ -0.001929  ,-0.136127 , 0 ]; %
-psm.l_cg(5,:) = [   0  , 0 , 0 ]; %
-psm.l_cg(6,:) = [   0.001528 ,-0.000127 , 0.013848]; %
-
-psm.l_cg(11,:) = [   0 ,0 , 0]; %
-
-%Make a Symmetric Matrix 
-% psm.I=(psm.I + psm.I.')/2;
-
-for i = 1:length(psm.I)
-psm.Ixx(i)=psm.I(1,1,i);
-psm.Ixy(i)=psm.I(1,2,i);
-psm.Ixz(i)=psm.I(1,3,i);
-psm.Iyy(i)=psm.I(2,2,i);
-psm.Iyz(i)=psm.I(2,3,i);
-psm.Izz(i)=psm.I(3,3,i);
-end
+% %% Actual values of the PSM from Solidworks
+% psm.m = [1.47048, 0.995109+0.0744253, 0.178407+0.445695, 2.09102, 0, 0.0311806 + 0.193728, 0.000342894,0.000249121,6.63661e-06, 0.995109+0.0744253, 0.0311806 + 0.193728 ]; %Kg
+% psm.I(:,:,1) = [ 0.01571450, 0.0000043 , 0.00000728; 0, 0.01814321, -0.00048589; 0, 0, 0.00824930];  %kg m^2 
+% psm.I(:,:,2) = [ 0.00202417+0.00000876, 0.00047511 , 0.00000043-0.00001711; 0, 0.00564963+0.00022654, 0.00000129; 0, 0, 0.00564716+0.00022322];  %pitch back and front added together
+% psm.I(:,:,3) = [ 0.00463460+0.01127103, 0.00001128-0.00031801 , 0.00000003; 0,0.00014989+0.00045979, -0.00000040; 0, 0, 0.00449516+0.01110239];  %pitch top and bottom added together
+% psm.I(:,:,4) = [ 0.00156905, -0.00123970, 0.00000002; 0, 0.04284466, 0.0000; 0, 0, 0.04227453];  %kg m^2 
+% psm.I(:,:,5) = zeros(3);  
+% psm.I(:,:,6) = [ 0.00006363 + 0.00139739, 0.00000014, -0.00000018-0.00000957; 0, 000004346+0.00135923, 0.00000157; 0, 0, 0.00002063+0.00006656];  %kg m^2 
+% psm.I(:,:,7) = zeros(3);  %kg m^2 
+% psm.I(:,:,8) = zeros(3);  %kg m^2 
+% psm.I(:,:,9) = zeros(3);  %kg m^2 
+% psm.I(:,:,10) = psm.I(:,:,2); %Asumptions
+% psm.I(:,:,11) = psm.I(:,:,6); %Asumptions
+% 
+% %Still assumption
+% psm.l_cg(1,:) = [   0   ,  0.038769    ,0.158996 ]; %x -y -z
+% psm.l_cg(2,:) = [   -0.012175*cos(beta)-0.036897*sin(beta)  ,  +0.012175*sin(beta)-0.036897*cos(beta)    ,0]; %
+% psm.l_cg(3,:) = [   0.010348*cos(beta)+0.256832*sin(beta)  ,-0.010348*sin(beta)+0.256832*cos(beta), 0 ]; %
+% psm.l_cg(4,:) = [ -0.001929  ,-0.136127 , 0 ]; %
+% psm.l_cg(5,:) = [   0  , 0 , 0 ]; %
+% psm.l_cg(6,:) = [   0.001528 ,-0.000127 , 0.013848]; %
+% 
+% psm.l_cg(11,:) = [   0 ,0 , 0]; %
+% 
+% %Make a Symmetric Matrix 
+% % psm.I=(psm.I + psm.I.')/2;
+% 
+% for i = 1:length(psm.I)
+% psm.Ixx(i)=psm.I(1,1,i);
+% psm.Ixy(i)=psm.I(1,2,i);
+% psm.Ixz(i)=psm.I(1,3,i);
+% psm.Iyy(i)=psm.I(2,2,i);
+% psm.Iyz(i)=psm.I(2,3,i);
+% psm.Izz(i)=psm.I(3,3,i);
+% end
 
 %% Substitution
 D_t = subs(D_t, [ reshape(l_cg(:,1:3),1,[]),transpose(Ixx), transpose(Ixy), transpose(Ixz), transpose(Iyy), transpose(Iyz), transpose(Izz), M ] ,[reshape(psm.l_cg(:,1:3),1,[]),psm.Ixx,psm.Ixy,psm.Ixz,psm.Iyy,psm.Iyz,psm.Izz, psm.m]);
@@ -316,3 +316,5 @@ ylabel('y');
 zlabel('z');
 
 end
+end
+

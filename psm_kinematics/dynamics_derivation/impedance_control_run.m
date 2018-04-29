@@ -309,22 +309,22 @@ end
 
 
 % figure()
-%         %scatter3(output(1,beg:ends),output(2,beg:ends),output(3,beg:ends));
-%         line(output(1,beg:ends),output(2,beg:ends),output(3,beg:ends));
-%         hold on
-% %         
-%         scatter3(output(1,beg),output(2,beg),output(3,beg),'r');     
-%         hold on
-%         output(1:3)=subs(T(1:3,4,11),[q1 q2 q3 q4 q5 q6],[q_out(end,1:3) 0 0 0]);
-%         scatter3(output(1),output(2),output(3));
-%         marker_id = sprintf('%d',i);
-%         text(output(1),output(2),output(3),marker_id);     
-%         hold on
+        %scatter3(output(1,beg:ends),output(2,beg:ends),output(3,beg:ends));
+       line(output(1,beg:ends),output(2,beg:ends),output(3,beg:ends));
+        hold on
+%         
+        scatter3(output(1,beg),output(2,beg),output(3,beg),'r');     
+        hold on
+        output(1:3)=subs(dyn.T(1:3,4,11),gen.q,[ctrl.q_out(end,1:3) 0 0 0]);
+        scatter3(output(1),output(2),output(3));
+        marker_id = sprintf('%d',i);
+        text(output(1),output(2),output(3),marker_id);     
+        hold on
 
-% title('Plot PSM Force output');
-% xlabel('x');
-% ylabel('y');
-% zlabel('z');
+title('Plot PSM Force output');
+xlabel('x');
+ylabel('y');
+zlabel('z');
 
 end
 end

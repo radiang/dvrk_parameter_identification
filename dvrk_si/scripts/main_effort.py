@@ -8,8 +8,8 @@ import numpy as np
 import dvrk
 
 
-foldername = './data/3dof_inplanepitch_svd_traj/'
-testname =  'PID_data_.75speed_try2.csv'
+foldername = './data/new_3dof_inaxis_svd_traj/'
+testname =  'PID_data_0.9_test_effort.csv'
 
 q= genfromtxt(foldername+testname, delimiter=',')
 qt= q.transpose()

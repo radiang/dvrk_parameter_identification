@@ -32,12 +32,15 @@ ident.a=1;
 
 
 %% Test Parameter Identification force 
-eff.traj_p = [0 0.5 0 ; 0 0.3 0; 0 0.1 0.15];
+eff.traj_p = [0 0.2 0 ; 0 0.2 0; 0 0.1 0.15];
 eff.traj_v = zeros(3);
 eff.traj_a = zeros(3);
 eff.tf = 2;
-eff.ts = 0.1;  
+eff.ts = 0.01;  
 [eff] = make_effort(gen,eff);
+
+[eff] = compare_effort(gen,eff);
+
 
 %% Save
 savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');

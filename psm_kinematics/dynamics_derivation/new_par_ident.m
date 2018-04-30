@@ -69,6 +69,9 @@ end
 
 pinv(W);
 
+ident.W= W;
+ident.tau=q(:,7:9);
+
 tau = reshape(q(:,7:9).',1,[]);
 gen.par_cond=cond(W);
 gen.par_num = pinv(W)*tau(1:length(W)).';

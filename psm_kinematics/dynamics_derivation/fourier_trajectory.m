@@ -1,11 +1,71 @@
-clear all
-close all
+function [fs, gen] = fourier_trajectory(gen,ident,traj)
 
-filename = '3dof_inplanepitch_svd';
-loadname = strcat('data/',filename,'_results_twice.mat');
-load(loadname);
+%% Options
+fs.Nl = 5; 
+fs.w = 0.1 ;%rad/s
+
+fs.ts = 0.01;
+fs.period = 28 ;%s.
+fs.N = fs.period/fs.ts;
+
+fs.time = linspace(0,fs.period-fs.ts,fs.N);
 
 %% Fourier Expansion
 
-F.a=sym('a%d',[3]);
-F.b=sym('a%d',[3]);
+fs.a=sym('a%d_%d',[gen.dof, fs.Nl]);
+fs.b=sym('b%d_%d',[gen.dof, fs.Nl]);
+fs.q0 = sym('q0_%d', [gen.dof, 1]);
+syms t real
+
+fs.qi = fs.q0;
+fs.qdi = sym(zeros(gen.dof,1));
+fs.qddi = sym(zeros(gen.dof,1));
+%Nl = length(fs.a);
+
+for j = 1:gen.dof
+for i =1:fs.Nl
+    fs.qi(j) = fs.qi(j)+fs.a(j,i)/(fs.w*i)*sin(fs.w*i*t)-fs.b(j,i)/(fs.w*i)*cos(fs.w*i*t);
+    fs.qdi(j) = fs.qdi(j)+fs.a(j,i)*cos(fs.w*i*t)+fs.b(j,i)*sin(fs.w*i*t);
+    fs.qddi(j) = fs.qddi(j)-fs.a(j,i)*(fs.w*i)*sin(fs.w*i*t)+fs.b(j,i)*(fs.w*i)*cos(fs.w*i*t);    
+end
+end
+%% Filter torque
+T=linspace(1,length(ident.tau),length(ident.tau));
+
+windowSize = ident.window; 
+b = (1/windowSize)*ones(1,windowSize);
+a = ident.a;
+x1= ident.tau(:,1).';
+%zi = zeros(1,max(length(a),length(b))-1);
+
+fs.tau_filter(:,1) = filter(b,a,x1)';
+
+plot(T,ident.tau(:,1).',T,fs.tau_filter(:,1).');
+
+
+% %% Calculate Cost Function
+% fs.cov = cov(ident.tau);
+% 
+% %Faster implementation not done
+% %f = matlabFunction(fs.qi(1))
+% %f(fs.a(1,1),fs.a(1,2),fs.a(1,3),fs.a(1,4),fs.a(1,5),fs.b(1,1),fs.b(1,2),fs.b(1,3),fs.b(1,4),fs.b(1,5),fs.q0(1),1);
+% 
+% for i =1:fs.N
+%     
+%     tic
+%     for j =1 :gen.dof
+%         q(j) = subs(fs.qi(j),t,fs.time(i)); 
+%         qd(j) = subs(fs.qi(j),t,fs.time(i));
+%         qdd(j) = subs(fs.qi(j),t,fs.time(i));
+%     end
+%     toc
+%    fs.F((i-1)*gen.dof+1:(i-1)*gen.dof+gen.dof,:) = gen.condfun(q(1),q(2),q(3),qd(1),qd(2),qd(3),qdd(1),qdd(2),qdd(3));
+%     
+% end
+% 
+% fs.cost = fs.cov^-0.5*ident.W;
+% 
+% 
+
+
+end

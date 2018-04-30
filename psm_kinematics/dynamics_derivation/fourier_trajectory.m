@@ -39,33 +39,38 @@ x1= ident.tau(:,1).';
 %zi = zeros(1,max(length(a),length(b))-1);
 
 fs.tau_filter(:,1) = filter(b,a,x1)';
-
+figure()
 plot(T,ident.tau(:,1).',T,fs.tau_filter(:,1).');
 
 
-% %% Calculate Cost Function
-% fs.cov = cov(ident.tau);
-% 
-% %Faster implementation not done
-% %f = matlabFunction(fs.qi(1))
-% %f(fs.a(1,1),fs.a(1,2),fs.a(1,3),fs.a(1,4),fs.a(1,5),fs.b(1,1),fs.b(1,2),fs.b(1,3),fs.b(1,4),fs.b(1,5),fs.q0(1),1);
-% 
-% for i =1:fs.N
-%     
-%     tic
-%     for j =1 :gen.dof
-%         q(j) = subs(fs.qi(j),t,fs.time(i)); 
-%         qd(j) = subs(fs.qi(j),t,fs.time(i));
-%         qdd(j) = subs(fs.qi(j),t,fs.time(i));
-%     end
-%     toc
-%    fs.F((i-1)*gen.dof+1:(i-1)*gen.dof+gen.dof,:) = gen.condfun(q(1),q(2),q(3),qd(1),qd(2),qd(3),qdd(1),qdd(2),qdd(3));
-%     
-% end
-% 
-% fs.cost = fs.cov^-0.5*ident.W;
-% 
-% 
+%% Calculate Cost Function
+fs.cov = cov(ident.tau);
+
+%Faster implementation not done
+%f = matlabFunction(fs.qi(1))
+%f(fs.a(1,1),fs.a(1,2),fs.a(1,3),fs.a(1,4),fs.a(1,5),fs.b(1,1),fs.b(1,2),fs.b(1,3),fs.b(1,4),fs.b(1,5),fs.q0(1),1);
+
+for i =1:fs.N
+    
+    tic
+    A=sym([]);
+    for j =1 :gen.dof
+        q(j) = fs.qi(j); 
+        qd(j) = fs.qdi(j);
+        qdd(j) = fs.qddi(j);
+        
+        A = [A,q(j), qd(j),qdd(j)];
+    end
+    A = subs(A,t, fs.time(i));
+    toc
+    
+   fs.F((i-1)*gen.dof+1:(i-1)*gen.dof+gen.dof,:) = gen.condfun(A(1),A(4),A(7),A(2),A(5),A(8),A(3),A(6),A(9));
+    
+end
+
+fs.cost = fs.cov^-0.5*ident.W;
+
+
 
 
 end

@@ -1,4 +1,4 @@
-function [x,v,ac,T]=Trajectory_quintic(theta,dtheta,ddtheta,tf,ts,plot_set)% theta = [qa, qb, ... qn] , dtheta = [ qa', qb', ..., qc'] , minimal 2 values. 
+function [x,v,ac,T]=Trajectory_quintic(theta,dtheta,ddtheta,tf,ts,t0,plot_set)% theta = [qa, qb, ... qn] , dtheta = [ qa', qb', ..., qc'] , minimal 2 values. 
 
 if nargin > 4
     plot_on = plot_set; 
@@ -11,7 +11,6 @@ end
 Q=[theta;
    dtheta;ddtheta];
 
-t0 = 0;
 t=t0:ts:tf;
 
 r=size(Q,2)-1;

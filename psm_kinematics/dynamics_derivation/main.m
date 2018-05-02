@@ -29,8 +29,6 @@ ident.a=1;
 [gen,traj,ident]=new_par_ident(gen,traj,ident,1);
 
 
-
-
 %% Test Parameter Identification force 
 eff.traj_p = [0 0.2 0 ; 0 0.2 0; 0 0.1 0.15];
 eff.traj_v = zeros(3);
@@ -39,16 +37,19 @@ eff.tf = 2;
 eff.ts = 0.01;  
 [eff] = make_effort(gen,eff);
 
-[eff] = compare_effort(gen,eff);
-
-
 %% Save
 savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
 save(savename);
 
+%% Compare effort
+[eff] = compare_effort(gen,eff);
+
+
 %%  Fourier Trajectory Optimization
 [fs,gen]=fourier_trajectory(gen,ident,traj);
 
+savename=strcat('data/',gen.filename,'/fourier.mat');
+save(savename);
 %% Make force Controllers 
 [gen,traj,dyn,ctrl]=impedance_control_run(gen,traj,dyn);
 

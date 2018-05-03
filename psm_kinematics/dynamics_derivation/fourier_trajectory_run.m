@@ -69,12 +69,13 @@ for i = 1:fs.Nl
     a = traj.limit_pos(j)/fs.w/i;
     b = traj.limit_vel(j);
     
-    x = min(abs([a,b]));
+    %x = min(abs([a,b]));
+    x = 100;
     
 lb_arr(j,i)       = -x;
 lb_arr(j,i+fs.Nl) = -x;
-ub_arr(j,i)       = x;
-ub_arr(j,i+fs.Nl) = x;
+ub_arr(j,i)       =  x;
+ub_arr(j,i+fs.Nl) =  x;
 
 % Ae(j,i)=1/(fs.w*i);
 % Ae(j,i+fs.Nl) = 1/(fs.w*i);
@@ -98,6 +99,7 @@ b=[];
 Ae=[];
 be=[];
 
+traj.limit_pos(1,3) = 0.24;
 traj.limit_vel(1,2:3)=[0.4 0.1];
 
 %% Run Optimization

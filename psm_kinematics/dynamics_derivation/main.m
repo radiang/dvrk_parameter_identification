@@ -15,6 +15,7 @@ traj.scale = 0.8;
 
 %% Trajectory Optimization 
 gen.condfun=matlabFunction(gen.Ys2);
+
 [gen,traj]=new_brute_trajectory(gen,traj);
 
 %% Optimal Trajectory
@@ -51,8 +52,10 @@ save(savename);
 
 [fs,gen]=fourier_trajectory_run(gen,ident,traj);
 
-savename=strcat('data/',gen.filename,'/fourier_opt.mat');
+savename=strcat('data/',gen.filename,'/fourier_opt2.mat');
 save(savename);
+
+[fs,gen] = check_fourier(gen,ident,traj,fs);
 %% Make force Controllers 
 [gen,traj,dyn,ctrl]=impedance_control_run(gen,traj,dyn);
 

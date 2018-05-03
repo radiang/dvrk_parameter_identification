@@ -58,7 +58,9 @@ four.w = fs.w; %rad/s
 
 
 %% Initial Condition
-z0 = 0.5*ones(1,(2*fs.Nl+1)*gen.dof);
+z0 = 0.5*ones(1,(2*fs.Nl+1)*(gen.dof));
+z0((2*fs.Nl+1)*(gen.dof-1)+1:(2*fs.Nl+1)*(gen.dof))= z0((2*fs.Nl+1)*(gen.dof-1)+1:(2*fs.Nl+1)*(gen.dof))/100;
+
 
 %% Make bounds
 for j = 1:gen.dof
@@ -95,6 +97,8 @@ A=[];
 b=[];
 Ae=[];
 be=[];
+
+traj.limit_vel(1,2:3)=[0.4 0.1];
 
 %% Run Optimization
 

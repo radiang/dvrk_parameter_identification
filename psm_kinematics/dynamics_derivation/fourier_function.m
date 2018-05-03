@@ -2,7 +2,7 @@ function [val]=fourier_function(z,four)
 
 
 n = 2*four.N+1;
-
+tic
 for j = 1:four.dof
 for t=1:n
 temp1 = sprintf('z(%d)',(j-1)*n+t);
@@ -11,7 +11,7 @@ eval(strcat(temp2,'=',temp1));
 
 end
 end
-
+%toc
 % disc_num = four.tf/four.ts;
 % time = linspace(0,four.tf-four.ts,disc_num);
 
@@ -39,7 +39,8 @@ F((k-1)*four.dof+1:(k-1)*four.dof+four.dof,:) = four.fun(qi(1),qi(2),qi(3),qdi(1
 
 end
 
-val = cond(mpower(four.cov,-0.5)*F);
+toc
+val = cond(mpower(four.cov,-0.5)*F)
 
 
 

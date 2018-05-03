@@ -51,7 +51,7 @@ save(savename);
 
 [fs,gen]=fourier_trajectory_run(gen,ident,traj);
 
-savename=strcat('data/',gen.filename,'/fourier.mat');
+savename=strcat('data/',gen.filename,'/fourier_opt.mat');
 save(savename);
 %% Make force Controllers 
 [gen,traj,dyn,ctrl]=impedance_control_run(gen,traj,dyn);

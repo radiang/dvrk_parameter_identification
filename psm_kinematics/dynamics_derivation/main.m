@@ -52,7 +52,7 @@ save(savename);
 
 [fs,gen]=fourier_trajectory_run(gen,ident,traj);
 
-savename=strcat('data/',gen.filename,'/fourier_opt2.mat');
+savename=strcat('data/',gen.filename,'/fourier_opt3.mat');
 save(savename);
 
 [fs,gen] = check_fourier(gen,ident,traj,fs);

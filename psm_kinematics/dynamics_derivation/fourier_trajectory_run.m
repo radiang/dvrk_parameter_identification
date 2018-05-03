@@ -58,8 +58,8 @@ four.w = fs.w; %rad/s
 
 
 %% Initial Condition
-z0 = 0.5*ones(1,(2*fs.Nl+1)*(gen.dof));
-z0((2*fs.Nl+1)*(gen.dof-1)+1:(2*fs.Nl+1)*(gen.dof))= z0((2*fs.Nl+1)*(gen.dof-1)+1:(2*fs.Nl+1)*(gen.dof))/100;
+z0 = 0.2*ones(1,(2*fs.Nl+1)*(gen.dof));
+z0((2*fs.Nl+1)*(gen.dof-1)+1:(2*fs.Nl+1)*(gen.dof))= z0((2*fs.Nl+1)*(gen.dof-1)+1:(2*fs.Nl+1)*(gen.dof))/50;
 
 
 %% Make bounds
@@ -106,7 +106,7 @@ traj.limit_vel(1,2:3)=[0.4 0.1];
 
 fun = @(z) fourier_function(z,four);
 nonloncon = @(z) max_fourier(z,four,traj.limit_pos(1:gen.dof),traj.limit_vel(1:gen.dof));
-options = optimoptions('fmincon','MaxIterations',3000,'MaxFunctionEvaluations',6000);
+options = optimoptions('fmincon','MaxIterations',3000,'MaxFunctionEvaluations',10000);
 [fs.vars, fs.opt_cond]=fmincon(fun,z0,A,b,Ae,be,lb,ub,nonloncon,options);
 
 

@@ -42,11 +42,14 @@ savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
 save(savename);
 
 %% Compare effort
+%Compare effort of open loop effort to desired trajectory using identified
+%parameters 
 [eff] = compare_effort(gen,eff);
 
-
 %%  Fourier Trajectory Optimization
-[fs,gen]=fourier_trajectory(gen,ident,traj);
+%[fs,gen]=fourier_trajectory(gen,ident,traj);
+
+[fs,gen]=fourier_trajectory_run(gen,ident,traj);
 
 savename=strcat('data/',gen.filename,'/fourier.mat');
 save(savename);

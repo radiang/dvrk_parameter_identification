@@ -58,7 +58,8 @@ fs.tau_noise = ident.tau(:,:)-fs.tau_filter(:,:);
 fs.scale_noise = std(fs.tau_noise);
 
 %% Calculate Cost Function
-fs.cov = cov(ident.tau);
+%fs.cov = cov(ident.tau);
+fs.cov=cov(ident.tau(1:fs.N*gen.dof,:).');
 
 %Faster implementation not done
 %f = matlabFunction(fs.qi(1))
@@ -87,8 +88,10 @@ end
 save('fourier.mat')
 
 %% Make Cost Function
-fs.F=simplify(fs.F);
-fs.cost = (inv(fs.cov).'*inv(fs.cov))*fs.F-log(det(fs.F.'*fs.cov*fs.F));
+%fs.F=simplify(fs.F);
+
+fs.cost1 = matlabFunction(cond(inv(sqrt(fs.cov))*fs.F));
+fs.cost2=matlabFunction(-log(det(fs.F.'*fs.cov*fs.F)));
 
 
 

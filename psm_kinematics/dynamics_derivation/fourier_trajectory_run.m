@@ -104,9 +104,10 @@ traj.limit_vel(1,2:3)=[0.4 0.1];
 
 %% Run Optimization
 
+
 fun = @(z) fourier_function(z,four);
 nonloncon = @(z) max_fourier(z,four,traj.limit_pos(1:gen.dof),traj.limit_vel(1:gen.dof));
-options = optimoptions('fmincon','MaxIterations',3000,'MaxFunctionEvaluations',10000);
+options = optimoptions('fmincon','MaxIterations',3000,'MaxFunctionEvaluations',6000);
 [fs.vars, fs.opt_cond]=fmincon(fun,z0,A,b,Ae,be,lb,ub,nonloncon,options);
 
 

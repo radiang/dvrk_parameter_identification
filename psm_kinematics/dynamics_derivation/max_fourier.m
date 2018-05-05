@@ -8,11 +8,11 @@ n = 2*four.N+1;
 for j =1:four.dof
     
     temp1 = sprintf('z(%d)',[n]);
-    temp2 = sprintf('d(%d)',j);
+    temp2 = sprintf('c(%d)',j);
     eval(strcat(temp2,'=',temp1));
     
     temp1 = sprintf('z(%d)',[n]);
-    temp2 = sprintf('d(%d)',j+four.dof);
+    temp2 = sprintf('c(%d)',j+four.dof);
     eval(strcat(temp2,'=',temp1));
     
    

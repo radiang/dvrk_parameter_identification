@@ -59,8 +59,10 @@ F((k-1)*four.dof+1:(k-1)*four.dof+four.dof,:) = F((k-1)*four.dof+1:(k-1)*four.do
 end
 
 %toc
+%First Condition
 val = cond(mpower(four.cov,-0.5)*F);
 
-
+%Second Condition
+%val = -log(det(F.'*mpower(four.cov,-1)*F));
 
 end

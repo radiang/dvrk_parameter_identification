@@ -37,6 +37,10 @@ c(2*four.dof+j) = b(j)-c(j) - limit(j);
 c(j+four.dof) = b(j+four.dof)+c(j+four.dof)-limit_vel(j);
 c(2*four.dof+j+four.dof) = b(j+four.dof)-c(j+four.dof)-limit_vel(j);
 
+if (j==3)
+  c(2*four.dof+j) = b(j)-c(j);   
+  c(2*four.dof+j+four.dof) = b(j+four.dof)-c(j+four.dof);
+end
 
 
 end

@@ -39,8 +39,9 @@ F((k-1)*four.dof+1:(k-1)*four.dof+four.dof,:) = four.fun(qi(1),qi(2),qi(3),qdi(1
 
 end
 
-val = cond(mpower(four.cov,-0.5)*F);
+%val = cond(mpower(four.cov,-0.5)*F);
 
+val = -log*det()
 
 
 end

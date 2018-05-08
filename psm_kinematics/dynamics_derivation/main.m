@@ -6,8 +6,8 @@ traj.tf = 2;
 traj.ts = 0.01;
 traj.point_num=12;
 
-traj.limit_pos=[1.5, 0.841, 0.03, 1.5, 1.5, 1.5];
-traj.limit_vel=[0.4, 0.1, 0.4, 0.4, 0.4, 0.4];
+traj.limit_pos=[1.5, 0.841, 0.24, 1.5, 1.5, 1.5];
+traj.limit_vel=[2, 2, 0.4, 0.4, 0.4, 0.4];
 traj.scale = 0.8;
 
 %% Dynamics Derivation
@@ -19,8 +19,8 @@ gen.condfun=matlabFunction(gen.Ys2);
 
 %% Optimal Trajectory
 [gen,traj]=new_optimization(gen,traj);
-save('temp1.mat')
-
+savename=strcat('data/',gen.filename,'/_optimized3.mat');
+save(savename);
 %% Parameter Identification
 gen.csvfilename='PID_data_0.9';
 ident.window = 12; 

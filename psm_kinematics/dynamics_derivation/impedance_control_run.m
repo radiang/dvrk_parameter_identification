@@ -1,5 +1,5 @@
 
-function [gen,traj,dyn,ctrl]=impedance_control_run(gen,traj,dyn)
+function [gen,traj,dyn,ctrl,init]=impedance_control_run(gen,traj,dyn)
 %% 3DOF FORCE Controller 
 % filename='new_3dof_inaxis_svd';
 % foldername = strcat('../trajectory_optimization/data/','new_3dof_inaxis_svd_traj/');
@@ -22,7 +22,7 @@ J_end_t = subs(gen.J_end, symvar(gen.J_end), qt);
 ctrl.J_diff_t = diff(J_end_t,t);
 
 %Make 3dof Jacobian 
-ctrl.J3 = subs(gen.J_end(1:6,1:3),[gen.q(4), gen.q(5), gen.q(6)],[0 0 0]);
+ctrl.J3 = subs(gen.J_end(1:3,1:3),[gen.q(4), gen.q(5), gen.q(6)],[0 0 0]);
 
 J3_diff = subs(ctrl.J_diff_t(1:6,1:3), [diff(q1t,t),diff(q2t,t),diff(q3t,t)],transpose(gen.Qd(1:3)));
 J3_diff = subs(J3_diff, q1t, gen.Q(1));

@@ -30,7 +30,7 @@ dyn.g =9.8; %m/s^2
 
 %% Try Plotting to check transformations
 %Joint Angles
-q_n = [0, .5, .02, 0, 0, 0];  %Put your numeric values here
+q_n = [0.2, 0, .02, 0, 0, 0];  %Put your numeric values here
 
 %Mass Locations
 lc_n = [-.03, .150/2, .516/2, .2881/2, .4162/2, .001, .001, .001]; %Put numeric values of Cg locations
@@ -212,42 +212,42 @@ dyn.Tee_cg(:,:,2)= dyn.T(:,:,2)*DH(-dyn.p/2-dyn.beta+gen.q(2),dyn.l_cg(11,1),0,-
 
  
 %% Plot Joint Angles Test
+
+figure()
+for i = 1:length(dyn.T)
+        T_num(:,:,i)=subs(dyn.T(:,:,i),gen.q,q_n);
+        
+        scatter3(T_num(1,4,i),T_num(2,4,i),T_num(3,4,i));
+        marker_id = sprintf('%d',i);
+        text(T_num(1,4,i),T_num(2,4,i),T_num(3,4,i),marker_id);     
+        hold on
+end
+
+
 % 
-% figure()
-% for i = 1:length(T)
-%         T_num(:,:,i)=subs(T(:,:,i),[q1 q2 q3 q4 q5 q6],q_n);
+% for i = 1:length(T_cg)
+%         T_cg_num(:,:,i)=subs(T_cg(:,:,i),[q1 q2 q3 q4 q5 q6 lc1 lc2 lc3 lc4 lc6 lc7 lc8 lc9], [q_n lc_n]);
 %         
-%         scatter3(T_num(1,4,i),T_num(2,4,i),T_num(3,4,i));
-%         marker_id = sprintf('%d',i);
-%         text(T_num(1,4,i),T_num(2,4,i),T_num(3,4,i),marker_id);     
+%         scatter3(T_cg_num(1,4,i),T_cg_num(2,4,i),T_cg_num(3,4,i),'*');
+%         marker_id = sprintf('cg_%d',i);
+%         text(T_cg_num(1,4,i),T_cg_num(2,4,i),T_cg_num(3,4,i),marker_id);
 %         hold on
 % end
-% 
-% 
-% % 
-% % for i = 1:length(T_cg)
-% %         T_cg_num(:,:,i)=subs(T_cg(:,:,i),[q1 q2 q3 q4 q5 q6 lc1 lc2 lc3 lc4 lc6 lc7 lc8 lc9], [q_n lc_n]);
-% %         
-% %         scatter3(T_cg_num(1,4,i),T_cg_num(2,4,i),T_cg_num(3,4,i),'*');
-% %         marker_id = sprintf('cg_%d',i);
-% %         text(T_cg_num(1,4,i),T_cg_num(2,4,i),T_cg_num(3,4,i),marker_id);
-% %         hold on
-% % end
-% 
-%  for i = 1:length(p_cg)
-%          p_cg_num(i,:)=subs(p_cg(i,:),[q l_cg(i,:)], [q_n, 0, 0, .1]);
-%          %if(i>9)
-%          scatter3(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),'*');
-%          marker_id = sprintf('cg_%d',i);
-%          text(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),marker_id);
-%          hold on
-%          %end
-%  end
-% title('Plot transform Frames');
-% xlabel('x');
-% ylabel('y');
-% zlabel('z');
-% T_num = double(T_num);
+
+ for i = 1:length(dyn.p_cg)
+         p_cg_num(i,:)=subs(dyn.p_cg(i,:),[q dyn.l_cg(i,:)], [q_n, 0.1, 0, .1]);
+         %if(i>9)
+         scatter3(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),'*');
+         marker_id = sprintf('cg_%d',i);
+         text(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),marker_id);
+         hold on
+         %end
+ end
+title('Plot transform Frames');
+xlabel('x');
+ylabel('y');
+zlabel('z');
+T_num = double(T_num);
 
 
 

@@ -57,6 +57,6 @@ save(savename);
 
 [fs,gen] = check_fourier(gen,ident,traj,fs);
 %% Make force Controllers 
-[gen,traj,dyn,ctrl]=impedance_control_run(gen,traj,dyn);
+[gen,traj,dyn,ctrl,init]=impedance_control_run(gen,traj,dyn);
 
 

@@ -9,7 +9,9 @@ Y=gen.Ys2;
 n = length(traj.brute_opt_pos)-1; %Data points
 dof_max=gen.dof;
 data_max= n*dof_max;
-scale = traj.scale;
+scale_p = traj.scale_p;
+scale_v = traj.scale_v;
+
 %% limits
 
 for i = 1:length(traj.limit_pos)
@@ -43,18 +45,18 @@ end
 for dof = 1:dof_max
 for data = 1:n
 
-lb(data_max+(dof-1)*n+data)=[velocity_min(1)];
-ub(data_max+(dof-1)*n+data)=[velocity_max(1)];
+lb(data_max+(dof-1)*n+data)=[velocity_min(dof)];
+ub(data_max+(dof-1)*n+data)=[velocity_max(dof)];
 if(dof==3)
-    lb(data_max+(dof-1)*n+data)=[velocity_min(2)];
-    ub(data_max+(dof-1)*n+data)=[velocity_max(2)];
+    lb(data_max+(dof-1)*n+data)=[velocity_min(dof)];
+    ub(data_max+(dof-1)*n+data)=[velocity_max(dof)];
 end
 end
 end
 
 
-lb = scale*lb;
-ub = scale*ub;
+lb = scale_p*lb;
+ub = scale_v*ub;
 
 %% Initial Guess
 
@@ -102,9 +104,9 @@ traj_v= reshape(vars((end/2+1):end),[],dof_max)';
 traj.opt_pos = [zeros(dof_max,1),traj_p,zeros(dof_max,1)];
 traj.opt_vel = [zeros(dof_max,1),traj_v,zeros(dof_max,1)];
 
-% for i=1:dof_max
-%    [opt(i,:),optd(i,:),optdd(i,:)]=Trajectory_f(traj.opt_pos(i,:),traj.opt_vel(i,:),traj.tf,traj.ts,1);
-% end
+
+%% Visuallize data
+
 
 
 % savename = strcat('data/',filename,'_optimized.mat');

@@ -234,15 +234,15 @@ end
 %         hold on
 % end
 
- for i = 1:length(dyn.p_cg)
-         p_cg_num(i,:)=subs(dyn.p_cg(i,:),[q dyn.l_cg(i,:)], [q_n, 0.1, 0, .1]);
-         %if(i>9)
-         scatter3(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),'*');
-         marker_id = sprintf('cg_%d',i);
-         text(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),marker_id);
-         hold on
-         %end
- end
+%  for i = 1:length(dyn.p_cg)
+%          p_cg_num(i,:)=subs(dyn.p_cg(i,:),[gen.q, dyn.l_cg(i,:)], [q_n, 0.1, 0, .1]);
+%          %if(i>9)
+%          scatter3(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),'*');
+%          marker_id = sprintf('cg_%d',i);
+%          text(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),marker_id);
+%          hold on
+%          %end
+%  end
 title('Plot transform Frames');
 xlabel('x');
 ylabel('y');

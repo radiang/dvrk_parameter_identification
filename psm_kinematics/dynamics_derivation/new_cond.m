@@ -19,6 +19,8 @@ end
 % array(1:dof_max,:)=[zeros(dof_max,1),array(1:dof_max,:)];
 % array_v(1:dof_max,:)=[zeros(dof_max,1),array_v(1:dof_max,:)];
 
+array(:,end+1) = [0,0,0]';
+array_v(:,end+1) =  [0,0,0]';
 
 for dof=1:dof_max
 [Q_data(dof,:),Qd_data(dof,:),Qdd_data(dof,:),T]=Trajectory_f(array(dof,:),array_v(dof,:),tf,ts);

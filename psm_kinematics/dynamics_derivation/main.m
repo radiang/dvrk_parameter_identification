@@ -1,14 +1,15 @@
 clear all
 
 %% Options 
-traj.iter = 50;
-traj.tf = 2;
+traj.iter = 60;
+traj.tf = 0.5;
 traj.ts = 0.01;
-traj.point_num=12;
+traj.point_num=40;
 
 traj.limit_pos=[1.5, 0.841, 0.24, 1.5, 1.5, 1.5];
 traj.limit_vel=[2, 2, 0.4, 0.4, 0.4, 0.4];
-traj.scale = 0.8;
+traj.scale_p = 0.7;
+traj.scale_v = 0.7;
 
 %% Dynamics Derivation
 [gen, dyn] = psm_dynamics_f();
@@ -20,8 +21,16 @@ gen.condfun=matlabFunction(gen.Ys2);
 
 %% Optimal Trajectory
 [gen,traj]=new_optimization(gen,traj);
-savename=strcat('data/',gen.filename,'/_optimized3.mat');
+
+% Visualize data
+for i=1:gen.dof
+   [opt(i,:),optd(i,:),optdd(i,:)]=Trajectory_f(traj.opt_pos(i,:),traj.opt_vel(i,:),traj.tf,traj.ts,1);
+end
+
+savename=strcat('data/',gen.filename,'/_optimized5.mat');
 save(savename);
+
+
 %% Parameter Identification
 gen.csvfilename='PID_data_0.9';
 ident.window = 12; 

@@ -52,19 +52,20 @@ end
 T=0:ts:tf*r;
 if plot_on == 1
 
- figure('Name','Position (degree)');
+ figure('Name','Position');
+ subplot(3,1,1)
  plot(T,x,'LineWidth',3);
- title('Position (degree)')
+ title('Position (rad)')
  grid
  
- figure('Name','Velocity (degree/s)');
+ subplot(3,1,2)
  plot(T,v,'LineWidth',3);
- title('Velocity (degree/s)')
+ title('Velocity (rad/s)')
   grid
- 
- figure('Name','Acceleration (degree/s^2)');
+  
+ subplot(3,1,3)
  plot(T,ac,'LineWidth',3);
- title('Acceleration (degree/s^2)')
+ title('Acceleration (rad/s^2)')
  grid
 end 
 

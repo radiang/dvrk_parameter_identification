@@ -4,8 +4,8 @@ function [gen,traj,ident]=new_par_ident(gen,traj,ident,plot_on)
 % load(loadname);
 
 foldername=strcat('data/',gen.filename,'/');
-testname = 'PID_data2';
-csvname = strcat(foldername,testname,'.csv');
+%testname = 'PID_data2';
+csvname = strcat(foldername,gen.csvfilename,'.csv');
 q=csvread(csvname);
 
 t = linspace(1,length(q(:,1)'),length(q(:,1)')); 

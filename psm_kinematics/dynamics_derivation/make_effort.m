@@ -2,7 +2,7 @@ function [eff] = make_effort(gen, eff)
 
 close all
 for i = 1:gen.dof
-[eff.joint(i,:), eff.jointd(i,:), eff.jointdd(i,:), eff.T] = Trajectory_quintic(eff.traj_p(i,:),eff.traj_v(i,:),eff.traj_a(i,:),eff.tf,eff.ts,1);
+[eff.joint(i,:), eff.jointd(i,:), eff.jointdd(i,:), eff.T] = Trajectory_quintic(eff.traj_p(i,:),eff.traj_v(i,:),eff.traj_a(i,:),eff.tf,eff.ts,0,0);
 end
 
 

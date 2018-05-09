@@ -14,7 +14,7 @@ q  = genfromtxt(foldername+testname+'.csv', delimiter=',')
 qt = q.transpose()
 
 times = 1
-speedscale=0.9
+speedscale=1
 scale = 0.92
 
 if times ==1: 
@@ -47,7 +47,7 @@ while  i<len(a[1][:]) and not rospy.is_shutdown():
 
 	i = i +1
 	
-with open(foldername+'PID_data_0.9.csv', 'wb') as myfile:
+with open(foldername+'PID_data_1_test2.csv', 'wb') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_NONE)
     for i in range(np.size(states,0)-10):
       wr.writerow(states[i])

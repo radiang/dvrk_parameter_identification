@@ -58,7 +58,7 @@ F((k-1)*four.dof+3,:)=[                                                         
 
 F((k-1)*four.dof+1:(k-1)*four.dof+four.dof,:) = F((k-1)*four.dof+1:(k-1)*four.dof+four.dof,:).*four.scale.';
 
-%F((k-1)*four.dof+1:(k-1)*four.dof+four.dof,:) = F((k-1)*four.dof+1:(k-1)*four.dof+four.dof,:).*(1./four.scale_noise.');
+%F((k-1)*four.dof+1:(k-1)*four.dof+four.dof,:) = F((k-1)*four.dof+1:(k-1)*four.dof+four.dof,:).*(four.scale_noise.');
 end
 
 P = diag(1./vecnorm(F));

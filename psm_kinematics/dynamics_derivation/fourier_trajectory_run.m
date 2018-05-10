@@ -37,13 +37,14 @@ fs.tau_filter(:,3) = filter(b,a,ident.tau(:,3))';
 % plot(T,ident.tau(:,3).',T,fs.tau_filter(:,3).');
 
 fs.tau_noise = ident.tau(:,:)-fs.tau_filter(:,:);
-fs.scale_noise = std(fs.tau_noise);
+fs.scale_noise = 1./std(fs.tau_noise);
 
 %fs.cov = cov(ident.tau);
 %fs.cov=cov(ident.tau(1:fs.disc_num*gen.dof,:).');
 fs.cov = 1;
 
 four.scale= 1./max(abs(ident.tau));
+fs.scale = four.scale;
 %% Cost Function Variables
 four.cov = fs.cov;
 four.dof=gen.dof;

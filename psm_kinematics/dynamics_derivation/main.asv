@@ -68,8 +68,7 @@ savename=strcat('data/',gen.filename,'/',gen.fourfilename,'.mat');
 save(savename);
 
 %% Fourier Trajectory Identification
-gen.fstestname = 'test1';
-[gen,fs,ident]=fs_par_ident(gen,fs,ident,1);
+[gen,ident,fs]=new_par_ident(gen,ident,fs,1);
 
 %% Make force Controllers 
 [gen,traj,dyn,ctrl,init]=impedance_control_run(gen,traj,dyn);

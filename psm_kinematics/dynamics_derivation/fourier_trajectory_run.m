@@ -2,7 +2,7 @@ function [fs, gen] = fourier_trajectory_run(gen,ident,traj)
 
 %% Options
 fs.Nl = 5; 
-fs.w = 0.1*2*pi() ;%rad/s
+fs.w = 0.1*pi() ;%rad/s
 
 fs.ts = 0.02;
 fs.period = 20;%s.
@@ -42,6 +42,8 @@ fs.scale_noise = std(fs.tau_noise);
 %fs.cov = cov(ident.tau);
 %fs.cov=cov(ident.tau(1:fs.disc_num*gen.dof,:).');
 fs.cov = 1;
+
+four.scale= 1./max(abs(ident.tau));
 %% Cost Function Variables
 four.cov = fs.cov;
 four.dof=gen.dof;
@@ -58,10 +60,26 @@ four.w = fs.w; %rad/s
 
 
 %% Initial Condition
+
 %z0 = 0.1*ones(1,(2*fs.Nl+1)*(gen.dof));
 %z0((2*fs.Nl+1)*(gen.dof-1)+1:(2*fs.Nl+1)*(gen.dof))= z0((2*fs.Nl+1)*(gen.dof-1)+1:(2*fs.Nl+1)*(gen.dof))/80;
 
-z0 = 0.00001*ones(1,(2*fs.Nl+1)*(gen.dof));
+z0 = 0.01*ones(1,(2*fs.Nl+1)*(gen.dof));
+z0(33)=0.1;
+
+
+% From Paper
+% test.v(:,:) = [0.05 -0.29 0.48 0.55 0.65 0.19 -0.4 -0.18 0.63 -0.46 -0.29;
+%                 0.03 0.29 -0.23 0.32 0.82 0.09 -0.08 0.05 -0.02 0.65 0.11;
+%                 -0.07 0.4 0.45 0.40 -0.03 -0.49 0.32 -0.26 -0.63 0.06 0.04];
+%             
+% scale = [0.98, 1, 0.1].';
+% test.v(:,:) = abs(test.v(:,:)).*scale;
+%    
+% 
+% z0 = reshape(test.v.',1,[]);
+
+
 
 %% Make bounds
 for j = 1:gen.dof
@@ -73,8 +91,8 @@ for i = 1:fs.Nl
     x = min(abs([a,b]));
     %x = 100;
     
-lb_arr(j,i)       = 0;
-lb_arr(j,i+fs.Nl) = 0;
+lb_arr(j,i)       = -x;
+lb_arr(j,i+fs.Nl) = -x;
 ub_arr(j,i)       =  x;
 ub_arr(j,i+fs.Nl) =  x;
 
@@ -83,9 +101,12 @@ ub_arr(j,i+fs.Nl) =  x;
 % Ae(j,1+2*fs.Nl) = 1;
 
 end
-lb_arr(j,1+fs.Nl*2)   = 0;
+lb_arr(j,1+fs.Nl*2)   = -traj.limit_pos(j);
 ub_arr(j,1+fs.Nl*2)   = traj.limit_pos(j);
 
+if j==3
+    lb_arr(j,1+fs.Nl*2)   = 0;
+end
 % b(j)=traj.limit_pos(j);
 % b(j+gen.dof)=-traj.limit_pos(j);
 
@@ -102,12 +123,43 @@ be=[];
 
 %traj.limit_pos(1,3) = 0.24;
 %traj.limit_vel(1,2:3)=[0.4 0.1];
+%% Constraints
+%nonloncon = @(z) max_fourier(z,four,traj.limit_pos(1:gen.dof),traj.limit_vel(1:gen.dof));
+n = 2*four.N+1;
+
+%A Matrix
+for k = 1:gen.dof 
+for j = 1:four.disc_num
+    D(j+(k-1)*four.disc_num,n*k) = 1;
+    E(j+(k-1)*four.disc_num,n*k) = 0;
+    
+    d(j+(k-1)*four.disc_num,1) = traj.limit_pos(k);
+    e(j+(k-1)*four.disc_num,1) = traj.limit_vel(k);
+    
+    for i =1:four.N
+        D(j+(k-1)*four.disc_num,i+(k-1)*n) = 1/(four.w*i)*sin(four.w*i*four.time(j));
+        D(j+(k-1)*four.disc_num,i+four.N+(k-1)*n) = -1/(four.w*i)*cos(four.w*i*four.time(j));
+        
+        E(j+(k-1)*four.disc_num,i+(k-1)*n) = cos(four.w*i*four.time(j));
+        E(j+(k-1)*four.disc_num,i+four.N+(k-1)*n) = sin(four.w*i*four.time(j));
+        
+    end
+end 
+end
+
+%b coefficients
+A = [D;E];
+b = [d;e];
+
+A = [A ; -A];
+b = [b;-b];
+
+b(b==-traj.limit_pos(3))=0;
 
 %% Run Optimization
 fun = @(z) fourier_function(z,four);
-nonloncon = @(z) max_fourier(z,four,traj.limit_pos(1:gen.dof),traj.limit_vel(1:gen.dof));
-options = optimoptions('fmincon','MaxIterations',5000,'MaxFunctionEvaluations',10000);
-[fs.vars, fs.opt_cond]=fmincon(fun,z0,A,b,Ae,be,lb,ub,nonloncon,options);
+options = optimoptions(@fmincon,'Algorithm','active-set','StepTolerance',1e-8,'FiniteDifferenceStepSize',2*sqrt(eps),'MaxIterations',5000,'MaxFunctionEvaluations',20000);
+[fs.vars, fs.opt_cond]=fmincon(fun,z0,A,b,Ae,be,lb,ub,[],options);
 
 
 %% Make Cost Function

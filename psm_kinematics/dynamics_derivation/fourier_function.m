@@ -8,7 +8,7 @@ for j = 1:four.dof
 for t=1:n
 temp1 = sprintf('z(%d)',(j-1)*n+t);
 temp2 = sprintf('v(%d,%d)',[j, t]);
-eval(strcat(temp2,'=',temp1));
+eval(strcat(temp2,'=',temp1,';'));
 
 
 end

@@ -2,10 +2,10 @@ function [fs, gen] = fourier_trajectory_run(gen,ident,traj)
 
 %% Options
 fs.Nl = 5; 
-fs.w = 0.1*pi() ;%rad/s
+fs.w = 0.1*2*pi() ;%rad/s
 
 fs.ts = 0.02;
-fs.period = 20;%s.
+fs.period = 30;%s.
 
 %% 
 
@@ -64,20 +64,20 @@ four.w = fs.w; %rad/s
 %z0 = 0.1*ones(1,(2*fs.Nl+1)*(gen.dof));
 %z0((2*fs.Nl+1)*(gen.dof-1)+1:(2*fs.Nl+1)*(gen.dof))= z0((2*fs.Nl+1)*(gen.dof-1)+1:(2*fs.Nl+1)*(gen.dof))/80;
 
-z0 = 0.01*ones(1,(2*fs.Nl+1)*(gen.dof));
-z0(33)=0.1;
+%z0 = 0.0001*ones(1,(2*fs.Nl+1)*(gen.dof));
+%z0(33)=0.1;
 
 
 % From Paper
-% test.v(:,:) = [0.05 -0.29 0.48 0.55 0.65 0.19 -0.4 -0.18 0.63 -0.46 -0.29;
-%                 0.03 0.29 -0.23 0.32 0.82 0.09 -0.08 0.05 -0.02 0.65 0.11;
-%                 -0.07 0.4 0.45 0.40 -0.03 -0.49 0.32 -0.26 -0.63 0.06 0.04];
-%             
-% scale = [0.98, 1, 0.1].';
-% test.v(:,:) = abs(test.v(:,:)).*scale;
-%    
-% 
-% z0 = reshape(test.v.',1,[]);
+test.v(:,:) = [0.05 -0.29 0.48 0.55 0.65 0.19 -0.4 -0.18 0.63 -0.46 -0.29;
+                0.03 0.29 -0.23 0.32 0.82 0.09 -0.08 0.05 -0.02 0.65 0.11;
+                -0.07 0.4 0.45 0.40 -0.03 -0.49 0.32 -0.26 -0.63 0.06 0.04];
+            
+scale = [0.98, 1, 0.3].';
+test.v(:,:) = abs(test.v(:,:)).*scale;
+   
+
+z0 = reshape(test.v.',1,[]);
 
 
 
@@ -85,7 +85,7 @@ z0(33)=0.1;
 for j = 1:gen.dof
     
 for i = 1:fs.Nl
-    a = traj.limit_pos(j)/fs.w/i;
+    a = traj.limit_pos(j)*fs.w*i;
     b = traj.limit_vel(j);
     
     x = min(abs([a,b]));
@@ -105,7 +105,7 @@ lb_arr(j,1+fs.Nl*2)   = -traj.limit_pos(j);
 ub_arr(j,1+fs.Nl*2)   = traj.limit_pos(j);
 
 if j==3
-    lb_arr(j,1+fs.Nl*2)   = 0;
+    lb_arr(j,1+fs.Nl*2)   = 0.005;
 end
 % b(j)=traj.limit_pos(j);
 % b(j+gen.dof)=-traj.limit_pos(j);
@@ -113,8 +113,8 @@ end
 end
 
 
-lb = reshape(lb_arr,1,[]);
-ub = reshape(ub_arr,1,[]);
+lb = reshape(lb_arr.',1,[]);
+ub = reshape(ub_arr.',1,[]);
 
 A=[];
 b=[];
@@ -125,9 +125,9 @@ be=[];
 %traj.limit_vel(1,2:3)=[0.4 0.1];
 %% Constraints
 %nonloncon = @(z) max_fourier(z,four,traj.limit_pos(1:gen.dof),traj.limit_vel(1:gen.dof));
-n = 2*four.N+1;
-
-%A Matrix
+ n = 2*four.N+1;
+% 
+% %A Matrix
 for k = 1:gen.dof 
 for j = 1:four.disc_num
     D(j+(k-1)*four.disc_num,n*k) = 1;
@@ -151,14 +151,16 @@ end
 A = [D;E];
 b = [d;e];
 
-A = [A ; -A];
-b = [b;-b];
+w = b;
+w(w==traj.limit_pos(3))=0.005;
 
-b(b==-traj.limit_pos(3))=0;
+A = [A ; -A];
+b = [b;w];
+
 
 %% Run Optimization
 fun = @(z) fourier_function(z,four);
-options = optimoptions(@fmincon,'Algorithm','active-set','StepTolerance',1e-8,'FiniteDifferenceStepSize',2*sqrt(eps),'MaxIterations',5000,'MaxFunctionEvaluations',20000);
+options = optimoptions(@fmincon,'Algorithm','active-set','MaxFunctionEvaluations',20000);
 [fs.vars, fs.opt_cond]=fmincon(fun,z0,A,b,Ae,be,lb,ub,[],options);
 
 

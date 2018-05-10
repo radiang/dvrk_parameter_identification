@@ -6,7 +6,7 @@ traj.tf = 0.5;
 traj.ts = 0.01;
 traj.point_num=40;
 
-traj.limit_pos=[1.5, 0.841, 0.24, 1.5, 1.5, 1.5];
+traj.limit_pos=[1.4, 0.8, 0.23, 1.5, 1.5, 1.5];
 traj.limit_vel=[2, 2, 0.4, 0.4, 0.4, 0.4];
 traj.scale_p = 0.7;
 traj.scale_v = 0.7;
@@ -58,13 +58,17 @@ save(savename);
 
 %%  Fourier Trajectory Optimization
 %[fs,gen]=fourier_trajectory(gen,ident,traj);
+gen.fourfilename = 'fourier_test';
 
 [fs,gen]=fourier_trajectory_run(gen,ident,traj);
 
-savename=strcat('data/',gen.filename,'/fourier_opt_final.mat');
+[fs,gen] = check_fourier(gen,ident,traj,fs);
+
+savename=strcat('data/',gen.filename,'/',gen.fourfilename,'.mat');
 save(savename);
 
-[fs,gen] = check_fourier(gen,ident,traj,fs);
+%% Fourier Trajectory Identifications
+
 
 %% Make force Controllers 
 [gen,traj,dyn,ctrl,init]=impedance_control_run(gen,traj,dyn);

@@ -10,6 +10,7 @@ temp1 = sprintf('z(%d)',(j-1)*n+t);
 temp2 = sprintf('v(%d,%d)',[j, t]);
 eval(strcat(temp2,'=',temp1));
 
+
 end
 end
 %toc
@@ -60,11 +61,13 @@ end
 
 
 %toc
+% Normal Condition
+val = cond(F);
+
+
 %First Condition
-val = cond(mpower(four.cov,-0.5)*F);
+%val = cond(mpower(four.cov,-0.5)*F);
 
 %Second Condition
 %val = -log(det(F.'*mpower(four.cov,-1)*F));
->>>>>>> e1a2520eeed673589427bd80d89697280e2aaeee
-
 end

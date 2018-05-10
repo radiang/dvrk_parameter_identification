@@ -1,6 +1,6 @@
 function [fs,gen]=check_fourier(gen,ident,traj,fs);
 
-test.v= reshape(fs.vars,gen.dof,[]);
+test.v= reshape(fs.vars,[],gen.dof).';
 test.dof = gen.dof;
 test.time = fs.time;
 test.N=fs.Nl;

@@ -7,11 +7,11 @@ n = 2*four.N+1;
  
 for j =1:four.dof
     
-    temp1 = sprintf('z(%d)',[n]);
+    temp1 = sprintf('z(%d)',j*n);
     temp2 = sprintf('c(%d)',j);
     eval(strcat(temp2,'=',temp1));
     
-    temp1 = sprintf('z(%d)',[n]);
+    temp1 = sprintf('z(%d)',j*n);
     temp2 = sprintf('c(%d)',j+four.dof);
     eval(strcat(temp2,'=',temp1));
     
@@ -34,6 +34,7 @@ end
 
 c(j) = b(j)+c(j)-limit(j);
 c(2*four.dof+j) = b(j)-c(j) - limit(j);
+
 c(j+four.dof) = b(j+four.dof)+c(j+four.dof)-limit_vel(j);
 c(2*four.dof+j+four.dof) = b(j+four.dof)-c(j+four.dof)-limit_vel(j);
 

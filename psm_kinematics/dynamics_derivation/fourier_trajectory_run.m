@@ -2,10 +2,10 @@ function [fs, gen] = fourier_trajectory_run(gen,ident,traj)
 
 %% Options
 fs.Nl = 5; 
-fs.w = 0.1 ;%rad/s
+fs.w = 0.1*2*pi() ;%rad/s
 
 fs.ts = 0.02;
-fs.period = 15;%s.
+fs.period = 20;%s.
 
 %% 
 
@@ -40,8 +40,8 @@ fs.tau_noise = ident.tau(:,:)-fs.tau_filter(:,:);
 fs.scale_noise = std(fs.tau_noise);
 
 %fs.cov = cov(ident.tau);
-fs.cov=cov(ident.tau(1:fs.disc_num*gen.dof,:).');
-
+%fs.cov=cov(ident.tau(1:fs.disc_num*gen.dof,:).');
+fs.cov = 1;
 %% Cost Function Variables
 four.cov = fs.cov;
 four.dof=gen.dof;
@@ -58,9 +58,10 @@ four.w = fs.w; %rad/s
 
 
 %% Initial Condition
-z0 = 0.2*ones(1,(2*fs.Nl+1)*(gen.dof));
-z0((2*fs.Nl+1)*(gen.dof-1)+1:(2*fs.Nl+1)*(gen.dof))= z0((2*fs.Nl+1)*(gen.dof-1)+1:(2*fs.Nl+1)*(gen.dof))/50;
+%z0 = 0.1*ones(1,(2*fs.Nl+1)*(gen.dof));
+%z0((2*fs.Nl+1)*(gen.dof-1)+1:(2*fs.Nl+1)*(gen.dof))= z0((2*fs.Nl+1)*(gen.dof-1)+1:(2*fs.Nl+1)*(gen.dof))/80;
 
+z0 = 0.00001*ones(1,(2*fs.Nl+1)*(gen.dof));
 
 %% Make bounds
 for j = 1:gen.dof
@@ -69,11 +70,11 @@ for i = 1:fs.Nl
     a = traj.limit_pos(j)/fs.w/i;
     b = traj.limit_vel(j);
     
-    %x = min(abs([a,b]));
-    x = 100;
+    x = min(abs([a,b]));
+    %x = 100;
     
-lb_arr(j,i)       = -x;
-lb_arr(j,i+fs.Nl) = -x;
+lb_arr(j,i)       = 0;
+lb_arr(j,i+fs.Nl) = 0;
 ub_arr(j,i)       =  x;
 ub_arr(j,i+fs.Nl) =  x;
 
@@ -82,7 +83,7 @@ ub_arr(j,i+fs.Nl) =  x;
 % Ae(j,1+2*fs.Nl) = 1;
 
 end
-lb_arr(j,1+fs.Nl*2)   = -traj.limit_pos(j);
+lb_arr(j,1+fs.Nl*2)   = 0;
 ub_arr(j,1+fs.Nl*2)   = traj.limit_pos(j);
 
 % b(j)=traj.limit_pos(j);
@@ -99,15 +100,13 @@ b=[];
 Ae=[];
 be=[];
 
-traj.limit_pos(1,3) = 0.24;
-traj.limit_vel(1,2:3)=[0.4 0.1];
+%traj.limit_pos(1,3) = 0.24;
+%traj.limit_vel(1,2:3)=[0.4 0.1];
 
 %% Run Optimization
-
-
 fun = @(z) fourier_function(z,four);
 nonloncon = @(z) max_fourier(z,four,traj.limit_pos(1:gen.dof),traj.limit_vel(1:gen.dof));
-options = optimoptions('fmincon','MaxIterations',3000,'MaxFunctionEvaluations',10000);
+options = optimoptions('fmincon','MaxIterations',5000,'MaxFunctionEvaluations',10000);
 [fs.vars, fs.opt_cond]=fmincon(fun,z0,A,b,Ae,be,lb,ub,nonloncon,options);
 
 

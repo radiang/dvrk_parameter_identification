@@ -32,7 +32,7 @@ save(savename);
 
 
 %% Parameter Identification
-gen.csvfilename='PID_data_0.9';
+gen.csvfilename='PID_data_0.9_test2';
 ident.window = 12; 
 ident.a=1;
 
@@ -61,10 +61,11 @@ save(savename);
 
 [fs,gen]=fourier_trajectory_run(gen,ident,traj);
 
-savename=strcat('data/',gen.filename,'/fourier_opt.mat');
+savename=strcat('data/',gen.filename,'/fourier_opt2.mat');
 save(savename);
 
 [fs,gen] = check_fourier(gen,ident,traj,fs);
+
 %% Make force Controllers 
 [gen,traj,dyn,ctrl,init]=impedance_control_run(gen,traj,dyn);
 

@@ -152,12 +152,10 @@ A = [D;E];
 b = [d;e];
 
 w = b;
-w(w==traj.limit_pos(3))=0.005;
+w(w==traj.limit_pos(3))=-0.005;
 
 A = [A ; -A];
 b = [b;w];
-
-
 %% Run Optimization
 fun = @(z) fourier_function(z,four);
 options = optimoptions(@fmincon,'Algorithm','active-set','MaxFunctionEvaluations',20000);

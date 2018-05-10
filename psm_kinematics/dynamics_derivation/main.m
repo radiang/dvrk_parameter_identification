@@ -67,7 +67,7 @@ gen.fourfilename = 'fourier_test';
 savename=strcat('data/',gen.filename,'/',gen.fourfilename,'.mat');
 save(savename);
 
-%% Fourier Trajectory Identifications
+%% Fourier Trajectory Identification
 
 
 %% Make force Controllers 

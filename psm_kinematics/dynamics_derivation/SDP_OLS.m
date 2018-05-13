@@ -4,6 +4,7 @@ function [gen] = SDP_OLS(gen,ident,dyn)
   nb = length(gen.Par2);
   beta = sym('beta_%d', [nb 1],'real');
 
+  n = nb;
   %% Make Ub
   w = ident.tau(1:size(ident.W)/3,:);
   w = reshape(w.',1,[]);
@@ -44,16 +45,21 @@ function [gen] = SDP_OLS(gen,ident,dyn)
   
 F = blkdiag(Up,Db);
 
-x = 0;
+nx = 0;
   %% Solve SDP
   
-% cvx_begin sdp
-% variable u
-% variable beta
-% variable gamma
-% minimize (u)
-% F >= 0
-% cvx_end
+cvx_begin sdp
+variable u
+variable beto(n)
+%variable gamma
+minimize(u)
+%F >= 0
+[u - norm(p2)^2 (p1-R1*beto)'; (p1-R1*beto) eye(n)]>=0
+%[u - norm(p2)^2, (p1-R1*beto)']>=0
+try_cvx(beto) >=0
+
+cvx_end
   
+x = 0 ;
 
 end

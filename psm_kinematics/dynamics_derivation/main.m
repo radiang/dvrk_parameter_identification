@@ -67,6 +67,9 @@ gen.fourfilename = 'fourier_test';
 savename=strcat('data/',gen.filename,'/',gen.fourfilename,'.mat');
 save(savename);
 
+%% SDP OLS
+[gen] = SDP_OLS(gen,ident);
+
 %% Fourier Trajectory Identification
 gen.fstestname = 'test1';
 [gen,fs,ident]=fs_par_ident(gen,fs,ident,1);

@@ -47,13 +47,13 @@ F = blkdiag(Up,Db);
 x = 0;
   %% Solve SDP
   
-cvx_begin sdp
-variable u
-variable beta
-variable gamma
-minimize (u)
-F >= 0
-cvx_end
+% cvx_begin sdp
+% variable u
+% variable beta
+% variable gamma
+% minimize (u)
+% F >= 0
+% cvx_end
   
 
 end

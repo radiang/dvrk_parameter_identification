@@ -182,8 +182,9 @@ condition=cond(W2)
 
 %% Find inverse Map  Par=m(Par2)
 
-m_ac = fliplr(m);
+ m_ac = fliplr(m);
  Kp = [eye(bn), -V21*inv(V22)];
+ Kg = [Kp;zeros(cn-bn,bn),eye(cn-bn)];
  
 % beta = gen.par_num;
 % 
@@ -210,7 +211,10 @@ m_ac = fliplr(m);
 
 %% Save inverse Map coefficients
 map.bn = bn;
-map.Kd = inv(E')*pinv(Kp);
+map.cn = cn;
+map.Kp = Kp;
+map.E = E;
+map.Kg = Kg;
 map.m_ac = m_ac;
 
 end

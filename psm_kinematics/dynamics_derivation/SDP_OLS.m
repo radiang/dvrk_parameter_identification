@@ -5,6 +5,8 @@ function [gen] = SDP_OLS(gen,ident,dyn,mapz)
   beta = sym('beta_%d', [nb 1],'real');
 
   n = nb;
+  nd = mapz.cn-mapz.bn;
+  
   %% Make Ub
   w = ident.tau(1:size(ident.W)/3,:);
   w = reshape(w.',1,[]);
@@ -51,16 +53,20 @@ nx = 0;
 cvx_begin sdp
 variable u
 variable beto(n)
-%variable gamma
+variable delto(nd)
 minimize(u)
 %F >= 0
 [u - norm(p2)^2 (p1-R1*beto)'; (p1-R1*beto) eye(n)]>=0
 %[u - norm(p2)^2, (p1-R1*beto)']>=0
-inverse_map(mapz,beto) >=0
+
+%%X=inverse_map(mapz,beto,delto) 
+%%diag([X(7:31).', X(end-4:end).'])>=0
 
 cvx_end
   
 gen.par_num_sdp = beto;
+gen.delta_sdp = delto;
+gen.u_sdp = u;
 x = 0 ;
 
 end

@@ -1,4 +1,4 @@
-function [gen] = SDP_OLS(gen,ident,dyn)
+function [gen] = SDP_OLS(gen,ident,dyn,mapz)
    syms u 
    
   nb = length(gen.Par2);
@@ -56,10 +56,11 @@ minimize(u)
 %F >= 0
 [u - norm(p2)^2 (p1-R1*beto)'; (p1-R1*beto) eye(n)]>=0
 %[u - norm(p2)^2, (p1-R1*beto)']>=0
-try_cvx(beto) >=0
+inverse_map(mapz,beto) >=0
 
 cvx_end
   
+gen.par_num_sdp = beto;
 x = 0 ;
 
 end

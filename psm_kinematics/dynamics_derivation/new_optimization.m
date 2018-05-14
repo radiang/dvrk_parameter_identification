@@ -92,7 +92,7 @@ xv0 = reshape(traj.brute_opt_vel(:,2:end)',1,[]);
 size = length(gen.Par2);
 fun = @(z) new_cond(z,gen.Ys2,n,dof_max,gen.condfun,size,traj.tf,traj.ts);
 
-options = optimoptions('fmincon','MaxIterations',3000,'MaxFunctionEvaluations',20000);
+options = optimoptions('fmincon','MaxIterations',3000,'MaxFunctionEvaluations',10000);
 [vars, traj.opt_cond]=fmincon(fun,[x0, xv0],A,b,Ae,be,lb,ub,[],options);
 
 
@@ -122,7 +122,7 @@ for dof=1:dof_max
 [ass(dof,:),ass(dof+dof_max,:),ass(dof+dof_max*2,:),T]=Trajectory_f(traj.opt_pos(dof,:),traj.opt_vel(dof,:),traj.tf,traj.ts,0);
 end
 
- csvname=strcat('data/',gen.filename,'_traj2.csv');
+ csvname=strcat('data/',gen.filename,'/traj2.csv');
  csvwrite(csvname,ass);
 
 end

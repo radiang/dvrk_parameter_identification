@@ -2,17 +2,17 @@ clear all
 
 %% Options 
 traj.iter = 60;
-traj.tf = 0.5;
+traj.tf = 2;
 traj.ts = 0.01;
-traj.point_num=40;
+traj.point_num=14;
 
 traj.limit_pos=[1.4, 0.8, 0.23, 1.5, 1.5, 1.5];
 traj.limit_vel=[2, 2, 0.4, 0.4, 0.4, 0.4];
-traj.scale_p = 0.7;
-traj.scale_v = 0.7;
+traj.scale_p = 0.6;
+traj.scale_v = 0.6;
 
 %% Dynamics Derivation
-[gen, dyn] = psm_dynamics_f();
+[gen, dyn,map] = psm_dynamics_f();
 
 %% Trajectory Optimization 
 gen.condfun=matlabFunction(gen.Ys2);
@@ -27,16 +27,20 @@ for i=1:gen.dof
    [opt(i,:),optd(i,:),optdd(i,:)]=Trajectory_f(traj.opt_pos(i,:),traj.opt_vel(i,:),traj.tf,traj.ts,1);
 end
 
-savename=strcat('data/',gen.filename,'/_optimized5.mat');
+savename=strcat('data/',gen.filename,'/_optimized.mat');
 save(savename);
 
 
+
 %% Parameter Identification
-gen.csvfilename='PID_data_0.9_test2';
+gen.csvfilename='test1';
 ident.window = 12; 
 ident.a=1;
 
 [gen,traj,ident]=new_par_ident(gen,traj,ident,1);
+
+%% SDP OLS
+[gen] = SDP_OLS(gen,ident,dyn,map);
 
 
 %% Test Parameter Identification force 
@@ -67,8 +71,6 @@ gen.fourfilename = 'fourier_test';
 savename=strcat('data/',gen.filename,'/',gen.fourfilename,'.mat');
 save(savename);
 
-%% SDP OLS
-[gen] = SDP_OLS(gen,ident,dyn);
 
 %% Fourier Trajectory Identification
 gen.fstestname = 'test1';

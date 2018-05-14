@@ -1,5 +1,5 @@
 
-function [gen, dyn]=psm_dynamics_f()
+function [gen, dyn, map]=psm_dynamics_f()
 syms T Jw lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9 l2 l3 l4 l5 l6 l7 l8 l9 m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11 q1 q2 q3 q4 q5 q6 qd1 qd2 qd3 qd4 qd5 qd6  qdd1 qdd2 qdd3 qdd4 qdd5 qdd6 thet1 ps  tau1 tau2 tau3 tau4 tau5 tau6 real; 
 
 gen.q   = [q1 q2 q3 q4 q5 q6];
@@ -15,7 +15,7 @@ dyn.M=[m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11];
 dyn.Lc=[lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9];
 
 
-gen.filename='new_3dof_inaxis_svd';
+gen.filename='latest_3dof_inaxis_svd';
 
 
 %% Options 
@@ -524,15 +524,15 @@ check(end+1:end+length(gen.qdd)) = gen.qdd;
 [gen.Y, tau]=equationsToMatrix(dyn.Dt == gen.Tau(1:gen.dof), gen.Par);
 
 %% Lumping Parameters
-gen.cond_ys2_lump=100000;
- old = gen.cond_ys2_lump;
+cond_ys2_lump=100000;
+ old = cond_ys2_lump;
  counter = 1;
-while gen.cond_ys2_lump>200 && counter<20
+while cond_ys2_lump>200 && counter<20
     
 
 %finding the linear combinations
 %[Ys1, Ys2, Par1, Par2, cond_ys2, W]=lumping_parameters_new(Y,Par,dof);
-[gen.Ys2,gen.Par2,gen.cond_ys2_lump,W]=svd_reduction(gen.Y,gen.Par,gen.dof);
+[Ys2,Par2,cond_ys2_lump,W,temp_map]=svd_reduction(gen.Y,gen.Par,gen.dof);
 % %% Trajectory Optimization 
 % 
 % [x, v, cond_save]=traj_opt_rand(Ys2,size(Ys2,2));
@@ -543,18 +543,24 @@ disp('Resulting Regressor Matrix: ')
 %Ys2
 
 disp('Resulting Identifiable Parameters: ')
-length(gen.Par2)
+length(Par2)
 
 counter=counter+1;
 
-if old>gen.cond_ys2_lump
-temp=strcat(gen.filename,'_all.mat');
-save(temp)
-
-temp2=strcat(gen.filename,'_Y.mat');
-save(temp2,'gen')
- old = gen.cond_ys2_lump;
+if old>cond_ys2_lump
+% temp=strcat('data/',gen.filename,'/all.mat');
+% save(temp)
+% 
+% temp2=strcat('data/',gen.filename,'/Y.mat');
+% save(temp2,'gen')
+%  old = gen.cond_ys2_lump;
+%  
  
+gen.cond_ys2 = cond_ys2_lump;
+gen.Par2 = Par2;
+gen.Ys2 = Ys2;
+map = temp_map;
+
 end
 end
 

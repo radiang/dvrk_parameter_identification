@@ -1,5 +1,5 @@
 
-function [Y2,Par2,condition,W]=svd_reduction(Y,Par,dof_num)
+function [Y2,Par2,condition,W,map]=svd_reduction(Y,Par,dof_num)
 
 syms q1 q2 q3 q4 q5 q6 qd1 qd2 qd3 qd4 qd5 qd6  qdd1 qdd2 qdd3 qdd4 qdd5 qdd6
  
@@ -92,6 +92,7 @@ end
  c = size(W,2);
  b = rank(W);
 
+ %% First Reduction 
 
 [U,S,V]=svd(W);
 
@@ -124,11 +125,13 @@ m=sort(m,'descend');
     Wn(:,m(i))=[];
     Yn(:,m(i))=[];
     Parn(:,m(i))=[];
+    
     W1(:,end+1)=W(:,m(i));
     Y1(:,end+1)=Y(:,m(i));
     Par1(end+1)=Par(m(i));
  end
 
+ %% Second reduction
 [Un,Sn,Vn]=svd(Wn);
  cn = size(Wn,2);
  bn = rank(Wn);
@@ -174,5 +177,40 @@ W2 = [W1, WB1];
 Par2 = [Par1, transpose(XB1)];
 
 condition=cond(W2)
+
+
+
+%% Find inverse Map  Par=m(Par2)
+
+m_ac = fliplr(m);
+ Kp = [eye(bn), -V21*inv(V22)];
+ 
+% beta = gen.par_num;
+% 
+% beta1 = beta(1:length(m));
+% beta2 = beta(length(m)+1:end);
+% 
+
+% 
+% X = pinv(Kp)*beta2;
+% X = inv(E')*X; % This is Parn
+%  
+% 
+% beta1_fl = fliplr(beta1.').';
+% 
+% for i=1:length(m_ac)
+% b = beta1_fl(i);
+% i1 = m_ac(i);
+% if i1 ==1
+%   X=  [b;X(i1:end)];
+% else
+% X = [X(1:i1-1);b;X(i1:end)];
+% end
+% end
+
+%% Save inverse Map coefficients
+map.bn = bn;
+map.Kd = inv(E')*pinv(Kp);
+map.m_ac = m_ac;
 
 end

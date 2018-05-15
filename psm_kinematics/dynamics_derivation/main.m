@@ -42,6 +42,7 @@ ident.a=1;
 %% SDP OLS
 [gen] = SDP_OLS(gen,ident,dyn,map);
 
+%Test Inverse_map
 
 %% Test Parameter Identification force 
 eff.traj_p = [0 0.2 0 ; 0 0.2 0; 0 0.1 0.15];

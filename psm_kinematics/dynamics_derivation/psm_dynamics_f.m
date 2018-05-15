@@ -15,7 +15,7 @@ dyn.M=[m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11];
 dyn.Lc=[lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9];
 
 
-gen.filename='latest_3dof_inaxis_svd';
+gen.filename='latest2_3dof_inaxis_svd';
 
 
 %% Options 
@@ -127,6 +127,14 @@ for i=1:1:length(dyn.Ixx)
               dyn.Ixz(i),dyn.Iyz(i),dyn.Izz(i);]; 
 end
 
+%% Inertia in Link frame
+
+for i = 1:length(dyn.Ixx)
+   S = [0, -dyn.l_cg(i,3), dyn.l_cg(i,2)   ;dyn.l_cg(i,3)  ,0 , -dyn.l_cg(i,1)   ; -dyn.l_cg(i,2)  , dyn.l_cg(i,1)    , 0  ]; 
+    
+dyn.L(:,:,i) = dyn.I(:,:,i) + dyn.M(i)*S'*S;
+
+end
 %% Make Stuff Zero
 
 

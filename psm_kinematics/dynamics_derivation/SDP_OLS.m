@@ -48,6 +48,27 @@ function [gen] = SDP_OLS(gen,ident,dyn,mapz)
 F = blkdiag(Up,Db);
 
 nx = 0;
+
+%% Find Inertia Strings in gen.Par
+
+index = ["xx", "yy","zz","xy","xz","yz"];
+for j = 1:length(index)
+for i = 1:length(dyn.M)
+    temp = sprintf('dyn.I%s(i)',index(j));
+    temp2 = sprintf('arr(%d,%d)',[j,i]);
+    %arr(j,i)
+    eval(strcat( 'x = find(gen.Par ==', temp,');'));
+    
+   if isempty(x)
+      arr(j,i) = 0;
+      
+   else
+       arr(j,i) = x;
+   end
+  
+end
+end
+
   %% Solve SDP
   
 cvx_begin sdp
@@ -59,8 +80,33 @@ minimize(u)
 [u - norm(p2)^2 (p1-R1*beto)'; (p1-R1*beto) eye(n)]>=0
 %[u - norm(p2)^2, (p1-R1*beto)']>=0
 
-%%X=inverse_map(mapz,beto,delto) 
-%%diag([X(7:31).', X(end-4:end).'])>=0
+X=inverse_map(mapz,beto,delto)
+% Mass Constraints
+diag([X(end-4:end).'])>=0
+% Inertia Constraints
+for i = 1:length(arr)
+    if sum(arr(:,i)) ~=0
+     
+       for j = 1:length(index)
+          if arr(j,i) ~=0
+              if j<=3
+              D(j,j,i)= X(arr(j,i));
+              elseif j==4
+              D(1,2,i)= X(arr(j,i));
+              D(2,1,i)= X(arr(j,i));
+              elseif j ==5 
+              D(1,3,i)= X(arr(j,i));
+              D(3,1,i)= X(arr(j,i));
+              else
+              D(2,3,i)= X(arr(j,i));
+              D(3,2,i)= X(arr(j,i));
+              end
+          end
+       end
+        D(:,:,i) >=0 
+    end
+      
+end
 
 cvx_end
   
@@ -68,5 +114,8 @@ gen.par_num_sdp = beto;
 gen.delta_sdp = delto;
 gen.u_sdp = u;
 x = 0 ;
+
+gen.par_nlump_num = inverse_map(mapz,beto,delto);
+
 
 end

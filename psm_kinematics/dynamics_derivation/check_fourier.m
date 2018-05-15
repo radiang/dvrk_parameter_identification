@@ -1,4 +1,4 @@
-function [fs,gen]=check_fourier(gen,ident,traj,fs);
+function [fs,gen]=check_fourier(gen,traj,fs)
 close all
 test.v= reshape(fs.vars,[],gen.dof).';
 test.w = fs.w;
@@ -31,11 +31,14 @@ test.N=fs.Nl;
 
 %% Condition number of regressor
 for i=1:length(fs.qi(1,:)) 
-    W(1+(i-1)*gen.dof:gen.dof+(i-1)*gen.dof,:)=gen.condfun(fs.qi(1,i),fs.qi(2,i),fs.qi(3,i),fs.qdi(1,i),fs.qdi(2,i),fs.qdi(3,i),fs.qddi(1,i),fs.qddi(2,i),fs.qddi(3,i));
- %W(1+(i-1)*dof_num:dof_num+(i-1)*dof_num,:)=subs(Ys2, transpose([Q(1:dof_num); Qd(1:dof_num) ;Qdd(1:dof_num)]),[q(i,1:3), qdf(i,1:3), acc(i,1:3)]);
+    X = gen.condfun(fs.qi(1,i),fs.qi(2,i),fs.qi(3,i),fs.qdi(1,i),fs.qdi(2,i),fs.qdi(3,i),fs.qddi(1,i),fs.qddi(2,i),fs.qddi(3,i));
+    W(1+(i-1)*gen.dof:gen.dof+(i-1)*gen.dof,:)= X.*[0.5200,    0.5034,    0.2574].';
+    
+    %W(1+(i-1)*dof_num:dof_num+(i-1)*dof_num,:)=subs(Ys2, transpose([Q(1:dof_num); Qd(1:dof_num) ;Qdd(1:dof_num)]),[q(i,1:3), qdf(i,1:3), acc(i,1:3)]);
 end
+P = diag(1./vecnorm(W));
 
-fs.cond=cond(W);
+fs.cond_weighted=cond(W*P);
 %% plot
 
 figure()

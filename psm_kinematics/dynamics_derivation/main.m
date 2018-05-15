@@ -8,16 +8,23 @@ traj.point_num=14;
 
 traj.limit_pos=[1.4, 0.8, 0.23, 1.5, 1.5, 1.5];
 traj.limit_vel=[2, 2, 0.4, 0.4, 0.4, 0.4];
-traj.scale_p = 0.6;
-traj.scale_v = 0.6;
+traj.scale_p = 0.7;
+traj.scale_v = 0.4;
+
+gen.filename='3dof_inplane_svd';
+
+%Degrees of Freedom of robot
+gen.dof = 3; 
+
 
 %% Dynamics Derivation
-[gen, dyn,map] = psm_dynamics_f();
+[gen, dyn,map] = psm_dynamics_f(gen);
 
 %% Trajectory Optimization 
 gen.condfun=matlabFunction(gen.Ys2);
 
 [gen,traj]=new_brute_trajectory(gen,traj);
+
 
 %% Optimal Trajectory
 [gen,traj]=new_optimization(gen,traj);
@@ -30,7 +37,16 @@ end
 savename=strcat('data/',gen.filename,'/_optimized.mat');
 save(savename);
 
+%%  Fourier Trajectory Optimization
+%[fs,gen]=fourier_trajectory(gen,ident,traj);
+gen.fourfilename = 'fourier_test2';
 
+[fs,gen]=fourier_trajectory_run(gen,traj);
+
+[fs,gen] = check_fourier(gen,traj,fs);
+
+savename=strcat('data/',gen.filename,'/',gen.fourfilename,'.mat');
+save(savename);
 
 %% Parameter Identification
 gen.csvfilename='test1';
@@ -61,16 +77,7 @@ save(savename);
 %parameters 
 [eff] = compare_effort(gen,eff);
 
-%%  Fourier Trajectory Optimization
-%[fs,gen]=fourier_trajectory(gen,ident,traj);
-gen.fourfilename = 'fourier_test';
 
-[fs,gen]=fourier_trajectory_run(gen,ident,traj);
-
-[fs,gen] = check_fourier(gen,ident,traj,fs);
-
-savename=strcat('data/',gen.filename,'/',gen.fourfilename,'.mat');
-save(savename);
 
 
 %% Fourier Trajectory Identification

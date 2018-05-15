@@ -1,54 +1,53 @@
-function [fs, gen] = fourier_trajectory_run(gen,ident,traj)
+function [fs, gen] = fourier_trajectory_run(gen,traj)
 
 %% Options
 fs.Nl = 5; 
-fs.w = 0.1*2*pi() ;%rad/s
+fs.w = 0.18*2*pi() ;%rad/s
 
 fs.ts = 0.02;
 fs.period = 30;%s.
 
 %% 
-
 fs.disc_num = fs.period/fs.ts;
 fs.time = linspace(0,fs.period-fs.ts,fs.disc_num);
 
 
 %% Filter torque
-T=linspace(1,length(ident.tau),length(ident.tau));
-
-windowSize = ident.window; 
-b = (1/windowSize)*ones(1,windowSize);
-a = ident.a;
-x1= ident.tau(:,1).';
-%zi = zeros(1,max(length(a),length(b))-1);
-
-fs.tau_filter(:,1) = filter(b,a,ident.tau(:,1))';
-fs.tau_filter(:,2) = filter(b,a,ident.tau(:,2))';
-fs.tau_filter(:,3) = filter(b,a,ident.tau(:,3))';
-
-
-% figure()
-% subplot(3,1,1)
-% plot(T,ident.tau(:,1).',T,fs.tau_filter(:,1).');
-% hold on
-% subplot(3,1,2)
-% plot(T,ident.tau(:,2).',T,fs.tau_filter(:,2).');
-% subplot(3,1,3)
-% plot(T,ident.tau(:,3).',T,fs.tau_filter(:,3).');
-
-fs.tau_noise = ident.tau(:,:)-fs.tau_filter(:,:);
-fs.scale_noise = 1./std(fs.tau_noise);
-
-%fs.cov = cov(ident.tau);
-%fs.cov=cov(ident.tau(1:fs.disc_num*gen.dof,:).');
-fs.cov = 1;
-
-four.scale= 1./max(abs(ident.tau));
-fs.scale = four.scale;
+% T=linspace(1,length(ident.tau),length(ident.tau));
+% 
+% windowSize = ident.window; 
+% b = (1/windowSize)*ones(1,windowSize);
+% a = ident.a;
+% x1= ident.tau(:,1).';
+% %zi = zeros(1,max(length(a),length(b))-1);
+% 
+% fs.tau_filter(:,1) = filter(b,a,ident.tau(:,1))';
+% fs.tau_filter(:,2) = filter(b,a,ident.tau(:,2))';
+% fs.tau_filter(:,3) = filter(b,a,ident.tau(:,3))';
+% 
+% 
+% % figure()
+% % subplot(3,1,1)
+% % plot(T,ident.tau(:,1).',T,fs.tau_filter(:,1).');
+% % hold on
+% % subplot(3,1,2)
+% % plot(T,ident.tau(:,2).',T,fs.tau_filter(:,2).');
+% % subplot(3,1,3)
+% % plot(T,ident.tau(:,3).',T,fs.tau_filter(:,3).');
+% 
+% fs.tau_noise = ident.tau(:,:)-fs.tau_filter(:,:);
+% fs.scale_noise = 1./std(fs.tau_noise);
+% 
+% %fs.cov = cov(ident.tau);
+% %fs.cov=cov(ident.tau(1:fs.disc_num*gen.dof,:).');
+% fs.cov = 1;
+% 
+% four.scale= 1./max(abs(ident.tau));
+% fs.scale = four.scale;
 %% Cost Function Variables
-four.cov = fs.cov;
+%four.cov = fs.cov;
 four.dof=gen.dof;
-four.scale_noise=fs.scale_noise;
+%four.scale_noise=fs.scale_noise;
 
 four.N = fs.Nl;
 four.time = fs.time;
@@ -59,6 +58,7 @@ four.fun=gen.condfun;
 
 four.w = fs.w; %rad/s
 
+four.Ys2 = gen.Ys2;
 
 %% Initial Condition
 
@@ -74,7 +74,7 @@ test.v(:,:) = [0.05 -0.29 0.48 0.55 0.65 0.19 -0.4 -0.18 0.63 -0.46 -0.29;
                 0.03 0.29 -0.23 0.32 0.82 0.09 -0.08 0.05 -0.02 0.65 0.11;
                 -0.07 0.4 0.45 0.40 -0.03 -0.49 0.32 -0.26 -0.63 0.06 0.04];
             
-scale = [0.98, 1, 0.3].';
+scale = [0.98, 1, 0.5].';
 test.v(:,:) = abs(test.v(:,:)).*scale;
    
 
@@ -122,8 +122,6 @@ b=[];
 Ae=[];
 be=[];
 
-%traj.limit_pos(1,3) = 0.24;
-%traj.limit_vel(1,2:3)=[0.4 0.1];
 %% Constraints
 %nonloncon = @(z) max_fourier(z,four,traj.limit_pos(1:gen.dof),traj.limit_vel(1:gen.dof));
  n = 2*four.N+1;
@@ -159,7 +157,7 @@ A = [A ; -A];
 b = [b;w];
 %% Run Optimization
 fun = @(z) fourier_function(z,four);
-options = optimoptions(@fmincon,'Algorithm','active-set','MaxFunctionEvaluations',20000);
+options = optimoptions(@fmincon,'Algorithm','active-set','MaxIterations',500,'MaxFunctionEvaluations',20000);
 [fs.vars, fs.opt_cond]=fmincon(fun,z0,A,b,Ae,be,lb,ub,[],options);
 
 

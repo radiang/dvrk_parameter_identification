@@ -1,5 +1,5 @@
 
-function [gen, dyn, map]=psm_dynamics_f()
+function [gen, dyn, map]=psm_dynamics_f(gen)
 syms T Jw lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9 l2 l3 l4 l5 l6 l7 l8 l9 m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11 q1 q2 q3 q4 q5 q6 qd1 qd2 qd3 qd4 qd5 qd6  qdd1 qdd2 qdd3 qdd4 qdd5 qdd6 thet1 ps  tau1 tau2 tau3 tau4 tau5 tau6 real; 
 
 gen.q   = [q1 q2 q3 q4 q5 q6];
@@ -14,14 +14,7 @@ gen.Tau = [tau1 tau2 tau3 tau4 tau5 tau6]';
 dyn.M=[m1 m2 m3 m4 m5 m6 m7 m8 m9 m10 m11];
 dyn.Lc=[lc1 lc2 lc3 lc4 lc5 lc6 lc7 lc8 lc9];
 
-
-gen.filename='latest2_3dof_inaxis_svd';
-
-
-%% Options 
-%Degrees of Freedom of robot
-gen.dof = 3; 
-
+%% Options
 %calculate dynamics?? 
 dyn.dynamic = 1;
 
@@ -143,19 +136,20 @@ end
 % l_cg(11,:) = zeros(1,3);
 
 %In Plane Masses
-% l_cg(1,1) = 0;
-% l_cg(2,3) = 0;
-% l_cg(3,3) = 0;
-% l_cg(4,3) = 0;
-% l_cg(6,2) = 0;
-% l_cg(7,1) = 0;
-% l_cg(8,3) = 0;
-% l_cg(9,2) = 0;
-% l_cg(11,2) = 0;
+l_cg(1,1) = 0;
+l_cg(2,3) = 0;
+l_cg(3,3) = 0;
+l_cg(4,3) = 0;
+l_cg(6,2) = 0;
+l_cg(7,1) = 0;
+l_cg(8,3) = 0;
+l_cg(9,2) = 0;
+l_cg(11,2) = 0;
 % 
 % 
 % l_cg(6,1)=0;
 % l_cg(1,2)=0;
+
 %Lump Gripper stuff 
 dyn.M(7)=0;
 dyn.I(1:3,1:3,7) = zeros(3);
@@ -185,31 +179,31 @@ dyn.l_cg(10,:) = zeros(1,4);
 % l_cg(11,:) = zeros(1,4);
 
 %In Axis Masses
- dyn.l_cg(1,3) = 0;
- dyn.l_cg(1,2) = dyn.d(2)/2;
- dyn.l_cg(2,2:3) = 0;
- dyn.l_cg(3,2:3) = 0;
- dyn.l_cg(4,2:3) = 0;
- dyn.l_cg(6,1:2) = 0;
- dyn.l_cg(7,1) = 0; 
- dyn.l_cg(7,3) = 0; 
- dyn.l_cg(8,2:3) = 0;
- dyn.l_cg(9,2:3) = 0;
- dyn.l_cg(11,1:2) = 0;
+%  dyn.l_cg(1,3) = 0;
+%  dyn.l_cg(1,2) = dyn.d(2)/2;
+%  dyn.l_cg(2,2:3) = 0;
+%  dyn.l_cg(3,2:3) = 0;
+%  dyn.l_cg(4,2:3) = 0;
+%  dyn.l_cg(6,1:2) = 0;
+%  dyn.l_cg(7,1) = 0; 
+%  dyn.l_cg(7,3) = 0; 
+%  dyn.l_cg(8,2:3) = 0;
+%  dyn.l_cg(9,2:3) = 0;
+%  dyn.l_cg(11,1:2) = 0;
 
 
 %% Let's try a new Center of Mass 
 
 dyn.map = [q1,q2,-q2,q2,0,q3,q4,q5,q6];
 % %INPLANE cg_i from frame i
-% for i = 1:length(l_cg)-2 
-% p_cg(i,:)  = T(:,:,i)*DH(map(i),0,0,0)*transpose(l_cg(i,:));
-% end 
+for i = 1:length(dyn.l_cg)-2 
+dyn.p_cg(i,:)  = dyn.T(:,:,i)*DH(dyn.map(i),0,0,0)*transpose(dyn.l_cg(i,:));
+end 
 
 %INAXIS cg_i from frame i+1
-for i = 1:length(dyn.l_cg)-2 
-dyn.p_cg(i,:)  = dyn.T(:,:,i+1)*transpose([dyn.l_cg(i,:)]);
-end 
+% for i = 1:length(dyn.l_cg)-2 
+% dyn.p_cg(i,:)  = dyn.T(:,:,i+1)*transpose([dyn.l_cg(i,:)]);
+% end 
 
 counter_num = 2;
 dyn.Tee_cg(:,:,1)= dyn.T(:,:,2)*DH(dyn.map(2),0,0,0);

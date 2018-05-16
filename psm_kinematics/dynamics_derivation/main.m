@@ -39,7 +39,7 @@ save(savename);
 
 %%  Fourier Trajectory Optimization
 %[fs,gen]=fourier_trajectory(gen,ident,traj);
-gen.fourfilename = 'fourier_test2';
+gen.fourfilename = 'fourier_test3';
 
 [fs,gen]=fourier_trajectory_run(gen,traj);
 

@@ -70,6 +70,7 @@ four.Ys2 = gen.Ys2;
 
 
 % From Paper
+
 test.v(:,:) = [0.05 -0.29 0.48 0.55 0.65 0.19 -0.4 -0.18 0.63 -0.46 -0.29;
                 0.03 0.29 -0.23 0.32 0.82 0.09 -0.08 0.05 -0.02 0.65 0.11;
                 -0.07 0.4 0.45 0.40 -0.03 -0.49 0.32 -0.26 -0.63 0.06 0.04];
@@ -157,7 +158,7 @@ A = [A ; -A];
 b = [b;w];
 %% Run Optimization
 fun = @(z) fourier_function(z,four);
-options = optimoptions(@fmincon,'Algorithm','active-set','MaxIterations',500,'MaxFunctionEvaluations',20000);
+options = optimoptions(@fmincon,'Display','iter','Algorithm','active-set','MaxIterations',500,'MaxFunctionEvaluations',20000);
 [fs.vars, fs.opt_cond]=fmincon(fun,z0,A,b,Ae,be,lb,ub,[],options);
 
 

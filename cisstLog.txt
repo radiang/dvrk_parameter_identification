@@ -1,0 +1,53 @@
+M- cisst 1.0.9 (git: 1.0.9-76-g2162939)
+M- CISST_ROOT: undefined
+M- cisst share: undefined
+M- cmn_m: 1, cmn_kg: 1, CISST_USE_SI_UNITS is set to 1
+M- Class cmnClassRegister: SetLogMaskClassMatching: log LoD has been set to "-D -M -W -E D- M- W- E- " for the following classes matching "mtsIntuitiveResearchKit": mtsIntuitiveResearchKitArm, mtsIntuitiveResearchKitArmQtWidget, mtsIntuitiveResearchKitArmTypesProxy, mtsIntuitiveResearchKitConsole, mtsIntuitiveResearchKitConsoleQt, mtsIntuitiveResearchKitConsoleQtWidget, mtsIntuitiveResearchKitECM, mtsIntuitiveResearchKitMTM, mtsIntuitiveResearchKitPSM, mtsIntuitiveResearchKitSUJ, mtsIntuitiveResearchKitSUJQtWidget, mtsIntuitiveResearchKitUDPStreamer, 
+M- osaThread::CreateInternal: create thread named: Unnamed
+M- osaThread::CreateInternal: create thread named: Unnamed
+M- Class mtsIntuitiveResearchKitConsole: Configure: console using file "/home/adnan/dvrk_ws/src/dvrk-ros/dvrk_robot/config/console-PSM2.json"
+----> content of configuration file: 
+/* -*- Mode: Javascript; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
+{
+	"arms" : 
+	[
+		{
+			"io" : "sawRobotIO1394-PSM2-29130.xml",
+			"kinematic" : "psm-large-needle-driver.json",
+			"name" : "PSM2",
+			"pid" : "sawControllersPID-PSM.xml",
+			"type" : "PSM"
+		}
+	]
+}
+<----
+M- Class mtsIntuitiveResearchKitConsole: Configure: using default io:period, io:port, io:firewire-protocol and io:watchdog-timeout
+M- Class mtsIntuitiveResearchKitConsole: Configure:
+     - Period IO is 0.0003
+     - FireWire port is 0
+     - Protocol is 1
+     - Watchdog timeout is 0.03
+FirewirePort::Init: number of ports = 1
+FirewirePort::Init: successfully initialized port 0
+FirewirePort::Init: successfully disabled cycle start packet
+FirewirePort::ScanNodes: base node id = ffc0
+FirewirePort::ScanNodes: building node map for 7 nodes:
+  Node 0, BoardId = 2, Firmware Version = 5
+  Node 1, BoardId = 3, Firmware Version = 5
+  Node 2, BoardId = 9, Firmware Version = 4
+  Node 3, BoardId = 8, Firmware Version = 4
+  Node 4, BoardId = 7, Firmware Version = 5
+  Node 5, BoardId = 6, Firmware Version = 5
+FirewirePort::ScanNodes: all nodes broadcast capable and do not support shorter wait
+FirewirePort::NumberOfUsers: found 2 users
+Full lsof result:
+COMMAND    PID PPID  USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+dvrk_cons 7644 8048 adnan   20u   CHR  244,0      0t0  333 /dev/fw0
+dvrk_cons 7644 8048 adnan   27u   CHR  244,0      0t0  333 /dev/fw0
+dvrk_cons 7857 8063 adnan   20u   CHR  244,0      0t0  333 /dev/fw0
+dvrk_cons 7857 8063 adnan   27u   CHR  244,0      0t0  333 /dev/fw0
+sh        7870 7857 adnan   20u   CHR  244,0      0t0  333 /dev/fw0
+sh        7870 7857 adnan   27u   CHR  244,0      0t0  333 /dev/fw0
+
+E- cmnThrow with std::exception (osaIO1394Port: Found more than one user on firewire port: 0)
+E- Class mtsRobotIO1394: File: mtsRobotIO1394.cpp Line: 178 -  osaIO1394Port: Found more than one user on firewire port: 0

@@ -7,14 +7,14 @@ import csv
 import numpy as np
 import dvrk
 
-foldername = './data/3dof_svd/'
-testname =  'fourier_test'
+foldername = './data/3dof_inplane_svd/'
+testname =  'fourier_test2'
 
 q  = genfromtxt(foldername+testname+'.csv', delimiter=',')
 qt = q.transpose()
 
 times = 1
-speedscale=0.4
+speedscale=1
 scale = 1
 
 if times ==1: 

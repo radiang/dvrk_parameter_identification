@@ -49,16 +49,19 @@ savename=strcat('data/',gen.filename,'/',gen.fourfilename,'.mat');
 save(savename);
 
 %% Parameter Identification
-gen.csvfilename='test1';
-ident.window = 12; 
+gen.csvfilename=gen.fourfilename;
+ident.window = 8; 
 ident.a=1;
 
 [gen,traj,ident]=new_par_ident(gen,traj,ident,1);
 
 %% SDP OLS
 [gen] = SDP_OLS(gen,ident,dyn,map);
-
 %Test Inverse_map
+
+%% Save
+savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
+save(savename);
 
 %% Test Parameter Identification force 
 eff.traj_p = [0 0.2 0 ; 0 0.2 0; 0 0.1 0.15];
@@ -68,9 +71,7 @@ eff.tf = 2;
 eff.ts = 0.01;  
 [eff] = make_effort(gen,eff);
 
-%% Save
-savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
-save(savename);
+
 
 %% Compare effort
 %Compare effort of open loop effort to desired trajectory using identified

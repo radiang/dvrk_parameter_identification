@@ -58,7 +58,7 @@ for i = 1:length(dyn.M)
     temp2 = sprintf('arr(%d,%d)',[j,i]);
     %arr(j,i)
     eval(strcat( 'x = find(gen.Par ==', temp,');'));
-    
+   
    if isempty(x)
       arr(j,i) = 0;
       
@@ -69,7 +69,19 @@ for i = 1:length(dyn.M)
 end
 end
 
+
+for i = 1:length(dyn.M)
+      x = find(gen.Par == dyn.M(i));
+   if isempty(x)
+      mass(i) = 0;
+   else
+       mass(i) = x;
+   end
+  
+end
   %% Solve SDP
+
+  counter = 1;
   
 cvx_begin sdp
 variable u
@@ -82,7 +94,18 @@ minimize(u)
 
 X=inverse_map(mapz,beto,delto)
 % Mass Constraints
-diag([X(end-4:end).'])>=0
+for i = 1:length(mass)
+    if sum(mass(i)) ~=0
+        if counter ==1
+            temp = X(mass(i));
+        else
+            temp(end+1) = X(mass(i)); 
+        end
+      counter = counter +1;
+    end 
+end
+diag(temp)>=0
+
 % Inertia Constraints
 for i = 1:length(arr)
     if sum(arr(:,i)) ~=0
@@ -110,12 +133,10 @@ end
 
 cvx_end
   
-gen.par_num_sdp = beto;
-gen.delta_sdp = delto;
-gen.u_sdp = u;
+gen.sdp_par2 = ident.P*beto;
+gen.sdp_delta = delto;
+gen.sdp_u = u;
 x = 0 ;
 
-gen.par_nlump_num = inverse_map(mapz,beto,delto);
-
-
+gen.sdp_par = inverse_map(mapz,beto,delto);
 end

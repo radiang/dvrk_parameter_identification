@@ -1,4 +1,4 @@
-function [gen,traj,ident]=new_par_ident(gen,traj,ident,plot_on)
+function [gen,traj,ident,fs]=new_par_ident(gen,traj,ident,fs,plot_on)
 % filename = 'new_3dof_inaxis_svd';
 % loadname = strcat('data/',filename,'_optimized.mat');
 % load(loadname);
@@ -12,6 +12,20 @@ q=csvread(csvname);
 t = linspace(1,length(q(:,1)'),length(q(:,1)')); 
 dof_num = gen.dof;
 
+%% Delete close to zero velocity
+tol = 0.08; 
+% Deleting data near zero friction better results for joint 1 and 2, 
+% but makes joint 3 data worse.
+
+for i = length(q(:,1)):-1:1
+    if abs(q(i,4))<tol||abs(q(i,5))<tol||abs(q(i,6))<tol
+        q(i,:) = [];
+        t(i) = [];
+        fs.qi(:,i)=[];
+        fs.qdi(:,i)=[];
+        fs.qddi(:,i)=[];
+    end
+end
 %% Filter Velocity
 
 % windowSize = ident.window; 
@@ -19,9 +33,9 @@ dof_num = gen.dof;
 % a = ident.a;
 
 fc = 4;
-fs = 200;
+fss = 200;
 
-[b,a] = butter(8,fc/(fs/2));
+[b,a] = butter(8,fc/(fss/2));
 
 x1= q(:,4).';
 x2= q(:,5).';
@@ -67,8 +81,8 @@ x3= ident.tau(:,3).';
 
 
 fc = 4;
-fs = 200;
-[b,a] = butter(8,fc/(fs/2));
+fss = 200;
+[b,a] = butter(8,fc/(fss/2));
 
 tauf(:,1) = filtfilt(b,a,x1)';
 tauf(:,2) = filtfilt(b,a,x2)';

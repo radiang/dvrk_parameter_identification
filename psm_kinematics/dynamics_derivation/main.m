@@ -53,7 +53,7 @@ gen.csvfilename=gen.fourfilename;
 ident.window = 8; 
 ident.a=1;
 
-[gen,traj,ident]=new_par_ident(gen,traj,ident,1);
+[gen,traj,ident,fs]=new_par_ident(gen,traj,ident,fs,1);
 
 %% SDP OLS
 [gen] = SDP_OLS(gen,ident,dyn,map);

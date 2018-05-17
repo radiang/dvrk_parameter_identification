@@ -2,9 +2,9 @@ function [fs, gen] = fourier_trajectory_run(gen,traj)
 
 %% Options
 fs.Nl = 5; 
-fs.w = 0.18*2*pi() ;%rad/s
+fs.w = 0.13*2*pi() ;%rad/s
 
-fs.ts = 0.02;
+fs.ts = 0.005;
 fs.period = 30;%s.
 
 %% 
@@ -158,7 +158,7 @@ A = [A ; -A];
 b = [b;w];
 %% Run Optimization
 fun = @(z) fourier_function(z,four);
-options = optimoptions(@fmincon,'Display','iter','Algorithm','active-set','MaxIterations',500,'MaxFunctionEvaluations',20000);
+options = optimoptions(@fmincon,'Display','iter','Algorithm','active-set','MaxIterations',200,'MaxFunctionEvaluations',6000);
 [fs.vars, fs.opt_cond]=fmincon(fun,z0,A,b,Ae,be,lb,ub,[],options);
 
 

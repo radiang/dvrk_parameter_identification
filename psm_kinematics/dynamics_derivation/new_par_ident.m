@@ -74,6 +74,8 @@ tauf(:,1) = filtfilt(b,a,x1)';
 tauf(:,2) = filtfilt(b,a,x2)';
 tauf(:,3) = filtfilt(b,a,x3)';
 
+ident.tau = tauf;
+
 figure()
 subplot(3,1,1)
 plot(t,x1,t,tauf(:,1)');
@@ -125,7 +127,7 @@ end
 
 %% 
 for i=1:length(q(:,1))-10 
-    W(1+(i-1)*dof_num:dof_num+(i-1)*dof_num,:)=diag(ident.scale)*gen.condfun(q(i,1),q(i,2),q(i,3),qdf(i,1),qdf(i,2),qdf(i,3),acc(i,1),acc(i,2),acc(i,3)).*ident.scale.';
+    W(1+(i-1)*dof_num:dof_num+(i-1)*dof_num,:)=gen.condfun(q(i,1),q(i,2),q(i,3),qdf(i,1),qdf(i,2),qdf(i,3),acc(i,1),acc(i,2),acc(i,3));
 end
 
 %X = ones(1,length(gen.Par2));
@@ -135,18 +137,46 @@ P = diag(X);
 ident.W= W*P;
 
 gen.LS_cond= cond(ident.W);
-tau = reshape(ident.tau.',1,[]).';
+ident.wtau = reshape(ident.tau.',1,[]).';
 
-gen.LS_par2 = pinv(ident.W)*(tau(1:length(ident.W)));
-gen.LS_par2 = P*gen.LS_par2;
-
-
+gen.ls_par2 = pinv(ident.W)*(ident.wtau(1:length(ident.W)));
+gen.ls_par2 = P*gen.ls_par2;
+%gen.ls_par2 = gen.ls_par2;
 
 ident.P = P;
 ident.acc = acc;
 ident.qdf = qdf;
 ident.q=q;
 
+%% Weigted Least Squares
+
+% Coefficients
+N = length(q(:,1))-10;
+for i=1:N 
+    Wl(i,:,1) = W(1+(i-1)*dof_num,:);
+    Wl(i,:,2) = W(2+(i-1)*dof_num,:);
+    Wl(i,:,3) = W(3+(i-1)*dof_num,:);
+end
+
+for j = 1:gen.dof
+    var2(j) = norm(ident.tau(1:N,j)-Wl(:,:,j)*gen.ls_par2)^2/(N-length(gen.Par2)) ;
+end
+
+r_var2 = 1./var2;
+huge = [];
+
+for i = 1:N
+   huge = [huge,r_var2];
+end
+
+G = diag(huge);
+
+% Least Squares Solution
+gen.wls_cond= cond(G*ident.W);
+Wwtau = G*ident.wtau(1:length(ident.W)); 
+
+gen.wls_par2 = pinv(G*ident.W)*(Wwtau);
+gen.wls_par2 = P*gen.wls_par2;
 
 end
 

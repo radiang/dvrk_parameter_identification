@@ -39,7 +39,7 @@ save(savename);
 
 %%  Fourier Trajectory Optimization
 %[fs,gen]=fourier_trajectory(gen,ident,traj);
-gen.fourfilename = 'fourier_test3';
+gen.fourfilename = 'fourier_test2_200';
 
 [fs,gen]=fourier_trajectory_run(gen,traj);
 
@@ -59,6 +59,10 @@ ident.a=1;
 [gen] = SDP_OLS(gen,ident,dyn,map);
 %Test Inverse_map
 
+%% Compare Simulated Effort Solutions
+[eff] = compare_effort_simulated(gen,ident,fs); 
+
+
 %% Save
 savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
 save(savename);
@@ -71,13 +75,10 @@ eff.tf = 2;
 eff.ts = 0.01;  
 [eff] = make_effort(gen,eff);
 
-
-
 %% Compare effort
 %Compare effort of open loop effort to desired trajectory using identified
 %parameters 
 [eff] = compare_effort(gen,eff);
-
 
 
 

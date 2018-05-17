@@ -60,13 +60,16 @@ ident.a=1;
 %Test Inverse_map
 
 %% Compare Simulated Effort Solutions
-[eff] = compare_effort_simulated(gen,ident,fs); 
+[eff] = compare_effort_simulated(gen,ident,test,fs); 
 
 
 %% Save
 savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
 save(savename);
 
+%% Get Coefficients and Test Positive Semidefiniteness
+ [ctrl] = controller_check(gen,fs);
+ 
 %% Test Parameter Identification force 
 eff.traj_p = [0 0.2 0 ; 0 0.2 0; 0 0.1 0.15];
 eff.traj_v = zeros(3);

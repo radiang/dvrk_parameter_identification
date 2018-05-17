@@ -18,8 +18,8 @@ dof_num = gen.dof;
 % b = (1/windowSize)*ones(1,windowSize);
 % a = ident.a;
 
-fc = 40;
-fs = 500;
+fc = 4;
+fs = 200;
 
 [b,a] = butter(8,fc/(fs/2));
 
@@ -52,9 +52,9 @@ end
 ident.tau=q(:,7:9);
 
 ident.scale = ones(1,gen.dof);
-%ident.scale= 1./max(abs(ident.tau));
+ident.scale= 1./max(abs(ident.tau));
 
-ident.tau = (diag(ident.scale)*ident.tau.').';
+%ident.tau = (diag(ident.scale)*ident.tau.').';
 
 %windowSize = ident.window; 
 %b = (1/windowSize)*ones(1,windowSize);
@@ -66,16 +66,17 @@ x2= ident.tau(:,2).';
 x3= ident.tau(:,3).';
 
 
-fc = 40;
-fs = 500;
+fc = 4;
+fs = 200;
 [b,a] = butter(8,fc/(fs/2));
 
 tauf(:,1) = filtfilt(b,a,x1)';
 tauf(:,2) = filtfilt(b,a,x2)';
 tauf(:,3) = filtfilt(b,a,x3)';
 
+%%%%%%%%%%
 ident.tau = tauf;
-
+%%%%%%%%%%%
 figure()
 subplot(3,1,1)
 plot(t,x1,t,tauf(:,1)');
@@ -84,6 +85,7 @@ subplot(3,1,2)
 plot(t,x2,t,tauf(:,2)');
 subplot(3,1,3)
 plot(t,x3,t,tauf(:,3)');
+
 %% Plot looksee
 if plot_on ==1
 figure()
@@ -162,7 +164,8 @@ for j = 1:gen.dof
     var2(j) = norm(ident.tau(1:N,j)-Wl(:,:,j)*gen.ls_par2)^2/(N-length(gen.Par2)) ;
 end
 
-r_var2 = 1./var2;
+%r_var2 = 1./var2;
+r_var2 = ident.scale;
 huge = [];
 
 for i = 1:N

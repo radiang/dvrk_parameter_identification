@@ -1,5 +1,5 @@
 %Open Calibrated_PSM_Dynamics_6DOF_Final.mat
-function [Mt, Nu, can] = seperate_f(Ys2,Par2,Qdd)
+function [Mt, Nu] = seperate_f(Ys2,Par2,Qdd)
 
 %% Start Seperation of Parameters
 %can = sym('can%d', [1 length(Par2)],'real'); %Lumped parameters expressed as a single variable

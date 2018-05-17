@@ -43,7 +43,7 @@ gen.fourfilename = 'fourier_test2_200';
 
 [fs,gen]=fourier_trajectory_run(gen,traj);
 
-[fs,gen] = check_fourier(gen,traj,fs);
+[fs,gen,test] = check_fourier(gen,traj,fs);
 
 savename=strcat('data/',gen.filename,'/',gen.fourfilename,'.mat');
 save(savename);

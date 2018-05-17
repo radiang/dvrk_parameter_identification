@@ -1,14 +1,19 @@
-function [fs,gen]=check_fourier(gen,traj,fs)
+function [fs,gen,test]=check_fourier(gen,traj,fs)
 close all
 test.v= reshape(fs.vars,[],gen.dof).';
 test.w = fs.w;
 
 
 test.dof = gen.dof;
-test.time = fs.time;
 test.N=fs.Nl;
 
+test.ts = 0.005;
+test.period=fs.period;
 
+test.disc_num = test.period./test.ts;
+
+
+test.time = linspace(0,test.period-test.ts,test.disc_num);
 
 %Cheating
 % test.v(:,:) = [0.05 -0.29 0.48 0.55 0.65 0.19 -0.4 -0.18 0.63 -0.46 -0.29;
@@ -38,7 +43,7 @@ for i=1:length(fs.qi(1,:))
 end
 P = diag(1./vecnorm(W));
 
-fs.cond_weighted=cond(W*P);
+fs.test_cond_weighted=cond(W*P);
 %% plot
 
 figure()

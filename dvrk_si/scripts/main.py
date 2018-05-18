@@ -7,8 +7,8 @@ import csv
 import numpy as np
 import dvrk
 
-foldername = './data/latest_3dof_inaxis_svd/'
-testname =  'fourier_test2'
+foldername = './data/3dof_svd/'
+testname =  'fourier_test3'
 
 q  = genfromtxt(foldername+testname+'.csv', delimiter=',')
 qt = q.transpose()
@@ -27,7 +27,7 @@ else:
 		a[i][:]=np.append(q[i][:],q[i][:])
 
 p=dvrk.psm('PSM1')
-r=rospy.Rate(200*speedscale)
+r=rospy.Rate(400*speedscale)
 p.home()
 p.move_joint_some(np.array([scale*a[0][0], scale*a[1][0], scale*a[2][0]]),np.array([0,1,2]))
 

@@ -13,7 +13,7 @@ t = linspace(1,length(q(:,1)'),length(q(:,1)'));
 dof_num = gen.dof;
 
 %% Delete close to zero velocity
-tol = 0.08; 
+tol = 0.07; 
 % Deleting data near zero friction better results for joint 1 and 2, 
 % but makes joint 3 data worse.
 

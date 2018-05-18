@@ -1,15 +1,15 @@
-function [eff] = compare_effort_simulated(gen,ident,test,fs)
+function [eff] = compare_effort_simulated(gen,ident,test)
 
-for i=1:length(fs.qi) 
-    sim_tor_ls(:,i)=gen.condfun(fs.qi(1,i),fs.qi(2,i),fs.qi(3,i),fs.qdi(1,i),fs.qdi(2,i),fs.qdi(3,i),fs.qddi(1,i),fs.qddi(2,i),fs.qddi(3,i))*gen.ls_par2;
-    sim_tor_wls(:,i)=gen.condfun(fs.qi(1,i),fs.qi(2,i),fs.qi(3,i),fs.qdi(1,i),fs.qdi(2,i),fs.qdi(3,i),fs.qddi(1,i),fs.qddi(2,i),fs.qddi(3,i))*gen.wls_par2;
+for i=1:length(ident.qddi) 
+    sim_tor_ls(:,i)=gen.condfun(ident.qi(1,i),ident.qi(2,i),ident.qi(3,i),ident.qdi(1,i),ident.qdi(2,i),ident.qdi(3,i),ident.qddi(1,i),ident.qddi(2,i),ident.qddi(3,i))*gen.ls_par2;
+    sim_tor_wls(:,i)=gen.condfun(ident.qi(1,i),ident.qi(2,i),ident.qi(3,i),ident.qdi(1,i),ident.qdi(2,i),ident.qdi(3,i),ident.qddi(1,i),ident.qddi(2,i),ident.qddi(3,i))*gen.wls_par2;
 end
 
 
 
 %% Torque
 figure()
-N = min([length(fs.qi), length(ident.tau)]);
+N = min([length(ident.qddi), length(ident.tau)]);
 error_ls = abs(ident.tau(1:N,:).' - sim_tor_ls(:,1:N));
 error_wls =abs( ident.tau(1:N,:).' - sim_tor_wls(:,1:N));
 

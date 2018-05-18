@@ -1,4 +1,4 @@
-function [gen,traj,ident,fs]=new_par_ident(gen,traj,ident,fs,plot_on)
+function [gen,traj,ident]=new_par_ident(gen,traj,ident,fs,plot_on)
 % filename = 'new_3dof_inaxis_svd';
 % loadname = strcat('data/',filename,'_optimized.mat');
 % load(loadname);
@@ -11,21 +11,19 @@ q=csvread(csvname);
 
 t = linspace(1,length(q(:,1)'),length(q(:,1)')); 
 dof_num = gen.dof;
-
 %% Delete close to zero velocity
-tol = 0.07; 
-% Deleting data near zero friction better results for joint 1 and 2, 
-% but makes joint 3 data worse.
+% tol = 0.08; 
+% %Deleting data near zero friction better results for joint 1 and 2, 
+% %but makes joint 3 data worse.
+% 
+% for i = length(q(:,1)):-1:1
+%     if abs(q(i,4))<tol||abs(q(i,5))<tol||abs(q(i,6))<tol
+%         q(i,:) = [];
+%         t(i) = [];
+%       
+%     end
+% end
 
-for i = length(q(:,1)):-1:1
-    if abs(q(i,4))<tol||abs(q(i,5))<tol||abs(q(i,6))<tol
-        q(i,:) = [];
-        t(i) = [];
-        fs.qi(:,i)=[];
-        fs.qdi(:,i)=[];
-        fs.qddi(:,i)=[];
-    end
-end
 %% Filter Velocity
 
 % windowSize = ident.window; 
@@ -100,6 +98,21 @@ plot(t,x2,t,tauf(:,2)');
 subplot(3,1,3)
 plot(t,x3,t,tauf(:,3)');
 
+%% Delete close to zero velocity
+% tol = 0.01; 
+% %Deleting data near zero friction better results for joint 1 and 2, 
+% %but makes joint 3 data worse.
+% 
+% for i = length(q(:,1)):-1:1
+%     if abs(q(i,4))<tol||abs(q(i,5))<tol||abs(q(i,6))<tol
+%         q(i,:) = [];
+%         t(i) = [];
+%         qdf(i,:) = [];
+%         acc(i,:) = [];
+%         tauf(i,:) = [];
+%     end
+% end
+
 %% Plot looksee
 if plot_on ==1
 figure()
@@ -159,10 +172,15 @@ gen.ls_par2 = pinv(ident.W)*(ident.wtau(1:length(ident.W)));
 gen.ls_par2 = P*gen.ls_par2;
 %gen.ls_par2 = gen.ls_par2;
 
+% Save
 ident.P = P;
-ident.acc = acc;
-ident.qdf = qdf;
+ident.qddi = acc.';
+ident.qdi = qdf.';
+ident.qi = q(:,1:3).';
 ident.q=q;
+
+ident.t = t;
+
 
 %% Weigted Least Squares
 

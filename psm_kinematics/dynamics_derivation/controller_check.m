@@ -1,4 +1,4 @@
-function [ctrl] = controller_check(gen,fs)
+function [ctrl] = controller_check(gen)
 
 %% 3DOF FORCE Controller 
 syms  q1t(t) q2t(t) q3t(t) q4t(t) q5t(t) q6t(t) 
@@ -124,22 +124,6 @@ ctrl.Nu3 = subs(Nu(1:3,1),[transpose(gen.Q(4:6)),transpose(gen.Qd(4:6))],[0, 0, 
  stringname = strcat('ccode/',gen.filename,'/',gen.fourfilename,'_Ys2_ccode.c');
  ccode(gen.Ys2,'File',stringname,'Comments','V1.2');
 
- %% Check for Positive Semidefiniteness
- 
- check_M = zeros(gen.dof,gen.dof,length(fs.qi));
- p = zeros(1,length(fs.qi));
- 
- tempfun =matlabFunction(ctrl.Mt3);
- for i =1 :length(fs.qi)
-     tic
-    ctrl.check_M(:,:,i) = tempfun(fs.qi(2,i),fs.qi(3,i));
-    
-   %check_M(:,:,i) = subs(ctrl.Mt3,gen.q(1:gen.dof),[fs.qi(1,i), fs.qi(2,i), fs.qi(3,i)]);
-   [~,p(i)]=chol(ctrl.check_M(:,:,1));
-      toc
- end
- ctrl.p = p;
- 
- x=0;
+
 
 end

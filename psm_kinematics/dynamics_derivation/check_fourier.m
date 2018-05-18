@@ -3,16 +3,15 @@ close all
 test.v= reshape(fs.vars,[],gen.dof).';
 test.w = fs.w;
 
+%%%%%%%%%%%%%%%%%%%%%%%
+test.ts = 0.005;
+%%% %%%%%%%%%%%%%%%%%%%
 
 test.dof = gen.dof;
 test.N=fs.Nl;
 
-test.ts = 0.005;
 test.period=fs.period;
-
 test.disc_num = test.period./test.ts;
-
-
 test.time = linspace(0,test.period-test.ts,test.disc_num);
 
 %Cheating

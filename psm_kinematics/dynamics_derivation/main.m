@@ -39,7 +39,7 @@ save(savename);
 
 %%  Fourier Trajectory Optimization
 %[fs,gen]=fourier_trajectory(gen,ident,traj);
-gen.fourfilename = 'fourier_test2_200';
+gen.fourfilename = 'fourier_test3';
 
 [fs,gen]=fourier_trajectory_run(gen,traj);
 
@@ -49,21 +49,25 @@ savename=strcat('data/',gen.filename,'/',gen.fourfilename,'.mat');
 save(savename);
 
 %% Parameter Identification
+clear all
+load('data/3dof_svd/fourier_test.mat');
+
 gen.csvfilename=gen.fourfilename;
 ident.window = 8; 
 ident.a=1;
 
-[gen,traj,ident,fs]=new_par_ident(gen,traj,ident,fs,1);
+[gen,traj,ident]=new_par_ident(gen,traj,ident,fs,1);
 
 %% SDP OLS
 [gen] = SDP_OLS(gen,ident,dyn,map);
 %Test Inverse_map
 
 %% Compare Simulated Effort Solutions
-[eff] = compare_effort_simulated(gen,ident,test,fs); 
+[eff] = compare_effort_simulated(gen,ident,test); 
 
 %% Get Coefficients and Test Positive Semidefiniteness
- [ctrl] = controller_check(gen,fs);
+ [ctrl] = controller_check(gen);
+ [ctrl] = pos_check(gen,ctrl,traj);
  
  %% Save
 savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');

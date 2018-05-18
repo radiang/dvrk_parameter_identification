@@ -30,8 +30,11 @@ dof_num = gen.dof;
 % b = (1/windowSize)*ones(1,windowSize);
 % a = ident.a;
 
-fc = 4;
+fc = 3.5;
 fss = 200;
+
+% fc = 3;
+% fss = 400;
 
 [b,a] = butter(8,fc/(fss/2));
 
@@ -77,17 +80,26 @@ x1= ident.tau(:,1).';
 x2= ident.tau(:,2).';
 x3= ident.tau(:,3).';
 
+fc = 3.5;
+fs = 200;
 
-fc = 4;
-fss = 200;
+% fc = 3.5;
+% fss = 400;
 [b,a] = butter(8,fc/(fss/2));
 
 tauf(:,1) = filtfilt(b,a,x1)';
 tauf(:,2) = filtfilt(b,a,x2)';
+
+
+
+% fc = 2;
+% fss = 400;
+[b,a] = butter(8,fc/(fss/2));
 tauf(:,3) = filtfilt(b,a,x3)';
 
+ident.tauf = tauf;
 %%%%%%%%%%
-ident.tau = tauf;
+%ident.tau = tauf;
 %%%%%%%%%%%
 figure()
 subplot(3,1,1)
@@ -99,9 +111,9 @@ subplot(3,1,3)
 plot(t,x3,t,tauf(:,3)');
 
 %% Delete close to zero velocity
-% tol = 0.01; 
-% %Deleting data near zero friction better results for joint 1 and 2, 
-% %but makes joint 3 data worse.
+% tol = 0.001; 
+% % Deleting data near zero friction better results for joint 1 and 2, 
+% % but makes joint 3 data worse.
 % 
 % for i = length(q(:,1)):-1:1
 %     if abs(q(i,4))<tol||abs(q(i,5))<tol||abs(q(i,6))<tol
@@ -182,10 +194,11 @@ ident.q=q;
 ident.t = t;
 
 
-%% Weigted Least Squares
+%% Weighted Least Squares
 
 % Coefficients
 N = length(q(:,1))-10;
+Wl = zeros(round(N/3)+10,length(gen.Par2),gen.dof);
 for i=1:N 
     Wl(i,:,1) = W(1+(i-1)*dof_num,:);
     Wl(i,:,2) = W(2+(i-1)*dof_num,:);
@@ -196,8 +209,8 @@ for j = 1:gen.dof
     var2(j) = norm(ident.tau(1:N,j)-Wl(:,:,j)*gen.ls_par2)^2/(N-length(gen.Par2)) ;
 end
 
-%r_var2 = 1./var2;
-r_var2 = ident.scale;
+r_var2 = 1./var2;
+%r_var2 = ident.scale;
 huge = [];
 
 for i = 1:N

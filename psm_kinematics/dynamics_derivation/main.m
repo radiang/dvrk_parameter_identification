@@ -63,7 +63,7 @@ ident.a=1;
 %Test Inverse_map
 
 %% Compare Simulated Effort Solutions
-[eff] = compare_effort_simulated(gen,ident,test); 
+compare_effort_simulated(gen,ident,test); 
 
 %% Get Coefficients and Test Positive Semidefiniteness
  [ctrl] = controller_check(gen);
@@ -85,8 +85,6 @@ eff.ts = 0.01;
 %Compare effort of open loop effort to desired trajectory using identified
 %parameters 
 [eff] = compare_effort(gen,eff);
-
-
 
 %% Fourier Trajectory Identification
 gen.fstestname = 'test1';

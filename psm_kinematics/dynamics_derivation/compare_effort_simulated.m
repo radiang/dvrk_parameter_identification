@@ -1,5 +1,11 @@
-function [eff] = compare_effort_simulated(gen,ident,test)
+function compare_effort_simulated(gen,ident,test)
 
+%% Compare with a different trajectory
+ident = [];
+load('compare.mat')
+ident = compare;
+
+%% Least squares and weights least squares
 for i=1:length(ident.qddi) 
     sim_tor_ls(:,i)=gen.condfun(ident.qi(1,i),ident.qi(2,i),ident.qi(3,i),ident.qdi(1,i),ident.qdi(2,i),ident.qdi(3,i),ident.qddi(1,i),ident.qddi(2,i),ident.qddi(3,i))*gen.ls_par2;
     sim_tor_wls(:,i)=gen.condfun(ident.qi(1,i),ident.qi(2,i),ident.qi(3,i),ident.qdi(1,i),ident.qdi(2,i),ident.qdi(3,i),ident.qddi(1,i),ident.qddi(2,i),ident.qddi(3,i))*gen.wls_par2;

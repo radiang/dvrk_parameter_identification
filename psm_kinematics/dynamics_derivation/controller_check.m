@@ -100,14 +100,35 @@ J3_num = double(J3_num);
 %          %end
 %  end
 
+%% Take (sign) term out of regressor matrix.
+m = [];
 
+ m(end+1)=find(gen.Par2=='Fs_1');
+ m(end+1)=find(gen.Par2=='Fs_2');
+ m(end+1)=find(gen.Par2=='Fs_3');
+
+ m= sort(m,'descend');
+ 
+ Ys2 = gen.Ys2;
+ Par2 = gen.Par2;
+ ls_par2 = gen.ls_par2;
+ 
+ for i = 1 :length(m)
+    Ys2(:,m(i)) = [];
+    Par2(m(i)) = [];
+    ls_par2(m(i)) = [];
+ end
 
 %% Seperate Variables to Par2 Force Controller 
-[Mt, Nu]=seperate_f(gen.Ys2,gen.ls_par2,gen.Qdd);
+[Mt, Nu, ctrl.C, ctrl.G]=seperate_f(Ys2,ls_par2,gen.Qdd,gen.Qd);
 
 %% Make into 3 DOF
 ctrl.Mt3 = subs(Mt(1:3,1:3),[transpose(gen.Q(4:6))], [0 0 0]);
 ctrl.Nu3 = subs(Nu(1:3,1),[transpose(gen.Q(4:6)),transpose(gen.Qd(4:6))],[0, 0, 0, 0, 0, 0]);
+ctrl.C = subs(ctrl.C(1:3,1:3),[transpose(gen.Q(4:6)),transpose(gen.Qd(4:6))],[0, 0, 0, 0, 0, 0]);
+ctrl.G = subs(ctrl.G(1:3,1),[transpose(gen.Q(4:6)),transpose(gen.Qd(4:6))],[0, 0, 0, 0, 0, 0]);
+
+
 %% Generate Ccode
  stringname = strcat('ccode/',gen.filename,'/',gen.fourfilename,'_J_ccode.c');
  ccode(ctrl.J3,'File',stringname,'Comments','V1.2');
@@ -118,8 +139,11 @@ ctrl.Nu3 = subs(Nu(1:3,1),[transpose(gen.Q(4:6)),transpose(gen.Qd(4:6))],[0, 0, 
  stringname = strcat('ccode/',gen.filename,'/',gen.fourfilename,'_Mt_ccode.c');
  ccode(ctrl.Mt3,'File',stringname,'Comments','V1.2');
 % 
- stringname = strcat('ccode/',gen.filename,'/',gen.fourfilename,'_Nu_ccode.c');
- ccode(ctrl.Nu3,'File',stringname,'Comments','V1.2');
+ stringname = strcat('ccode/',gen.filename,'/',gen.fourfilename,'_G_ccode.c');
+ ccode(ctrl.G,'File',stringname,'Comments','V1.2');
+
+ stringname = strcat('ccode/',gen.filename,'/',gen.fourfilename,'_C_ccode.c');
+ ccode(ctrl.C,'File',stringname,'Comments','V1.2');
 % 
  stringname = strcat('ccode/',gen.filename,'/',gen.fourfilename,'_Ys2_ccode.c');
  ccode(gen.Ys2,'File',stringname,'Comments','V1.2');

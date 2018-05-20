@@ -25,7 +25,7 @@ ctrl.J3_diff = subs(J3_diff, q3t, gen.Q(3));
 
 %% Check Jacobian in plot
 p = pi();
-q_n = [0, p/4, .1, 0, 0, 0];
+q_n = [0, pi()/4, .1, 0, 0, 0];
 
 J3_num = subs(J_end_t(1:6,1:3),q1t,q_n(1));
 J3_num = subs(J3_num,q2t,q_n(2));
@@ -35,7 +35,7 @@ J3_num = double(J3_num);
 
 
 % for i = 1:length(T)
-%         T_num(:,:,i)=subs(T(:,:,i),[q1 q2 q3 q4 q5 q6],q_n);
+%         T_num(:,:,i)=subs(dyn.T(:,:,i),gen.q,q_n);
 %         
 %         scatter3(T_num(1,4,i),T_num(2,4,i),T_num(3,4,i));
 %         line(T_num(1,4,i),T_num(2,4,i),T_num(3,4,i));
@@ -43,42 +43,45 @@ J3_num = double(J3_num);
 %         text(T_num(1,4,i),T_num(2,4,i),T_num(3,4,i),marker_id);     
 %         hold on
 % end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%figure()
-% T_num(:,:,:)=double(subs(dyn.T(:,:,:),[gen.q(1:6)],q_n));
-% a(1,:) = reshape(T_num(1,4,:),1,[]);
-% a(2,:) = reshape(T_num(2,4,:),1,[]);
-% a(3,:) = reshape(T_num(3,4,:),1,[]);
-% scatter3(a(1,:),a(2,:),a(3,:));
-% line(a(1,:),a(2,:),a(3,:));
-% hold on
-% 
-% x0 = double(subs(dyn.T(1:3,4,11), gen.q, q_n));
-% 
-% xv=J3_num*transpose([10 0 0]);
-% xvx=xv
-% xd = x0+xv(1:3);
-% plot3([xd(1),T_num(1,4,11)],[xd(2),T_num(2,4,11)],[xd(3),T_num(3,4,11)],'r');
-% hold on
-% xv=J3_num*transpose([0 10 0]);
-% xvy=xv
-% xd = x0+xv(1:3);
-% plot3([xd(1),T_num(1,4,11)],[xd(2),T_num(2,4,11)],[xd(3),T_num(3,4,11)],'g');
-% xv=J3_num*transpose([0 0 0.5]);
-% xd = x0+xv(1:3);
-% plot3([xd(1),T_num(1,4,11)],[xd(2),T_num(2,4,11)],[xd(3),T_num(3,4,11)],'b');
-% 
-% 
-% title('Plot transform Frames');
-% xlabel('x');
-% ylabel('y');
-% zlabel('z');
-% s=1;
-% xlim([-s/2 s])
-% ylim([-s/2 s])
-% zlim([-s/2 s])
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+figure()
+T_num(:,:,:)=double(subs(dyn.T(:,:,:),gen.q,q_n));
+a(1,:) = reshape(T_num(1,4,:),1,[]);
+a(2,:) = reshape(T_num(2,4,:),1,[]);
+a(3,:) = reshape(T_num(3,4,:),1,[]);
+scatter3(a(1,:),a(2,:),a(3,:));
+line(a(1,:),a(2,:),a(3,:));
+hold on
+
+x0 = double(subs(dyn.T(1:3,4,11), gen.q, q_n));
+
+xv=J3_num*transpose([10 0 0]);
+xvx=xv;
+xd = x0+xv(1:3);
+plot3([xd(1),T_num(1,4,11)],[xd(2),T_num(2,4,11)],[xd(3),T_num(3,4,11)],'r');
+hold on
+xv=J3_num*transpose([0 10 0]);
+xvy=xv;
+xd = x0+xv(1:3);
+plot3([xd(1),T_num(1,4,11)],[xd(2),T_num(2,4,11)],[xd(3),T_num(3,4,11)],'g');
+xv=J3_num*transpose([0 0 0.5]);
+xd = x0+xv(1:3);
+plot3([xd(1),T_num(1,4,11)],[xd(2),T_num(2,4,11)],[xd(3),T_num(3,4,11)],'b');
 
 
+title('Plot transform Frames');
+xlabel('x');
+ylabel('y');
+zlabel('z');
+s=1;
+xlim([-s/2 s])
+ylim([-s/2 s])
+zlim([-s/2 s])
+
+%%%%%%%% Check Random Stuff
+%cross(xvx(1:3),xvy(1:3))
+%inv(J3_num(1:3,1:3))*[1, 0 ,0 ].'
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 
 % for i = 1:length(T_cg)
@@ -89,7 +92,7 @@ J3_num = double(J3_num);
 %         text(T_cg_num(1,4,i),T_cg_num(2,4,i),T_cg_num(3,4,i),marker_id);
 %         hold on
 % end
-
+% 
 %  for i = 1:length(p_cg)
 %          p_cg_num(i,:)=subs(p_cg(i,:),[q l_cg(i,:)], [q_n, 0, 0, .1]);
 %          %if(i>9)

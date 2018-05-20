@@ -48,10 +48,17 @@ gen.fourfilename = 'fourier_test3';
 savename=strcat('data/',gen.filename,'/',gen.fourfilename,'.mat');
 save(savename);
 
-%% Parameter Identification
+%% Change to sigmoid function as suggested by Yan
 clear all
 load('data/3dof_svd/fourier_test.mat');
 
+% OR Change to Sigmoid function as suggested by Yan
+ for i = 1:gen.dof
+    term = sprintf('Fs_%d',i);
+    m=find(gen.Par2==term);
+    gen.Ys2(i,m) = 2*sigmf(gen.qd(i),[14 0])-1;
+ end
+%% Parameter Identification
 gen.csvfilename=gen.fourfilename;
 ident.window = 8; 
 ident.a=1;
@@ -59,14 +66,20 @@ ident.a=1;
 [gen,traj,ident]=new_par_ident(gen,traj,ident,fs,1);
 
 %% SDP OLS
-[gen] = SDP_OLS(gen,ident,dyn,map);
+%[gen] = SDP_OLS(gen,ident,dyn,map);
 %Test Inverse_map
 
 %% Compare Simulated Effort Solutions
+scale = 1.3;
+x=find(gen.Par2=='Fs_3');
+gen.ls_par2(x)=gen.ls_par2(x)*scale ;
+y = find(gen.Par2=='Fv_3');
+gen.ls_par2(y)=gen.ls_par2(y)*scale;
+
 compare_effort_simulated(gen,ident,test); 
 
 %% Get Coefficients and Test Positive Semidefiniteness
- [ctrl] = controller_check(gen);
+ [ctrl] = controller_check(gen,dyn);
  [ctrl] = pos_check(gen,ctrl,traj);
  
  %% Save

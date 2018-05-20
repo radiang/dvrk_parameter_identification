@@ -1,4 +1,4 @@
-function [ctrl] = controller_check(gen)
+function [ctrl] = controller_check(gen,dyn)
 
 %% 3DOF FORCE Controller 
 syms  q1t(t) q2t(t) q3t(t) q4t(t) q5t(t) q6t(t) 
@@ -103,24 +103,27 @@ J3_num = double(J3_num);
 %% Take (sign) term out of regressor matrix.
 m = [];
 
- m(end+1)=find(gen.Par2=='Fs_1');
- m(end+1)=find(gen.Par2=='Fs_2');
- m(end+1)=find(gen.Par2=='Fs_3');
-
- m= sort(m,'descend');
- 
  Ys2 = gen.Ys2;
  Par2 = gen.Par2;
  ls_par2 = gen.ls_par2;
  
- for i = 1 :length(m)
-    Ys2(:,m(i)) = [];
-    Par2(m(i)) = [];
-    ls_par2(m(i)) = [];
- end
+ 
+ m(end+1)=find(gen.Par2=='Fs_1');
+ m(end+1)=find(gen.Par2=='Fs_2');
+ m(end+1)=find(gen.Par2=='Fs_3');
+ m= sort(m,'descend');
+
+ % Delete sign term
+%  for i = 1 :length(m)
+%     Ys2(:,m(i)) = [];
+%     Par2(m(i)) = [];
+%     ls_par2(m(i)) = [];
+%  end
+
+ 
 
 %% Seperate Variables to Par2 Force Controller 
-[Mt, Nu, ctrl.C, ctrl.G]=seperate_f(Ys2,ls_par2,gen.Qdd,gen.Qd);
+[Mt, Nu, ctrl.C, ctrl.G, ctrl.Fr]=seperate_f(gen,dyn);
 
 %% Make into 3 DOF
 ctrl.Mt3 = subs(Mt(1:3,1:3),[transpose(gen.Q(4:6))], [0 0 0]);
@@ -144,6 +147,9 @@ ctrl.G = subs(ctrl.G(1:3,1),[transpose(gen.Q(4:6)),transpose(gen.Qd(4:6))],[0, 0
 
  stringname = strcat('ccode/',gen.filename,'/',gen.fourfilename,'_C_ccode.c');
  ccode(ctrl.C,'File',stringname,'Comments','V1.2');
+ 
+ stringname = strcat('ccode/',gen.filename,'/',gen.fourfilename,'_Fr_ccode.c');
+ ccode(ctrl.Fr,'File',stringname,'Comments','V1.2');
 % 
  stringname = strcat('ccode/',gen.filename,'/',gen.fourfilename,'_Ys2_ccode.c');
  ccode(gen.Ys2,'File',stringname,'Comments','V1.2');

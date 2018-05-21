@@ -40,7 +40,7 @@ save(savename);
 
 %%  Fourier Trajectory Optimization
 %[fs,gen]=fourier_trajectory(gen,ident,traj);
-gen.fourfilename = 'fourier_test3';
+gen.fourfilename = 'fourier_test4';
 
 [fs,gen]=fourier_trajectory_run(gen,traj);
 
@@ -50,15 +50,14 @@ savename=strcat('data/',gen.filename,'/',gen.fourfilename,'.mat');
 save(savename);
 
 %% Change to sigmoid function as suggested by Yan
-
 clear all
-load('data/3dof_svd/fourier_test.mat');
+load('data/test_3dof_svd/fourier_test2.mat');
 
 % OR Change to Sigmoid function as suggested by Yan
  for i = 1:gen.dof
     term = sprintf('Fs_%d',i);
     m=find(gen.Par2==term);
-    gen.Ys2(i,m) = 2*sigmf(gen.qd(i),[14 0])-1;
+    gen.Ys2(i,m) = 2*sigmf(gen.qd(i),[16 0])-1;
  end
  
 %% Parameter Identification
@@ -67,13 +66,12 @@ ident.window = 8;
 ident.a=1;
 
 [gen,traj,ident]=new_par_ident(gen,traj,ident,fs,1);
-
 %% SDP OLS
-[gen] = SDP_OLS(gen,ident,dyn,map);
+%[gen] = SDP_OLS(gen,ident,dyn,map);
 %Test Inverse_map
 
 %% Compare Simulated Effort Solutions
-scale = 1.3;
+scale = 1;
 x=find(gen.Par2=='Fs_3');
 gen.ls_par2(x)=gen.ls_par2(x)*scale ;
 y = find(gen.Par2=='Fv_3');
@@ -86,6 +84,8 @@ compare_effort_simulated(gen,ident,test);
  [ctrl] = pos_check(gen,ctrl,traj);
  
  %% Save
+ ident.W=[];
+ ident.wls_G=[];
 savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
 save(savename);
  

@@ -4,7 +4,7 @@ test.v= reshape(fs.vars,[],gen.dof).';
 test.w = fs.w;
 
 %%%%%%%%%%%%%%%%%%%%%%%
-test.ts = 0.0025;
+test.ts = 0.005;
 %%% %%%%%%%%%%%%%%%%%%%
 
 test.dof = gen.dof;

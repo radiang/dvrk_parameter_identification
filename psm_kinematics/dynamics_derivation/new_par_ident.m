@@ -12,7 +12,7 @@ q=csvread(csvname);
 t = linspace(1,length(q(:,1)'),length(q(:,1)')); 
 dof_num = gen.dof;
 
-N = length(q(:,1))-10;
+
 %% Delete close to zero velocity
 % tol = 0.08; 
 % %Deleting data near zero friction better results for joint 1 and 2, 
@@ -32,11 +32,11 @@ N = length(q(:,1))-10;
 % b = (1/windowSize)*ones(1,windowSize);
 % a = ident.a;
 
-fc = 3.5;
-fss = 200;
+% fc = 3.5;
+% fss = 200;
 
-% fc = 3;
-% fss = 400;
+fc = 3;
+fss = 400;
 
 [b,a] = butter(8,fc/(fss/2));
 
@@ -82,11 +82,11 @@ x1= ident.tau(:,1).';
 x2= ident.tau(:,2).';
 x3= ident.tau(:,3).';
 
-fc = 3.5;
-fs = 200;
-
 % fc = 3.5;
-% fss = 400;
+% fs = 200;
+
+fc = 2;
+fss = 400;
 [b,a] = butter(8,fc/(fss/2));
 
 tauf(:,1) = filtfilt(b,a,x1)';
@@ -113,9 +113,9 @@ subplot(3,1,3)
 plot(t,x3,t,tauf(:,3)');
 
 %% Delete close to zero velocity
-% tol = 0.001; 
-% % Deleting data near zero friction better results for joint 1 and 2, 
-% % but makes joint 3 data worse.
+tol = 0.005; 
+% Deleting data near zero friction better results for joint 1 and 2, 
+% but makes joint 3 data worse.
 % 
 % for i = length(q(:,1)):-1:1
 %     if abs(q(i,4))<tol||abs(q(i,5))<tol||abs(q(i,6))<tol
@@ -169,6 +169,7 @@ end
 
 
 %% 
+N = length(q(:,1))-10;
 for i=1:N 
     W(1+(i-1)*dof_num:dof_num+(i-1)*dof_num,:)=gen.condfun(q(i,1),q(i,2),q(i,3),qdf(i,1),qdf(i,2),qdf(i,3),acc(i,1),acc(i,2),acc(i,3));
 end
@@ -221,6 +222,7 @@ end
 
 G = diag(huge);
 
+ident.r_var2 = r_var2;
 % Least Squares Solution
 gen.wls_cond= cond(G*ident.W);
 Wwtau = G*ident.wtau(1:length(ident.W)); 

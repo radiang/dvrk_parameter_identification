@@ -7,19 +7,22 @@ function [gen] = SDP_OLS(gen,ident,dyn,mapz)
   n = nb;
   nd = mapz.cn-mapz.bn;
   
-  %% Make Ub
-  w = ident.tau(1:size(ident.W)/3,:);
-  w = reshape(w.',1,[]);
+  %% Scale Data
+  w = ident.tauf(1:size(ident.W)/3,:);
+  w = ident.wls_G*reshape(w.',1,[]).';
   
-  [Q, R] = qr(ident.W);
-  sizew = size(ident.W,2);
+  W = ident.wls_G*ident.W;
+  
+  %% Make Ub
+  [Q, R] = qr(W);
+  sizew = size(W,2);
   R1 = R(1:sizew,1:sizew);
   
   Q1 = Q(:,1:sizew);
   Q2 = Q(:,sizew+1:end);
   
-  p1 = Q1.'*w.';
-  p2 = Q2.'*w.';
+  p1 = Q1.'*w;
+  p2 = Q2.'*w;
    
   Up_11 = u - norm(p2)^2;
   Up_12 = (p1-R1*beta);

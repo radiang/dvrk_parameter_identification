@@ -4,6 +4,7 @@ clear all
 traj.iter = 60;
 traj.tf = 2;
 traj.ts = 0.01;
+
 traj.point_num=14;
 
 traj.limit_pos=[1.4, 0.8, 0.23, 1.5, 1.5, 1.5];
@@ -11,7 +12,7 @@ traj.limit_vel=[2, 2, 0.4, 0.4, 0.4, 0.4];
 traj.scale_p = 0.7;
 traj.scale_v = 0.4;
 
-gen.filename='3dof_inplane_svd';
+gen.filename='test_3dof_svd';
 
 %Degrees of Freedom of robot
 gen.dof = 3; 
@@ -49,6 +50,7 @@ savename=strcat('data/',gen.filename,'/',gen.fourfilename,'.mat');
 save(savename);
 
 %% Change to sigmoid function as suggested by Yan
+
 clear all
 load('data/3dof_svd/fourier_test.mat');
 
@@ -58,6 +60,7 @@ load('data/3dof_svd/fourier_test.mat');
     m=find(gen.Par2==term);
     gen.Ys2(i,m) = 2*sigmf(gen.qd(i),[14 0])-1;
  end
+ 
 %% Parameter Identification
 gen.csvfilename=gen.fourfilename;
 ident.window = 8; 
@@ -66,7 +69,7 @@ ident.a=1;
 [gen,traj,ident]=new_par_ident(gen,traj,ident,fs,1);
 
 %% SDP OLS
-%[gen] = SDP_OLS(gen,ident,dyn,map);
+[gen] = SDP_OLS(gen,ident,dyn,map);
 %Test Inverse_map
 
 %% Compare Simulated Effort Solutions

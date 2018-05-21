@@ -11,6 +11,8 @@ q=csvread(csvname);
 
 t = linspace(1,length(q(:,1)'),length(q(:,1)')); 
 dof_num = gen.dof;
+
+N = length(q(:,1))-10;
 %% Delete close to zero velocity
 % tol = 0.08; 
 % %Deleting data near zero friction better results for joint 1 and 2, 
@@ -167,7 +169,7 @@ end
 
 
 %% 
-for i=1:length(q(:,1))-10 
+for i=1:N 
     W(1+(i-1)*dof_num:dof_num+(i-1)*dof_num,:)=gen.condfun(q(i,1),q(i,2),q(i,3),qdf(i,1),qdf(i,2),qdf(i,3),acc(i,1),acc(i,2),acc(i,3));
 end
 
@@ -197,7 +199,7 @@ ident.t = t;
 %% Weighted Least Squares
 
 % Coefficients
-N = length(q(:,1))-10;
+
 Wl = zeros(round(N/3)+10,length(gen.Par2),gen.dof);
 for i=1:N 
     Wl(i,:,1) = W(1+(i-1)*dof_num,:);
@@ -226,6 +228,8 @@ Wwtau = G*ident.wtau(1:length(ident.W));
 gen.wls_par2 = pinv(G*ident.W)*(Wwtau);
 gen.wls_par2 = P*gen.wls_par2;
 
+
+ident.wls_G = G;
 end
 
 

@@ -25,7 +25,7 @@ ctrl.J3_diff = subs(J3_diff, q3t, gen.Q(3));
 
 %% Check Jacobian in plot
 p = pi();
-q_n = [0, pi()/4, .1, 0, 0, 0];
+q_n = [0, p/2, 0, 0, 0, 0];
 
 J3_num = subs(J_end_t(1:6,1:3),q1t,q_n(1));
 J3_num = subs(J3_num,q2t,q_n(2));

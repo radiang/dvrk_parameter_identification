@@ -33,9 +33,9 @@ dyn.p = sym(pi());
 %My own DH from RViz and DH Paper
 dyn.beta=atan((.072613-.0296)/(.2961-.1524));
 
-dyn.a      =    [ 0     ,        0,     .150,        .516,    .2881, -.0430,        0,      0,     .0091,    .0102,    0];
-dyn.alpha  =    [-dyn.p/2   ,     -dyn.p/2,        0,           0,        0,    dyn.p/2,        0,     dyn.p/2,     -dyn.p/2,        0, -dyn.p/2];
-dyn.d      =    [ 0.1524,    .0296,        0,           0,        0,      0, .4162+gen.q(3),       0,        0,        0,    0];
+dyn.a      =    [ 0         ,                  0,               .150,                      .516,              .2881,     -.0430,               0,      0,     .0091,    .0102,    0];
+dyn.alpha  =    [-dyn.p/2   ,           -dyn.p/2,                  0,                         0,                  0,    dyn.p/2,           0,     dyn.p/2,     -dyn.p/2,        0, -dyn.p/2];
+dyn.d      =    [ 0.1524,                  .0296,                  0,                         0,                  0,          0,  .4162+gen.q(3),       0,        0,        0,    0];
 dyn.tet    =    [ dyn.p/2   ,  -dyn.p/2+gen.q(1), -dyn.beta+gen.q(2), dyn.beta+dyn.p/2-gen.q(2),  -dyn.p/2+gen.q(2),   -dyn.p/2,      dyn.p/2,  dyn.p/2+gen.q(4),   dyn.p/2+gen.q(5),       gen.q(6), -dyn.p/2];
 
 %1: Yaw Coordinate Frame
@@ -56,7 +56,6 @@ end
 for i=1:length(dyn.a)
     if i==1
         dyn.T(1:4,1:4,i) = dyn.Ti_i(:,:,i);
-    
     else
     dyn.T(1:4,1:4,i)=dyn.T(1:4,1:4,i-1)*dyn.Ti_i(1:4,1:4,i);
     %T(1:4,1:4,j)=vpa(T(1:4,1:4,j),4);
@@ -96,9 +95,9 @@ end
 % Ti_cg(:,:,i) = DH(tet_cg(i),a_cg(i),d_cg(i),alpha_cg(i)); 
 % T_cg(:,:,i)  = T(:,:,i)*Ti_cg(:,:,i);
 % end 
-% 
-% %T_cg 5 does not have any mass and doesnt contribute to anything
-% 
+
+%T_cg 5 does not have any mass and doesnt contribute to anything
+
 %% Syms Stuff
 
 dyn.num = 11;
@@ -136,15 +135,15 @@ end
 % l_cg(11,:) = zeros(1,3);
 
 %In Plane Masses
-l_cg(1,1) = 0;
-l_cg(2,3) = 0;
-l_cg(3,3) = 0;
-l_cg(4,3) = 0;
-l_cg(6,2) = 0;
-l_cg(7,1) = 0;
-l_cg(8,3) = 0;
-l_cg(9,2) = 0;
-l_cg(11,2) = 0;
+% l_cg(1,1) = 0;
+% l_cg(2,3) = 0;
+% l_cg(3,3) = 0;
+% l_cg(4,3) = 0;
+% l_cg(6,2) = 0;
+% l_cg(7,1) = 0;
+% l_cg(8,3) = 0;
+% l_cg(9,2) = 0;
+% l_cg(11,2) = 0;
 % 
 % 
 % l_cg(6,1)=0;
@@ -197,9 +196,12 @@ dyn.l_cg(10,:) = zeros(1,4);
 dyn.map = [q1,q2,-q2,q2,0,q3,q4,q5,q6];
 % %INPLANE cg_i from frame i
 for i = 1:length(dyn.l_cg)-2 
-dyn.p_cg(i,:)  = dyn.T(:,:,i)*DH(dyn.map(i),0,0,0)*transpose(dyn.l_cg(i,:));
-end 
-
+    if (i==6)
+        dyn.p_cg(i,:)  = dyn.T(:,:,i)*DH(0,0,dyn.map(i),0)*transpose(dyn.l_cg(i,:));
+    else
+        dyn.p_cg(i,:)  = dyn.T(:,:,i)*DH(dyn.map(i),0,0,0)*transpose(dyn.l_cg(i,:));
+    end 
+end
 %INAXIS cg_i from frame i+1
 % for i = 1:length(dyn.l_cg)-2 
 % dyn.p_cg(i,:)  = dyn.T(:,:,i+1)*transpose([dyn.l_cg(i,:)]);
@@ -214,6 +216,8 @@ dyn.Tee_cg(:,:,2)= dyn.T(:,:,2)*DH(-dyn.p/2-dyn.beta+gen.q(2),dyn.l_cg(11,1),0,-
 
  
 %% Plot Joint Angles Test
+close all
+q_n = [dyn.p/4, dyn.p/6, 0.2, 0, 0, 0];  %Put your numeric values here
 
 figure()
 for i = 1:length(dyn.T)
@@ -221,10 +225,21 @@ for i = 1:length(dyn.T)
         
         scatter3(T_num(1,4,i),T_num(2,4,i),T_num(3,4,i));
         marker_id = sprintf('%d',i);
-        text(T_num(1,4,i),T_num(2,4,i),T_num(3,4,i),marker_id);     
+        line(T_num(1,4,i),T_num(2,4,i),T_num(3,4,i));
+        text(T_num(1,4,i),T_num(2,4,i),T_num(3,4,i),marker_id);  
         hold on
 end
 
+%T_num(:,:,:)=double(subs(dyn.T(:,:,:),gen.q,q_n));
+a(1,:) = reshape(T_num(1,4,:),1,[]);
+a(2,:) = reshape(T_num(2,4,:),1,[]);
+a(3,:) = reshape(T_num(3,4,:),1,[]);
+scatter3(a(1,:),a(2,:),a(3,:));
+line(a(1,:),a(2,:),a(3,:));
+xlim([-0.1, 1]);
+zlim([-0.1, 1]);
+ylim([-0.55,0.55]);
+hold on
 
 % 
 % for i = 1:length(T_cg)
@@ -236,15 +251,15 @@ end
 %         hold on
 % end
 
-%  for i = 1:length(dyn.p_cg)
-%          p_cg_num(i,:)=subs(dyn.p_cg(i,:),[gen.q, dyn.l_cg(i,:)], [q_n, 0.1, 0, .1]);
-%          %if(i>9)
-%          scatter3(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),'*');
-%          marker_id = sprintf('cg_%d',i);
-%          text(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),marker_id);
-%          hold on
-%          %end
-%  end
+ for i = 1:length(dyn.p_cg)
+         p_cg_num(i,:)=subs(dyn.p_cg(i,:),[gen.q, dyn.l_cg(i,1:3)], [q_n, 0,0.1,0]);
+         %if(i>9)
+         scatter3(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),'*');
+         marker_id = sprintf('cg_%d',i);
+         text(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),marker_id);
+         hold on
+         %end
+ end
 title('Plot transform Frames');
 xlabel('x');
 ylabel('y');
@@ -529,7 +544,7 @@ check(end+1:end+length(gen.qdd)) = gen.qdd;
 cond_ys2_lump=100000;
  old = cond_ys2_lump;
  counter = 1;
-while cond_ys2_lump>200 && counter<20
+while cond_ys2_lump>200 && counter<40
     
 
 %finding the linear combinations
@@ -555,8 +570,9 @@ if old>cond_ys2_lump
 % 
 % temp2=strcat('data/',gen.filename,'/Y.mat');
 % save(temp2,'gen')
-%  old = gen.cond_ys2_lump;
-%  
+
+
+old = cond_ys2_lump;
  
 gen.cond_ys2 = cond_ys2_lump;
 gen.Par2 = Par2;
@@ -564,6 +580,7 @@ gen.Ys2 = Ys2;
 map = temp_map;
 
 end
+
 end
 
 

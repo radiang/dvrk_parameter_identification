@@ -2,7 +2,7 @@ function [fs, gen] = fourier_trajectory_run(gen,traj)
 
 %% Options
 fs.Nl = 5; 
-fs.w = 0.16*2*pi() ;%rad/s
+fs.w = 0.2*2*pi() ;%rad/s
 
 fs.ts = 0.02;
 fs.period = 30;%s.

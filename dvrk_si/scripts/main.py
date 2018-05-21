@@ -7,7 +7,7 @@ import csv
 import numpy as np
 import dvrk
 
-foldername = './data/3dof_svd/'
+foldername = './data/test_3dof_svd/'
 testname =  'fourier_test3'
 
 q  = genfromtxt(foldername+testname+'.csv', delimiter=',')

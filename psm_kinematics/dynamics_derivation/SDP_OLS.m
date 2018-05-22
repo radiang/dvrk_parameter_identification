@@ -6,12 +6,21 @@ function [gen] = SDP_OLS(gen,ident,dyn,mapz)
 
   n = nb;
   nd = mapz.cn-mapz.bn;
-  
+  %% fdsa
+
+%r_var2 = ident.scale;
+huge = [];
+
+for i = 1:length(ident.W)/gen.dof
+   huge = [huge,ident.r_var2];
+end
+
+G = diag(huge);
   %% Scale Data
   w = ident.tauf(1:size(ident.W)/3,:);
-  w = ident.wls_G*reshape(w.',1,[]).';
+  w = reshape(w.',1,[]).';
   
-  W = ident.wls_G*ident.W;
+  W = ident.W;
   
   %% Make Ub
   [Q, R] = qr(W);

@@ -51,7 +51,7 @@ save(savename);
 
 %% Change to sigmoid function as suggested by Yan
 clear all
-load('data/test_3dof_svd/fourier_test2.mat');
+load('data/test_3dof_svd/fourier_test4.mat');
 
 % OR Change to Sigmoid function as suggested by Yan
  for i = 1:gen.dof
@@ -66,10 +66,19 @@ ident.window = 8;
 ident.a=1;
 
 [gen,traj,ident]=new_par_ident(gen,traj,ident,fs,1);
-%% SDP OLS
-%[gen] = SDP_OLS(gen,ident,dyn,map);
-%Test Inverse_map
 
+savename =strcat('data/',gen.filename,'/',gen.csvfilename,'_compare.mat');
+compare = ident;
+compare.W = [];
+compare.wtau = [];
+compare.wls_G = [];
+
+save(savename,'compare');
+%% SDP OLS
+[gen] = SDP_OLS(gen,ident,dyn,map);
+
+savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
+save(savename);
 %% Compare Simulated Effort Solutions
 scale = 1;
 x=find(gen.Par2=='Fs_3');
@@ -84,8 +93,8 @@ compare_effort_simulated(gen,ident,test);
  [ctrl] = pos_check(gen,ctrl,traj);
  
  %% Save
- ident.W=[];
- ident.wls_G=[];
+ %ident.W=[];
+ %ident.wls_G=[];
 savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
 save(savename);
  

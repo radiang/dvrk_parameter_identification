@@ -3,9 +3,9 @@ ident.tau = ident.tauf;
 %% Compare with a different trajectory
 
 ident = [];
-load('compare2.mat')
+loadname = strcat('data/',gen.filename,'/','fourier_test','_compare.mat');
+load(loadname);
 ident = compare;
-
 
 %% Least squares and weights least squares
 for i=1:length(ident.qddi) 

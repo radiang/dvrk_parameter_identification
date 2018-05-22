@@ -32,11 +32,11 @@ dof_num = gen.dof;
 % b = (1/windowSize)*ones(1,windowSize);
 % a = ident.a;
 
-% fc = 3.5;
-% fss = 200;
+ fc = 3.5;
+ fss = 200;
 
-fc = 3;
-fss = 400;
+%fc = 3;
+%fss = 400;
 
 [b,a] = butter(8,fc/(fss/2));
 
@@ -82,11 +82,12 @@ x1= ident.tau(:,1).';
 x2= ident.tau(:,2).';
 x3= ident.tau(:,3).';
 
-% fc = 3.5;
-% fs = 200;
+ fc = 3.5;
+ fs = 200;
 
-fc = 2;
-fss = 400;
+%fc = 2;
+%fss = 400;
+
 [b,a] = butter(8,fc/(fss/2));
 
 tauf(:,1) = filtfilt(b,a,x1)';
@@ -96,6 +97,7 @@ tauf(:,2) = filtfilt(b,a,x2)';
 
 % fc = 2;
 % fss = 400;
+
 [b,a] = butter(8,fc/(fss/2));
 tauf(:,3) = filtfilt(b,a,x3)';
 
@@ -231,7 +233,7 @@ gen.wls_par2 = pinv(G*ident.W)*(Wwtau);
 gen.wls_par2 = P*gen.wls_par2;
 
 
-ident.wls_G = G;
+%ident.wls_G = G;
 end
 
 

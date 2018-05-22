@@ -144,6 +144,9 @@ ctrl.G = subs(ctrl.G(1:3,1),[transpose(gen.Q(4:6)),transpose(gen.Qd(4:6))],[0, 0
 % 
  stringname = strcat('ccode/',gen.filename,'/',gen.fourfilename,'_Mt_ccode.c');
  ccode(ctrl.Mt3,'File',stringname,'Comments','V1.2');
+ 
+ stringname = strcat('ccode/',gen.filename,'/',gen.fourfilename,'_Nu_ccode.c');
+ ccode(ctrl.Nu3,'File',stringname,'Comments','V1.2');
 % 
  stringname = strcat('ccode/',gen.filename,'/',gen.fourfilename,'_G_ccode.c');
  ccode(ctrl.G,'File',stringname,'Comments','V1.2');

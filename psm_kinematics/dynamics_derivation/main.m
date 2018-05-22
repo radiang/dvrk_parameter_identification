@@ -51,7 +51,7 @@ save(savename);
 
 %% Change to sigmoid function as suggested by Yan
 clear all
-load('data/test_3dof_svd/fourier_test4.mat');
+load('data/test_3dof_svd/fourier_test.mat');
 
 % OR Change to Sigmoid function as suggested by Yan
  for i = 1:gen.dof

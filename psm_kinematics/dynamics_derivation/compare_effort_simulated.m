@@ -1,11 +1,11 @@
-function compare_effort_simulated(gen,ident,test)
+function [test]= compare_effort_simulated(gen,ident,test)
 ident.tau = ident.tauf;
 %% Compare with a different trajectory
 
-ident = [];
-loadname = strcat('data/',gen.filename,'/','fourier_test','_compare.mat');
-load(loadname);
-ident = compare;
+% ident = [];
+% loadname = strcat('data/',gen.filename,'/','fourier_test3','_compare.mat');
+% load(loadname);
+% ident = compare;
 
 %% Least squares and weights least squares
 for i=1:length(ident.qddi) 
@@ -19,16 +19,16 @@ end
 %% Torque
 figure()
 N = min([length(ident.qddi), length(ident.tau)]);
-error_ls = abs(ident.tau(1:N,:).' - sim_tor_ls(:,1:N));
-error_wls =abs( ident.tau(1:N,:).' - sim_tor_wls(:,1:N));
+error_ls = abs(ident.tauf(1:N,:).' - sim_tor_ls(:,1:N));
+error_wls =abs( ident.tauf(1:N,:).' - sim_tor_wls(:,1:N));
 
 for i = 1:gen.dof
 subplot(gen.dof,1,i)
 plot(test.time(1:N),ident.tauf(1:N,i),test.time(1:N),sim_tor_ls(i,1:N), test.time(1:N),sim_tor_wls(i,1:N));
 hold on
-%plot(test.time(1:N),sim_tor_sdp(i,1:N));
+%plot(test.time(1:N),sim_tor_sdp(i,1:N));s
 hold on
-%plot(test.time(1:N), error_ls(i,1:N),test.time(1:N), error_wls(i,1:N))
+plot(test.time(1:N), error_ls(i,1:N),test.time(1:N), error_wls(i,1:N))
 hold off
 
 titlename =sprintf('Joint %d',i);
@@ -36,8 +36,16 @@ title(titlename)
 legend('Measured','LS','WLS','error_LS','error_WLS')
 
 end
+%% Accumulative error
+ 
+test.total_ls = sum(error_ls.');
+test.total_wls = sum(error_wls.');
 
+disp('total ls errors: ');
+test.total_ls
+disp('total wls errors: ');
+test.total_wls
 
-
+end
 
 

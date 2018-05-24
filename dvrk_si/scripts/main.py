@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import datetime
 
 foldername = './data/test_3dof_svd/'
-testname =  'fourier_test'
+testname =  'fourier_test4'
 
 q  = genfromtxt(foldername+testname+'.csv', delimiter=',')
 qt = q.transpose()
@@ -28,7 +28,7 @@ else:
 	for i in range(len(qt[1][:])):
 		a[i][:]=np.append(q[i][:],q[i][:])
 
-p=dvrk.psm('PSM2')
+p=dvrk.psm('PSM1')
 r=rospy.Rate(200*speedscale)
 p.home()
 p.move_joint_some(np.array([scale*a[0][0], scale*a[1][0], scale*a[2][0]]),np.array([0,1,2]))
@@ -38,7 +38,7 @@ states = np.zeros((len(a[1][:]),3*3))
 i = 0
 
 
-while  i<len(a[1][:])/2 and not rospy.is_shutdown():
+while  i<len(a[1][:]) and not rospy.is_shutdown():
 
 #while  i<100 and not rospy.is_shutdown():
 #for i in range(len(q[1][:])):
@@ -55,9 +55,9 @@ while  i<len(a[1][:])/2 and not rospy.is_shutdown():
 #print ' array transpose: '  
 #print states[8,:]
 
-plt.plot(states[:,8])
-file_str = 'PID_test' + ':' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-plt.savefig('./graphs/' + file_str + '.eps', bbox_inches='tight', format='eps', dpi=600)
+#plt.plot(states[:,8])
+#file_str = 'PID_test' + ':' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+#plt.savefig('./graphs/' + file_str + '.eps', bbox_inches='tight', format='eps', dpi=600)
 
 plt.show()
 with open(foldername+testname+'_results.csv', 'wb') as myfile:

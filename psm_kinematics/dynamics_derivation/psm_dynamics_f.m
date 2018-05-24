@@ -194,6 +194,7 @@ dyn.l_cg(10,:) = zeros(1,4);
 %% Let's try a new Center of Mass 
 
 dyn.map = [q1,q2,-q2,q2,0,q3,q4,q5,q6];
+coeff_travel_11= (136-15.5)/200;
 % %INPLANE cg_i from frame i
 for i = 1:length(dyn.l_cg)-2 
     if (i==6)
@@ -209,7 +210,8 @@ end
 
 counter_num = 2;
 dyn.Tee_cg(:,:,1)= dyn.T(:,:,2)*DH(dyn.map(2),0,0,0);
-dyn.Tee_cg(:,:,2)= dyn.T(:,:,2)*DH(-dyn.p/2-dyn.beta+gen.q(2),dyn.l_cg(11,1),0,-dyn.p/2)*DH(0,0,dyn.map(6),0);
+%dyn.Tee_cg(:,:,2)= dyn.T(:,:,2)*DH(-dyn.p/2-dyn.beta+gen.q(2),dyn.l_cg(11,1),0,-dyn.p/2)*DH(0,0,dyn.map(6),0);
+dyn.Tee_cg(:,:,2)= dyn.T(:,:,2)*DH(-dyn.p/2-dyn.beta+gen.q(2),0,0,-dyn.p/2)*DH(0,0,coeff_travel_11*dyn.map(6),0);
 
  dyn.p_cg(end+1,:) = dyn.Tee_cg(:,:,1)*transpose(dyn.l_cg(10,:)); %Pitch Counterweight 
  dyn.p_cg(end+1,:) = dyn.Tee_cg(:,:,2)*transpose(dyn.l_cg(11,:)); %Insertion Counterweight 
@@ -217,7 +219,7 @@ dyn.Tee_cg(:,:,2)= dyn.T(:,:,2)*DH(-dyn.p/2-dyn.beta+gen.q(2),dyn.l_cg(11,1),0,-
  
 %% Plot Joint Angles Test
 close all
-q_n = [dyn.p/4, dyn.p/6, 0.2, 0, 0, 0];  %Put your numeric values here
+q_n = [0, dyn.beta, 0.0, 0, 0, 0];  %Put your numeric values here
 
 figure()
 for i = 1:length(dyn.T)
@@ -252,7 +254,7 @@ hold on
 % end
 
  for i = 1:length(dyn.p_cg)
-         p_cg_num(i,:)=subs(dyn.p_cg(i,:),[gen.q, dyn.l_cg(i,1:3)], [q_n, 0,0.1,0]);
+         p_cg_num(i,:)=subs(dyn.p_cg(i,:),[gen.q, dyn.l_cg(i,1:3)], [q_n, 0.01 , 0,0.1]);
          %if(i>9)
          scatter3(p_cg_num(i,1),p_cg_num(i,2),p_cg_num(i,3),'*');
          marker_id = sprintf('cg_%d',i);

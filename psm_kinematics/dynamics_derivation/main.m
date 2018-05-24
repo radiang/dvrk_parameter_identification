@@ -51,7 +51,7 @@ save(savename);
 
 %% Change to sigmoid function as suggested by Yan
 clear all
-load('data/test_3dof_svd/fourier_test.mat');
+load('data/test_3dof_svd/fourier_test2.mat');
 
 % OR Change to Sigmoid function as suggested by Yan
  for i = 1:gen.dof
@@ -86,7 +86,7 @@ gen.ls_par2(x)=gen.ls_par2(x)*scale ;
 y = find(gen.Par2=='Fv_3');
 gen.ls_par2(y)=gen.ls_par2(y)*scale;
 
-compare_effort_simulated(gen,ident,test); 
+[test]=compare_effort_simulated(gen,ident,test); 
 
 %% Get Coefficients and Test Positive Semidefiniteness
  [ctrl] = controller_check(gen,dyn);

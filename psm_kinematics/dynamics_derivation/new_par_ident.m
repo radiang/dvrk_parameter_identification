@@ -9,10 +9,13 @@ foldername=strcat('data/',gen.filename,'/');
 csvname = strcat(foldername,gen.csvfilename,'_results.csv');
 q=csvread(csvname);
 
-t = linspace(1,length(q(:,1)'),length(q(:,1)')); 
+
 dof_num = gen.dof;
 
 
+%% Hardcode delete first few trajectories
+q(1:280,:)=[];
+t = linspace(1,length(q(:,1)'),length(q(:,1)')); 
 %% Delete close to zero velocity
 % tol = 0.08; 
 % %Deleting data near zero friction better results for joint 1 and 2, 

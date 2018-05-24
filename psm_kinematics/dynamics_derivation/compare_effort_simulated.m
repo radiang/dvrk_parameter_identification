@@ -2,10 +2,10 @@ function [test]= compare_effort_simulated(gen,ident,test)
 ident.tau = ident.tauf;
 %% Compare with a different trajectory
 
-% ident = [];
-% loadname = strcat('data/',gen.filename,'/','fourier_test3','_compare.mat');
-% load(loadname);
-% ident = compare;
+ident = [];
+loadname = strcat('data/',gen.filename,'/','fourier_test3','_compare.mat');
+load(loadname);
+ident = compare;
 
 %% Least squares and weights least squares
 for i=1:length(ident.qddi) 
@@ -39,7 +39,9 @@ end
 %% Accumulative error
  
 test.total_ls = sum(error_ls.');
+test.total2_ls = sum(test.total_ls);
 test.total_wls = sum(error_wls.');
+test.total2_wls = sum(test.total_wls);
 
 disp('total ls errors: ');
 test.total_ls

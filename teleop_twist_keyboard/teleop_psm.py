@@ -80,7 +80,11 @@ if __name__=="__main__":
 	pub2 = rospy.Publisher('/psm/cmd_force', Twist, queue_size = 1)
 	rospy.init_node('teleop_twist_keyboard')
 
+<<<<<<< HEAD
 	speed = rospy.get_param("/speed", 0.001)
+=======
+	speed = rospy.get_param("/speed", 0.005)
+>>>>>>> 75a0a4c5ec139e49104d91d3e59a307244f0bb57
 	turn = rospy.get_param("/turn", 0.02)
 	x = 0
 	y = 0

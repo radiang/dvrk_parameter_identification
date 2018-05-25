@@ -51,13 +51,13 @@ save(savename);
 
 %% Change to sigmoid function as suggested by Yan
 clear all
-load('data/test_3dof_svd/fourier_test2.mat');
+load('data/test_3dof_svd/fourier_test.mat');
 
-% OR Change to Sigmoid function as suggested by Yan
+%OR Change to Sigmoid function as suggested by Yan
  for i = 1:gen.dof
     term = sprintf('Fs_%d',i);
     m=find(gen.Par2==term);
-    gen.Ys2(i,m) = 2*sigmf(gen.qd(i),[400 0])-1;
+    gen.Ys2(i,m) = -2*sigmf(gen.qd(i),[400 0])+1;
  end
  
 %% Parameter Identification
@@ -67,10 +67,10 @@ ident.a=1;
 
 [gen,traj,ident]=new_par_ident(gen,traj,ident,fs,1);
 
-savename =strcat('data/',gen.filename,'/',gen.csvfilename,'_compare.mat');
-compare = ident;
-compare.W = [];
-compare.wtau = [];
+savename      = strcat('data/',gen.filename,'/',gen.csvfilename,'_compare.mat');
+compare       = ident;
+compare.W     = [];
+compare.wtau  = [];
 compare.wls_G = [];
 
 save(savename,'compare');

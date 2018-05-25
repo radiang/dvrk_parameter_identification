@@ -131,7 +131,7 @@ m = [];
 %% Make into 3 DOF
 ctrl.Mt3 = subs(Mt(1:3,1:3),[transpose(gen.Q(4:6))], [0 0 0]);
 ctrl.Nu3 = subs(Nu(1:3,1),[transpose(gen.Q(4:6)),transpose(gen.Qd(4:6))],[0, 0, 0, 0, 0, 0]);
-ctrl.C = subs(ctrl.C(1:3,1:3),[transpose(gen.Q(4:6)),transpose(gen.Qd(4:6))],[0, 0, 0, 0, 0, 0]);
+%ctrl.C = subs(ctrl.C(1:3,1:3),[transpose(gen.Q(4:6)),transpose(gen.Qd(4:6))],[0, 0, 0, 0, 0, 0]);
 ctrl.G = subs(ctrl.G(1:3,1),[transpose(gen.Q(4:6)),transpose(gen.Qd(4:6))],[0, 0, 0, 0, 0, 0]);
 
 

@@ -1,6 +1,7 @@
 
 x = -10:0.002:10;
-y = 2*sigmf(x,[400 0])-1;
+y = -2*sigmf(x,[400 0])+1;
+%y = 1*sign(x);
 plot(x,y)
 grid('on')
 xlabel('sigmf, P = [2 4]')

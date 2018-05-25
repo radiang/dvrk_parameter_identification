@@ -25,7 +25,7 @@ ctrl.J3_diff = subs(J3_diff, q3t, gen.Q(3));
 
 %% Check Jacobian in plot
 p = pi();
-q_n = [0, p/2, 0, 0, 0, 0];
+q_n = [0, 0, 0.1, 0, 0, 0];
 
 J3_num = subs(J_end_t(1:6,1:3),q1t,q_n(1));
 J3_num = subs(J3_num,q2t,q_n(2));
@@ -33,6 +33,11 @@ J3_num = subs(J3_num,q3t,q_n(3));
 
 J3_num = double(J3_num);
 
+ctrl.qn = q_n;
+%%%%%%%%%%%%%%
+ctrl.vd = [0, 0, 0.05]; %m/s
+disp('Dynamic Model Jacobian: ')
+double(inv(J3_num(1:3,:)))*ctrl.vd.'
 
 % for i = 1:length(T)
 %         T_num(:,:,i)=subs(dyn.T(:,:,i),gen.q,q_n);
@@ -61,10 +66,12 @@ xvx=xv;
 xd = x0+xv(1:3);
 plot3([xd(1),T_num(1,4,11)],[xd(2),T_num(2,4,11)],[xd(3),T_num(3,4,11)],'r');
 hold on
+
 xv=J3_num*transpose([0 10 0]);
 xvy=xv;
 xd = x0+xv(1:3);
 plot3([xd(1),T_num(1,4,11)],[xd(2),T_num(2,4,11)],[xd(3),T_num(3,4,11)],'g');
+
 xv=J3_num*transpose([0 0 0.5]);
 xd = x0+xv(1:3);
 plot3([xd(1),T_num(1,4,11)],[xd(2),T_num(2,4,11)],[xd(3),T_num(3,4,11)],'b');

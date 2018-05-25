@@ -40,7 +40,7 @@ save(savename);
 
 %%  Fourier Trajectory Optimization
 %[fs,gen]=fourier_trajectory(gen,ident,traj);
-gen.fourfilename = 'fourier_test4';
+gen.fourfilename = 'fourier_test6';
 
 [fs,gen]=fourier_trajectory_run(gen,traj);
 
@@ -90,6 +90,8 @@ gen.ls_par2(y)=gen.ls_par2(y)*scale;
 
 %% Get Coefficients and Test Positive Semidefiniteness
  [ctrl] = controller_check(gen,dyn);
+ kin_jacobian(ctrl);
+ 
  [ctrl] = pos_check(gen,ctrl,traj);
  
  %% Save

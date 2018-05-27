@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import datetime
 
 foldername = './data/test_3dof_svd/'
-testname =  'fourier_test4'
+testname =  'fourier_test6'
 
 q  = genfromtxt(foldername+testname+'.csv', delimiter=',')
 qt = q.transpose()

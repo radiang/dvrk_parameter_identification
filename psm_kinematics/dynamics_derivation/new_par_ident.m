@@ -1,4 +1,4 @@
-function [gen,traj,ident]=new_par_ident(gen,traj,ident,fs,plot_on)
+function [gen,traj,ident]=new_par_ident(gen,traj,fs,plot_on)
 % filename = 'new_3dof_inaxis_svd';
 % loadname = strcat('data/',filename,'_optimized.mat');
 % load(loadname);
@@ -30,10 +30,6 @@ t = linspace(1,length(q(:,1)'),length(q(:,1)'));
 % end
 
 %% Filter Velocity
-
-% windowSize = ident.window; 
-% b = (1/windowSize)*ones(1,windowSize);
-% a = ident.a;
 
  fc = 3.5;
  fss = 200;
@@ -76,10 +72,6 @@ ident.scale= 1./max(abs(ident.tau));
 
 %ident.tau = (diag(ident.scale)*ident.tau.').';
 
-%windowSize = ident.window; 
-%b = (1/windowSize)*ones(1,windowSize);
-%a = ident.a;
-
 
 x1= ident.tau(:,1).';
 x2= ident.tau(:,2).';
@@ -95,8 +87,6 @@ x3= ident.tau(:,3).';
 
 tauf(:,1) = filtfilt(b,a,x1)';
 tauf(:,2) = filtfilt(b,a,x2)';
-
-
 
 % fc = 2;
 % fss = 400;

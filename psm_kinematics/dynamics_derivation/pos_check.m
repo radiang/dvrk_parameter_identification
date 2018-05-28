@@ -26,12 +26,12 @@ end
  
  tempfun =matlabFunction(ctrl.Mt3);
  for i =1 :length(qi)
-     tic
+     
     ctrl.check_M(:,:,i) = tempfun(qi(2,i),qi(3,i));
     
    %check_M(:,:,i) = subs(ctrl.Mt3,gen.q(1:gen.dof),[fs.qi(1,i), fs.qi(2,i), fs.qi(3,i)]);
    [~,p(i)]=chol(ctrl.check_M(:,:,1));
-      toc
+   
  end
  ctrl.p = p;
  ctrl.sizeM = size(ctrl.check_M);

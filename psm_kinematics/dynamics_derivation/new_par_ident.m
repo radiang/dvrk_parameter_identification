@@ -2,7 +2,7 @@ function [gen,traj,ident]=new_par_ident(gen,traj,fs,plot_on)
 % filename = 'new_3dof_inaxis_svd';
 % loadname = strcat('data/',filename,'_optimized.mat');
 % load(loadname);
-close all
+%close all
 
 foldername=strcat('data/',gen.filename,'/');
 %testname = 'PID_data2';

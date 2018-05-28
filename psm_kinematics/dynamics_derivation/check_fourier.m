@@ -1,5 +1,5 @@
 function [fs,gen,test]=check_fourier(gen,traj,fs)
-close all
+%close all
 test.v= reshape(fs.vars,[],gen.dof).';
 test.w = fs.w;
 

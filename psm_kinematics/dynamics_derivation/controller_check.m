@@ -21,11 +21,15 @@ J3_diff = subs(ctrl.J_diff_t(1:6,1:3), [diff(q1t,t),diff(q2t,t),diff(q3t,t)],tra
 J3_diff = subs(J3_diff, q1t, gen.Q(1));
 J3_diff = subs(J3_diff, q2t, gen.Q(2));
 ctrl.J3_diff = subs(J3_diff, q3t, gen.Q(3));
+%% Kinematic Jacobian
+p = pi();
+q_n = [0, 0.0, 0.1, 0, 0, 0];
+ctrl.vd = [0, 0, 0.05]; %m/s
+ctrl.qn = q_n;
 
+ctrl = kin_jacobian(ctrl);
 
 %% Check Jacobian in plot
-p = pi();
-q_n = [0, 0, 0.1, 0, 0, 0];
 
 J3_num = subs(J_end_t(1:6,1:3),q1t,q_n(1));
 J3_num = subs(J3_num,q2t,q_n(2));
@@ -33,12 +37,12 @@ J3_num = subs(J3_num,q3t,q_n(3));
 
 J3_num = double(J3_num);
 
-ctrl.qn = q_n;
-%%%%%%%%%%%%%%
-ctrl.vd = [0, 0, 0.05]; %m/s
-disp('Dynamic Model Jacobian: ')
-double(inv(J3_num(1:3,:)))*ctrl.vd.'
 
+%%%%%%%%%%%%%%
+
+disp('Dynamic Model Jacobian: ')
+%double(inv(J3_num(1:3,:)))*ctrl.vd.'
+double(inv(J3_num(1:3,:)))
 % for i = 1:length(T)
 %         T_num(:,:,i)=subs(dyn.T(:,:,i),gen.q,q_n);
 %         
@@ -144,7 +148,7 @@ ctrl.G = subs(ctrl.G(1:3,1),[transpose(gen.Q(4:6)),transpose(gen.Qd(4:6))],[0, 0
 
 %% Generate Ccode
  stringname = strcat('ccode/',gen.filename,'/',gen.fourfilename,'_J_ccode.c');
- ccode(ctrl.J3,'File',stringname,'Comments','V1.2');
+ ccode(ctrl.kin_Jac,'File',stringname,'Comments','V1.2');
 % 
  stringname = strcat('ccode/',gen.filename,'/',gen.fourfilename,'_Jd_ccode.c');
  ccode(ctrl.J3_diff,'File',stringname,'Comments','V1.2');

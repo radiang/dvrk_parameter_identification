@@ -12,13 +12,15 @@ traj.limit_vel=[2, 2, 0.4, 0.4, 0.4, 0.4];
 traj.scale_p = 0.7;
 traj.scale_v = 0.4;
 
-gen.filename='test_3dof_svd';
+gen.filename='bary_3dof_svd';
 
 %Degrees of Freedom of robot
 gen.dof = 3; 
 
 
 %% Dynamics Derivation
+%[gen, dyn,map] = bary_psm_dynamics_f(gen);
+
 [gen, dyn,map] = psm_dynamics_f(gen);
 
 %% Trajectory Optimization 
@@ -50,26 +52,21 @@ savename=strcat('data/',gen.filename,'/',gen.fourfilename,'.mat');
 save(savename);
 
 %% Parameter Identification
-gen.csvfilename=gen.fourfilename;
-
 
 clear all
-load('data/test_3dof_svd/fourier_test2.mat');
-
+load('data/test_3dof_svd/fourier_test6.mat');
+gen.csvfilename=gen.fourfilename;
 
 %gen_fr = gen;
 
 % Change to sigmoid function as suggested by Yan
-%OR Change to Sigmoid function as suggested by Yan
  for i = 1:gen.dof
     term = sprintf('Fs_%d',i);
     m=find(gen.Par2==term);
     gen.Ys2(i,m) = -2*sigmf(gen.qd(i),[400 0])+1;
  end
  
- 
 [gen,traj,ident]=new_par_ident(gen,traj,fs,1);
- 
 %[gen_fr,traj_fr,ident_fr]=new_par_ident(gen_fr,traj,fs,1);
 
 savename      = strcat('data/',gen.filename,'/',gen.csvfilename,'_compare.mat');
@@ -95,8 +92,6 @@ gen.ls_par2(y)=gen.ls_par2(y)*scale;
 
 %% Get Coefficients and Test Positive Semidefiniteness
  [ctrl] = controller_check(gen,dyn);
- kin_jacobian(ctrl);
- 
  [ctrl] = pos_check(gen,ctrl,traj);
  
  %% Save

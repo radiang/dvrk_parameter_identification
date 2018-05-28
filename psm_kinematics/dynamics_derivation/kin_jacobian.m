@@ -1,5 +1,5 @@
 
-function kin_jacobian(ctrl) 
+function [ctrl] = kin_jacobian(ctrl) 
 
 %% Kinematic Jacobian 
 syms q1 q2 q3 q4 q5 q6 
@@ -41,10 +41,12 @@ end
 
 Jac = [diff(kin.T(1:3,end),gen.q(1)),diff(kin.T(1:3,end),gen.q(2)),diff(kin.T(1:3,end),gen.q(3))];
 
-  
 Jac_num = subs(Jac,gen.q,ctrl.qn);
 
+ctrl.kin_Jac = Jac;
+
 disp('Kinematic Model')
-inv_jac = double(inv(Jac_num))*ctrl.vd.'
+%inv_jac = double(inv(Jac_num))*ctrl.vd.'
+inv_jac = double(inv(Jac_num))
 end
 

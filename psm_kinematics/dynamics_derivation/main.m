@@ -19,9 +19,9 @@ gen.dof = 3;
 
 
 %% Dynamics Derivation
-%[gen, dyn,map] = bary_psm_dynamics_f(gen);
+[gen, dyn,map] = bary_psm_dynamics_f(gen);
 
-[gen, dyn,map] = psm_dynamics_f(gen);
+%[gen, dyn,map] = psm_dynamics_f(gen);
 
 %% Trajectory Optimization 
 gen.condfun=matlabFunction(gen.Ys2);

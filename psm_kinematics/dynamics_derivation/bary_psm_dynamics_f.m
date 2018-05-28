@@ -353,17 +353,17 @@ if dyn.dynamic==1
 
 
 
-%%
+%% Kinetic Energy
 for i=1:length(dyn.Jv_cg)
    %B(1:9,1:6,i)=M(i)*Jv(:,:,i)'*Jv(:,:,i)+Jw(:,:,i)'*I(1:3,1:3,i)*Jw(:,:,i);
    if (i==5)
    dyn.B(1:6,1:6,i) = zeros(6);
    elseif(i==10)
-      dyn.B(1:6,1:6,i)=dyn.M(i)*dyn.Jv_cg(:,:,i)'*dyn.Jv_cg(:,:,i)+dyn.Jw(:,:,i)'*dyn.Tee_cg(1:3,1:3,1)*dyn.I(1:3,1:3,i)*dyn.Tee_cg(1:3,1:3,1)'*dyn.Jw(:,:,i);     
+      dyn.B(1:6,1:6,i)=dyn.M(i)*dyn.Jv_cg(:,:,i).'*dyn.Jv_cg(:,:,i)+dyn.Jw(:,:,i).'*dyn.Tee_cg(1:3,1:3,1)*dyn.I(1:3,1:3,i)*dyn.Tee_cg(1:3,1:3,1).'*dyn.Jw(:,:,i);     
    elseif(i==11)
-      dyn.B(1:6,1:6,i)=dyn.M(i)*dyn.Jv_cg(:,:,i)'*dyn.Jv_cg(:,:,i)+dyn.Jw(:,:,i)'*dyn.Tee_cg(1:3,1:3,2)*dyn.I(1:3,1:3,i)*dyn.Tee_cg(1:3,1:3,2)'*dyn.Jw(:,:,i);     
+      dyn.B(1:6,1:6,i)=dyn.M(i)*dyn.Jv_cg(:,:,i).'*dyn.Jv_cg(:,:,i)+dyn.Jw(:,:,i).'*dyn.Tee_cg(1:3,1:3,2)*dyn.I(1:3,1:3,i)*dyn.Tee_cg(1:3,1:3,2).'*dyn.Jw(:,:,i);     
    else
-       dyn.B(1:6,1:6,i)=dyn.M(i)*dyn.Jv_cg(:,:,i)'*dyn.Jv_cg(:,:,i)+dyn.Jw(:,:,i)'*dyn.T(1:3,1:3,i)*dyn.I(1:3,1:3,i)*dyn.T(1:3,1:3,i)'*dyn.Jw(:,:,i); %Not sure about transformations
+       dyn.B(1:6,1:6,i)=dyn.M(i)*dyn.Jv_cg(:,:,i).'*dyn.Jv_cg(:,:,i)+dyn.Jw(:,:,i).'*dyn.T(1:3,1:3,i)*dyn.I(1:3,1:3,i)*dyn.T(1:3,1:3,i).'*dyn.Jw(:,:,i); %Not sure about transformations
    end 
 end
 
@@ -378,63 +378,109 @@ end
 
 
 %D=combine(D,'sincos');
-dyn.D = simplify(dyn.D);
-dyn.D = combine(dyn.D);
+%dyn.D = simplify(dyn.D);
+%dyn.D = combine(dyn.D);
 
-%% Crystoffel Symbols
-for i=1:gen.dof
-    for j=1:gen.dof
-        for k=1:gen.dof
-            dyn.c(i,j,k)=diff(dyn.D(k,j),gen.Q(i))+diff(dyn.D(k,i),gen.Q(j))-diff(dyn.D(i,j),gen.Q(k));
-        end
-    end
-end
-
-dyn.C=sym(zeros(gen.dof,gen.dof));
-    for j=1:gen.dof
-        for k=1:gen.dof
-            for i=1:gen.dof
-                dyn.C(k,j)= dyn.C(k,j) + dyn.c(i,j,k)*gen.Qd(i);
-                %C(k,j)=(c(1,j,k)*Qd(1)+c(2,j,k)*Qd(2)+c(3,j,k)*Qd(3)+c(4,j,k)*Qd(4)+c(5,j,k)*Qd(5)+c(6,j,k)*Qd(6));
-            end
-        end
-    end
-    
-%%  Potential Energy
-  dyn.P=sym(zeros(1,length(dyn.p_cg)));
-  dyn.P_tog=sym(zeros(1));
-  dyn.Psi = sym(zeros(gen.dof,1));
+ K = 1/2*gen.qd(1:gen.dof)*dyn.D*transpose(gen.qd(1:gen.dof));
+ 
+%% Potential Energy
+  P=sym(zeros(1,length(dyn.p_cg)));
+  P_tog=sym(zeros(1));
+  Psi = sym(zeros(gen.dof,1));
   
   for i=1:length(dyn.p_cg)
-  dyn.P(i) = dyn.g*dyn.M(i)*dyn.p_cg(i,3);
-  
-  if (i==5)
-      dyn.P(i)=0;
-  end
-  
-  dyn.P_tog = dyn.P_tog + dyn.P(i);
-  
+  P(i) = dyn.g*dyn.M(i)*dyn.p_cg(i,3);
+  P_tog = P_tog + P(i);
   end 
   
-%     P=sym(zeros(1,length(T_cg)));
-%   P_tog=sym(zeros(1));
-%   Psi = sym(zeros(dof,1));
+for i=1:gen.dof 
+Psi(i,1)=diff(P_tog,gen.Q(i));
+end
+
+% Kinetic and Potential Energy
+ disp('Kinetic Energy')
+simplify(K)
+disp('Potential Energy')
+simplify(P_tog)
+
+
+
+ %% 4b. Solve Lagrangian 
+%Solve Lagrangian
+L=K-P_tog;
+
+syms qj1(t) qj2(t) qj3(t)
+
+disp('Lagrangian')
+simplify(L)
+%% 4c Derive Dynamics
+Aterm(1:gen.dof,1)=[diff(L,qd1);diff(L,qd2);diff(L,qd3)];
+Aterm = subs(Aterm,[gen.q(1:gen.dof), gen.qd(1:gen.dof)],[qj1(t), qj2(t), qj3(t), diff(qj1(t),t), diff(qj2(t),t),diff(qj3(t),t)]);
+Aterm = diff(Aterm,t);
+Aterm = subs(Aterm,[qj1(t), qj2(t), qj3(t), diff(qj1(t),t), diff(qj2(t),t),diff(qj3(t),t), diff(qj1(t),t,t), diff(qj2(t),t,t),diff(qj3(t),t,t)],[gen.q(1:gen.dof), gen.qd(1:gen.dof), gen.qdd(1:gen.dof)]);
+
+%sub = subs(Aterm,[diff(q1(t),t),diff(q2(t),t)],[qd1, qd2]);
+Bterm(1:gen.dof,1) = [diff(L,q1);diff(L,q2);diff(L,q3)];
+
+tau(1:gen.dof,1)=Aterm-Bterm;
+
+%tau=collect(tau,symvar(tau));
+tau=simplify(tau);
+
+% %% Crystoffel Symbols
+% for i=1:gen.dof
+%     for j=1:gen.dof
+%         for k=1:gen.dof
+%             dyn.c(i,j,k)=diff(dyn.D(k,j),gen.Q(i))+diff(dyn.D(k,i),gen.Q(j))-diff(dyn.D(i,j),gen.Q(k));
+%         end
+%     end
+% end
+% 
+% dyn.C=sym(zeros(gen.dof,gen.dof));
+%     for j=1:gen.dof
+%         for k=1:gen.dof
+%             for i=1:gen.dof
+%                 dyn.C(k,j)= dyn.C(k,j) + dyn.c(i,j,k)*gen.Qd(i);
+%                 %C(k,j)=(c(1,j,k)*Qd(1)+c(2,j,k)*Qd(2)+c(3,j,k)*Qd(3)+c(4,j,k)*Qd(4)+c(5,j,k)*Qd(5)+c(6,j,k)*Qd(6));
+%             end
+%         end
+%     end
+%     
+% %%  Potential Energy
+%   dyn.P=sym(zeros(1,length(dyn.p_cg)));
+%   dyn.P_tog=sym(zeros(1));
+%   dyn.Psi = sym(zeros(gen.dof,1));
 %   
-%   for i=1:length(T_cg)
-%   P(i) = M(i)*T_cg(3,4,i);
+%   for i=1:length(dyn.p_cg)
+%   dyn.P(i) = dyn.g*dyn.M(i)*dyn.p_cg(i,3);
 %   
 %   if (i==5)
-%       P(i)=0;
+%       dyn.P(i)=0;
 %   end
 %   
-%   P_tog = P_tog + P(i);
+%   dyn.P_tog = dyn.P_tog + dyn.P(i);
 %   
 %   end 
-  
-  
-for i=1:gen.dof 
-dyn.Psi(i,1)=diff(dyn.P_tog,gen.Q(i));
-end
+%   
+% %     P=sym(zeros(1,length(T_cg)));
+% %   P_tog=sym(zeros(1));
+% %   Psi = sym(zeros(dof,1));
+% %   
+% %   for i=1:length(T_cg)
+% %   P(i) = M(i)*T_cg(3,4,i);
+% %   
+% %   if (i==5)
+% %       P(i)=0;
+% %   end
+% %   
+% %   P_tog = P_tog + P(i);
+% %   
+% %   end 
+%   
+%   
+% for i=1:gen.dof 
+% dyn.Psi(i,1)=diff(dyn.P_tog,gen.Q(i));
+% end
 
 %% Frictiones 
 dyn.Fv=sym('Fv_%d',[6 1],'real');
@@ -455,7 +501,7 @@ dyn.M_Ke(6,6)= 0;
 
 %% Put together
 
-dyn.Dt=dyn.D(1:gen.dof,1:gen.dof)*gen.Qdd(1:gen.dof)+dyn.C(1:gen.dof,1:gen.dof)*gen.Qd(1:gen.dof)+dyn.Psi(1:gen.dof,:);
+dyn.Dt=tau;
 
 dyn.Dt=dyn.Dt-dyn.M_Fv(1:gen.dof,1:gen.dof)*gen.Qd(1:gen.dof)-dyn.M_Fs(1:gen.dof,1:gen.dof)*sign(gen.Qd(1:gen.dof))-dyn.M_Ke(1:gen.dof,1:gen.dof)*gen.Q(1:gen.dof);
 dyn.Dt=simplify(dyn.Dt);

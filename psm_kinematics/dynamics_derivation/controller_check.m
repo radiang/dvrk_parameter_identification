@@ -23,7 +23,7 @@ J3_diff = subs(J3_diff, q2t, gen.Q(2));
 ctrl.J3_diff = subs(J3_diff, q3t, gen.Q(3));
 %% Kinematic Jacobian
 p = pi();
-q_n = [0, 0.0, 0.1, 0, 0, 0];
+q_n = [0.5, 0, 0.1, 0, 0, 0];
 ctrl.vd = [0, 0, 0.05]; %m/s
 ctrl.qn = q_n;
 

@@ -1,19 +1,22 @@
 %% Test Matrices
 clear all
-qn  = [0.2, 0.1, 0];
-qdn = [0, 0, -0.02];
-test_num = 6;
+qn  = [0, 0, 0.1];
+qdn = [0.1, 0.1, 0.1];
+test_num = 4;
 dof_num = 3;
 disp('-------------------------start----------------------------')
 
-for j = 1:test_num
+testname = 'stribeck_3dof_svd';
 
+% Matrice values
+for j = 1:test_num
+    
 if (j==1)
     string = sprintf('');
 else    
     string =sprintf('%d',j);
 end
-loadname = strcat('data/test_3dof_svd/fourier_test',string,'_results.mat' );
+loadname = strcat('data/',testname,'/fourier_test',string,'_results.mat' );
 load(loadname);
 
 nM(:,:,j) = double(subs(ctrl.Mt3, gen.q(1:3), qn));
@@ -25,6 +28,13 @@ nG(:,j) = double(subs(ctrl.G, gen.q(1:3),qn));
 
 all(:,j) = nC(:,j)+nF(:,j)+nG(:,j);
 all_F(:,j) = nF(:,j)+nN(:,j);
+
+% LS ERRORS
+exm.tot_ls_error(j) = test.total2_ls;
+exm.ls_error(j,:) = test.total_ls;
+
+exm.tot_wls_error(j) = test.total2_wls;
+exm.wls_error(j,:) = test.total_wls;
 
 end 
 
@@ -39,3 +49,9 @@ for k = 1:dof_num
     [c(k) ind(k)] = min(abs(mean_all(k)-all(k,:)));
 end 
 
+[bull exm.best_test_ls] = min(exm.tot_ls_error);
+[bull exm.best_test_wls] = min(exm.tot_wls_error);
+
+
+savename = strcat('data/',testname,'/comparisons.mat' );
+save(savename);

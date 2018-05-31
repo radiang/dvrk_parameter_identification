@@ -54,7 +54,7 @@ save(savename);
 %% Parameter Identification
 
 clear all
-load('data/test_3dof_svd/fourier_test6.mat');
+load('data/stribeck_3dof_svd/fourier_test4.mat');
 gen.csvfilename=gen.fourfilename;
 
 %gen_fr = gen;
@@ -67,17 +67,17 @@ gen.csvfilename=gen.fourfilename;
 %  end
  
  %% Try to change frictions
- for i = 1:gen.dof
-    term = sprintf('Fs_%d',i);
-    m=find(gen.Par2==term);
-    gen.Ys2(i,m) = -2*sigmf(gen.qd(i),[400 0])+1;
-
-    gen.Ys2() = [gen.Ys2(:,m), [0,0,1].', gen.Ys2(:,m+1)] 
-        
-    term = sprintf('Fv_%d',i);
-    m=find(gen.Par2==term);
-    gen.Ys2(i,m) = -2*sigmf(gen.qd(i),[400 0])+1;
- end
+%  for i = 1:gen.dof
+%     term = sprintf('Fs_%d',i);
+%     m=find(gen.Par2==term);
+%     gen.Ys2(i,m) = -2*sigmf(gen.qd(i),[400 0])+1;
+% 
+%     gen.Ys2() = [gen.Ys2(:,m), [0,0,1].', gen.Ys2(:,m+1)] 
+%         
+%     term = sprintf('Fv_%d',i);
+%     m=find(gen.Par2==term);
+%     gen.Ys2(i,m) = -2*sigmf(gen.qd(i),[400 0])+1;
+%  end
  
  %% The Par Ident
  

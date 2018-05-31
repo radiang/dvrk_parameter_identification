@@ -12,16 +12,16 @@ traj.limit_vel=[2, 2, 0.4, 0.4, 0.4, 0.4];
 traj.scale_p = 0.7;
 traj.scale_v = 0.4;
 
-gen.filename='bary_3dof_svd';
+gen.filename='stribeck_3dof_svd';
 
 %Degrees of Freedom of robot
 gen.dof = 3; 
 
 
 %% Dynamics Derivation
-[gen, dyn,map] = bary_psm_dynamics_f(gen);
+%[gen, dyn,map] = bary_psm_dynamics_f(gen);
 
-%[gen, dyn,map] = psm_dynamics_f(gen);
+[gen, dyn,map] = psm_dynamics_f(gen);
 
 %% Trajectory Optimization 
 gen.condfun=matlabFunction(gen.Ys2);
@@ -42,7 +42,7 @@ save(savename);
 
 %%  Fourier Trajectory Optimization
 %[fs,gen]=fourier_trajectory(gen,ident,traj);
-gen.fourfilename = 'fourier_test6';
+gen.fourfilename = 'fourier_test2';
 
 [fs,gen]=fourier_trajectory_run(gen,traj);
 
@@ -59,12 +59,27 @@ gen.csvfilename=gen.fourfilename;
 
 %gen_fr = gen;
 
-% Change to sigmoid function as suggested by Yan
+%% Change to sigmoid function as suggested by Yan
+%  for i = 1:gen.dof
+%     term = sprintf('Fs_%d',i);
+%     m=find(gen.Par2==term);
+%     gen.Ys2(i,m) = -2*sigmf(gen.qd(i),[400 0])+1;
+%  end
+ 
+ %% Try to change frictions
  for i = 1:gen.dof
     term = sprintf('Fs_%d',i);
     m=find(gen.Par2==term);
     gen.Ys2(i,m) = -2*sigmf(gen.qd(i),[400 0])+1;
+
+    gen.Ys2() = [gen.Ys2(:,m), [0,0,1].', gen.Ys2(:,m+1)] 
+        
+    term = sprintf('Fv_%d',i);
+    m=find(gen.Par2==term);
+    gen.Ys2(i,m) = -2*sigmf(gen.qd(i),[400 0])+1;
  end
+ 
+ %% The Par Ident
  
 [gen,traj,ident]=new_par_ident(gen,traj,fs,1);
 %[gen_fr,traj_fr,ident_fr]=new_par_ident(gen_fr,traj,fs,1);

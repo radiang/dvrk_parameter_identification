@@ -414,6 +414,9 @@ for i=1:gen.dof
 dyn.Psi(i,1)=diff(dyn.P_tog,gen.Q(i));
 end
 
+%% Put together
+dyn.Dt=dyn.D(1:gen.dof,1:gen.dof)*gen.Qdd(1:gen.dof)+dyn.C(1:gen.dof,1:gen.dof)*gen.Qd(1:gen.dof)+dyn.Psi(1:gen.dof,:);
+
 %% Frictiones 
 dyn.Fv=sym('Fv_%d',[6 1],'real');
 dyn.Fvl=sym('Fvl_%d%d',[2 2],'real');
@@ -431,12 +434,11 @@ dyn.M_Ke(3,3)= 0;
 dyn.M_Ke(5,5)= 0;
 dyn.M_Ke(6,6)= 0;
 
-%% Put together
-
-dyn.Dt=dyn.D(1:gen.dof,1:gen.dof)*gen.Qdd(1:gen.dof)+dyn.C(1:gen.dof,1:gen.dof)*gen.Qd(1:gen.dof)+dyn.Psi(1:gen.dof,:);
-
 dyn.Dt=dyn.Dt-dyn.M_Fv(1:gen.dof,1:gen.dof)*gen.Qd(1:gen.dof)-dyn.M_Fs(1:gen.dof,1:gen.dof)*sign(gen.Qd(1:gen.dof))-dyn.M_Ke(1:gen.dof,1:gen.dof)*gen.Q(1:gen.dof);
 dyn.Dt=simplify(dyn.Dt);
+
+
+%% 
 
 temp=strcat(gen.filename,'_temp_sim.mat');
 save(temp);
@@ -541,6 +543,36 @@ check(end+1:end+length(gen.qdd)) = gen.qdd;
  
 %Par(end-17:end)=[]; 
 [gen.Y, tau]=equationsToMatrix(dyn.Dt == gen.Tau(1:gen.dof), gen.Par);
+
+%% Stribeck Friction for Joint 3
+syms Fc_3  delta_s  vs
+
+
+m = find(gen.Par == 'Fs_3');
+temp_Fc = sign(qd3)*(exp(-(abs(qd3)/abs(vs))^delta_s) - 1); 
+temp_Fs = -exp(-(abs(qd3)/abs(vs))^delta_s)*sign(qd3);
+
+%Fs
+gen.Y(:,m) = [0, 0, temp_Fs].';
+
+%Fc
+temp = [gen.Y(:,1:m), [0,0, temp_Fc].', gen.Y(:,m+1:end)];
+gen.Y(:,:)=[];
+gen.Y=temp;
+gen.Par = [gen.Par(1,1:m), Fc_3, gen.Par(1,(m+1):end)];
+
+%Offsets
+m = find (gen.Par == 'Fc_3');
+temp = [gen.Y(:,1:m), [0,0, 1].', gen.Y(:,m+1:end)];
+gen.Y(:,:)=[];
+gen.Y=temp;
+
+syms Fco_3 Fso_3
+gen.Par = [gen.Par(1,1:m), Fco_3+Fso_3, gen.Par(1,(m+1):end)];
+
+% Valus of vs and delta s
+gen.Y = subs(gen.Y, [vs, delta_s], [0.0055, 0.6]);
+
 
 %% Lumping Parameters
 cond_ys2_lump=100000;

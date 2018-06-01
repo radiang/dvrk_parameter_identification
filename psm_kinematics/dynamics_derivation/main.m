@@ -58,26 +58,6 @@ load('data/stribeck_3dof_svd/fourier_test4.mat');
 gen.csvfilename=gen.fourfilename;
 
 %gen_fr = gen;
-
-%% Change to sigmoid function as suggested by Yan
-%  for i = 1:gen.dof
-%     term = sprintf('Fs_%d',i);
-%     m=find(gen.Par2==term);
-%     gen.Ys2(i,m) = -2*sigmf(gen.qd(i),[400 0])+1;
-%  end
- 
- %% Try to change frictions
-%  for i = 1:gen.dof
-%     term = sprintf('Fs_%d',i);
-%     m=find(gen.Par2==term);
-%     gen.Ys2(i,m) = -2*sigmf(gen.qd(i),[400 0])+1;
-% 
-%     gen.Ys2() = [gen.Ys2(:,m), [0,0,1].', gen.Ys2(:,m+1)] 
-%         
-%     term = sprintf('Fv_%d',i);
-%     m=find(gen.Par2==term);
-%     gen.Ys2(i,m) = -2*sigmf(gen.qd(i),[400 0])+1;
-%  end
  
  %% The Par Ident
  
@@ -91,11 +71,26 @@ compare.wtau  = [];
 compare.wls_G = [];
 
 save(savename,'compare');
+
 %% SDP OLS
 [gen] = SDP_OLS(gen,ident,dyn,map);
 
 savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
 save(savename);
+
+% %% Change to sigmoid function as suggested by Yan
+%  for i = 1:gen.dof
+%     term = sprintf('Fs_%d',i);
+%     m=find(gen.Par2==term);
+%     gen.Ys2(i,m) = -2*sigmf(gen.qd(i),[400 0])+1;
+%  end
+%  
+%  syms Fco_3 Fso_3 Fc_3 Fs_3  delta_s  vs
+%  m = find (gen.Par2 == 'Fc_3');
+%  gen.Y2(:,:)=[];
+%  m = find(gen.Par2 == 'Fs_3');
+%  
+% [gen,traj,ident]=new_par_ident(gen,traj,fs,1);
 %% Compare Simulated Effort Solutions
 scale = 1;
 x=find(gen.Par2=='Fs_3');

@@ -571,7 +571,10 @@ syms Fco_3 Fso_3
 gen.Par = [gen.Par(1,1:m), Fco_3+Fso_3, gen.Par(1,(m+1):end)];
 
 % Valus of vs and delta s
-gen.Y = subs(gen.Y, [vs, delta_s], [0.0055, 0.6]);
+delta_n = 0.6;
+vs_n = 0.0055;
+
+gen.Y = subs(gen.Y, [vs, delta_s], [vs_n, delta_n]);
 
 
 %% Lumping Parameters

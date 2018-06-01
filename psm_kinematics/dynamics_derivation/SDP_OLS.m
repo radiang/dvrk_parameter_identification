@@ -143,6 +143,8 @@ for i = 1:length(arr)
       
 end
 
+%Constraints 
+diag([beto(16), beto(17), (beto(17) - beto(16))])<0
 cvx_end
   
 gen.sdp_par2 = ident.P*beto;

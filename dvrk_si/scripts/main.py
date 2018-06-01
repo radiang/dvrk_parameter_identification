@@ -9,14 +9,14 @@ import dvrk
 import matplotlib.pyplot as plt
 import datetime
 
-foldername = './data/stribeck_3dof_svd/'
+foldername = './data/stribeck_test_3dof_svd/'
 testname =  'fourier_test4'
 
 q  = genfromtxt(foldername+testname+'.csv', delimiter=',')
 qt = q.transpose()
 
 times = 1
-speedscale=1
+speedscale=0.5
 scale = 1
 
 if times ==1: 
@@ -31,7 +31,9 @@ else:
 p=dvrk.psm('PSM1')
 r=rospy.Rate(200*speedscale)
 p.home()
-p.move_joint_some(np.array([scale*a[0][0], scale*a[1][0], scale*a[2][0]]),np.array([0,1,2]))
+p.move_joint_some(np.array([0, 0, scale*a[2][0], 0, 0, 0]),np.array([0,1,2,3,4,5]))
+
+#p.move_joint_some(np.array([scale*a[0][0], scale*a[1][0], scale*a[2][0]]),np.array([0,1,2]))
 
 states = np.zeros((len(a[1][:]),3*3))
 
@@ -43,7 +45,9 @@ while  i<len(a[1][:]) and not rospy.is_shutdown():
 #while  i<100 and not rospy.is_shutdown():
 #for i in range(len(q[1][:])):
 	#print(qt[1])
-	p.move_joint_some(np.array([scale*a[0][i], scale*a[1][i], scale*a[2][i]]),np.array([0,1,2]),False)
+	
+	p.move_joint_some(np.array([0, 0, scale*a[2][i]]),np.array([0,1,2]),False)
+	#p.move_joint_some(np.array([scale*a[0][i], scale*a[1][i], scale*a[2][i]]),np.array([0,1,2]),False)
 	states[i][0:3] = p.get_current_joint_position()[0:3]
 	states[i][3:6] = p.get_current_joint_velocity()[0:3]
 	states[i][6:9] = p.get_current_joint_effort()[0:3]
@@ -60,7 +64,7 @@ while  i<len(a[1][:]) and not rospy.is_shutdown():
 #plt.savefig('./graphs/' + file_str + '.eps', bbox_inches='tight', format='eps', dpi=600)
 
 plt.show()
-with open(foldername+testname+'_results.csv', 'wb') as myfile:
+with open(foldername+testname+'_results2.csv', 'wb') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_NONE)
     for i in range(np.size(states,0)-10):
       wr.writerow(states[i])

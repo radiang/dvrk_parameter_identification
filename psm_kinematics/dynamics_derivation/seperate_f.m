@@ -1,10 +1,10 @@
 %Open Calibrated_PSM_Dynamics_6DOF_Final.mat
-function [Mt, Nu, Cxqd, G, Fr] = seperate_f(gen,dyn)
+function [Mt, Nu, Cxqd, G, Fr, num_Y] = seperate_f(gen,dyn)
 syms q1 q2 q3 qd1 qd2 qd3 real 
 
 %% Start Seperation of Parameters
 %can = sym('can%d', [1 length(Par2)],'real'); %Lumped parameters expressed as a single variable
-can = gen.sdp_par2;
+can = gen.ls_par2;
 can_Y = gen.Ys2; %Lumped 6x32observation matrix
 
 %Seperate the Friction Matrix
@@ -28,6 +28,7 @@ end
 
 Mult = can_Y*can; %Equals the manipulator equation
 
+num_Y = Mult;
 %Seperate the Inertia Matrix with Lumped Parameters
 [Mt, Nu]=equationsToMatrix(Mult == 0, gen.Qdd(1:gen.dof)); %Seperate the Inertia matrix to lumped parameters
 

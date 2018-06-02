@@ -137,7 +137,7 @@ m = [];
  
 
 %% Seperate Variables to Par2 Force Controller 
-[Mt, Nu, ctrl.C, ctrl.G, ctrl.Fr]=seperate_f(gen,dyn);
+[Mt, Nu, ctrl.C, ctrl.G, ctrl.Fr, ctrl.num_Y]=seperate_f(gen,dyn);
 
 %% Make into 3 DOF
 ctrl.Mt3 = subs(Mt(1:3,1:3),[transpose(gen.Q(4:6))], [0 0 0]);

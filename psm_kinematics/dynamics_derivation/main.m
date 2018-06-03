@@ -42,7 +42,7 @@ save(savename);
 
 %%  Fourier Trajectory Optimization
 %[fs,gen]=fourier_trajectory(gen,ident,traj);
-gen.fourfilename = 'fourier_test4';
+gen.fourfilename = 'fourier_test';
 
 [fs,gen]=fourier_trajectory_run(gen,traj);
 
@@ -54,7 +54,7 @@ save(savename);
 %% Parameter Identification
 
 clear all
-load('data/stribeck_3dof_svd/fourier_test.mat');
+load('data/stribeck_3dof_svd/fourier_test2.mat');
 gen.csvfilename=gen.fourfilename;
 
 %gen_fr = gen;
@@ -112,10 +112,14 @@ save(savename);
  
 %% Curve fitting stribeck third joint
 clear all
-load('data/stribeck_test_3dof_svd/fourier_test3_results.mat');
+load('data/stribeck_3dof_svd/fourier_test_results.mat');
+
+constant_velocity_test(gen);
 
 gen.filename = 'stribeck_test_3dof_svd';
+
 [gen,ctrl] = friction_fitting(gen,ctrl);
+
 %% Test Parameter Identification force 
 eff.traj_p = [0 0.2 0 ; 0 0.2 0; 0 0.1 0.15];
 eff.traj_v = zeros(3);

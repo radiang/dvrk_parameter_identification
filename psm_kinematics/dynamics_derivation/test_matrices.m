@@ -1,6 +1,6 @@
 %% Test Matrices
 clear all
-qn  = [0, 0, 0.1];
+qn  = [0, 0.1, 0.1];
 qdn = [0, 0, 0.1];
 test_num = 4;
 dof_num = 3;

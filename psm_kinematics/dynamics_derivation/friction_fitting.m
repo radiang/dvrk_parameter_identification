@@ -95,41 +95,29 @@ for k = 1:N
 end
 %dirty = minus(q
 figure()
-subplot(3,1,1)
 plot(t(1:N),tauf(1:N,3)',t(1:N),distortion(3,1:N));
 legend('before','after');
+
+figure()
+scatter(qdf(1:N,3),distortion(3,:));
+title('Friction torques')
+xlabel('Velocity [rad/s]')
+ylabel('Torques [N m]')
 %%
-b_init = 13;
-c_init = 1.5;
-d_init = 1000;
+xdata = qdf(1:N,3).';
+ydata = distortion(3,:);
 
-b_init1 = 13;
-c_init1 = 1.5;
-d_init1 = 1000;
+Fc_init      = 0.1;
+Fs_init      = 0.5;
+vs_init      = 0.007;
+delta_init   = 0.5;
+sig_init = 0.45;
 
-for i = 1:35
-    %Paramter Estimation for Front Wheel
-    %xdata =
-    %ydata = 
-    f = fittype('d*sin(c*atan(b*x))'); 
-    [fit1,gof,fitinfo] = fit(xdata,ydata,f,'StartPoint',[b_init c_init d_init]);
-    b_init = fit1.b;
-    c_init = fit1.c;
-    d_init = fit1.d;
-    
-
-    % Parameter Estimation for rear wheel 
-    xdata1 = (S(i).Slip_Ravg(3:end))'; 
-    ydata1 = (S(i).F_Ravg(2,3:end))';
-    f2 = fittype('dr*sin(cr*atan(br*x))'); 
-    [fit2,gof2,fitinfo2] = fit(xdata1,ydata1,f2,'StartPoint',[b_init1 c_init1 d_init1]);
-    b_init1 = fit2.br;
-    c_init1 = fit2.cr;
-    d_init1 = fit2.dr;
+    f = fittype('A+(V-A)*exp(-(x/C)^D)+E*x'); 
+    [fit1,gof,fitinfo] = fit(xdata.',ydata.',f,'StartPoint',[Fc_init Fs_init vs_init delta_init sig_init]);
+   
     
        
-end
-
 Bf = fit1.b
 Cf = fit1.c
 Df = fit1.d;

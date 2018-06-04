@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import datetime
 
 foldername = './data/stribeck_3dof_svd/'
-testname =  'fr_test'
+testname =  'frtest_neg'
 
 q  = genfromtxt(foldername+testname+'.csv', delimiter=',')
 qt = q.transpose()
@@ -36,7 +36,7 @@ period_data = len(a[0][:])
 
 j = 0
 
-while j<len(a)
+while j<len(a) and not rospy.is_shutdown():
 
 	p.move_joint_some(np.array([0, 0, scale*a[j][0], 0, 0, 0]),np.array([0,1,2,3,4,5]))
 
@@ -52,14 +52,18 @@ while j<len(a)
 	#while  i<100 and not rospy.is_shutdown():
 	#for i in range(len(q[1][:])):
 	#print(qt[1])
-
-		p.move_joint_some(np.array([0, 0, scale*a[j][i]]),np.array([0,1,2]),False)
-		#p.move_joint_some(np.array([scale*a[0][i], scale*a[1][i], scale*a[2][i]]),np.array([0,1,2]),False)
-		states[(j-1)*period_data+i][0:3] = p.get_current_joint_position()[0:3]
-		states[(j-1)*period_data+i][3:6] = p.get_current_joint_velocity()[0:3]
-		states[(j-1)*period_data+i][6:9] = p.get_current_joint_effort()[0:3]
+		if math.isnan(a[j][i]):
+			states[(j-1)*period_data+i][0:3] = [0, 0, 0]
+			states[(j-1)*period_data+i][3:6] = [0, 0, 0]
+			states[(j-1)*period_data+i][6:9] = [0, 0, 0]
+		else:
+			p.move_joint_some(np.array([0, 0, scale*a[j][i]]),np.array([0,1,2]),False)
+			#p.move_joint_some(np.array([scale*a[0][i], scale*a[1][i], scale*a[2][i]]),np.array([0,1,2]),False)
+			states[(j-1)*period_data+i][0:3] = p.get_current_joint_position()[0:3]
+			states[(j-1)*period_data+i][3:6] = p.get_current_joint_velocity()[0:3]
+			states[(j-1)*period_data+i][6:9] = p.get_current_joint_effort()[0:3]
+		
 		r.sleep()
-
 		i = i +1
 	#print ' array non transpose:  ' 
 	#print states[:,8]

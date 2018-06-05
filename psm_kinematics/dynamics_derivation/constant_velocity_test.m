@@ -2,7 +2,7 @@ function constant_velocity_test(gen)
 close all
 offset = 0.005;
 limit_min = 0+offset;
-limit_max = 0.24-offset;
+limit_max = 0.235-offset;
 
 rate = 200;
 ts = 1/rate;

@@ -4,7 +4,7 @@ function [gen,ctrl] = friction_fitting(gen,ctrl)
 
 foldername=strcat('data/',gen.filename,'/');
 %testname = 'PID_data2';
-csvname = strcat(foldername,gen.csvfilename,'_results2.csv');
+csvname = strcat(foldername,'frtest_results.csv');
 q=csvread(csvname);
 
 t = linspace(1,length(q(:,1)'),length(q(:,1)')); 

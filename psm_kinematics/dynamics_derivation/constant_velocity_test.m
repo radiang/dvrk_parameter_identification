@@ -2,7 +2,7 @@ function constant_velocity_test(gen)
 close all
 offset = 0.005;
 limit_min = 0+offset;
-limit_max = 0.235-offset;
+limit_max = 0.22-offset;
 
 rate = 200;
 ts = 1/rate;
@@ -24,17 +24,19 @@ for i = 1:length(speeds)
        period = sec_limit; 
     end
     
+    %Ramp Up
     [x(i,:),v,ac,T] =  Trajectory_quintic([limit_min, begin],[0 speeds(i)], [0,0], 0.2 ,ts,0,0);
     q(i,1) = begin;
 
+    %Constant Velocity
     for j = 1:round(period*rate)-1
          q(i,j+1) = q(i,j) + speeds(i)*ts;
     end
-    
-
+    %Ramp down 
+    [x_end(i,:),v,ac,T] =  Trajectory_quintic([max(q(i,:)), limit_min],[0 0], [0,0], 2 ,ts,0,0);
 end
 
-q = [x,q];
+q = [x,q, x_end];
 
 q(q==0)=nan;
 traj = reshape(q.',1,[]);
@@ -55,5 +57,32 @@ figure()
 plot(traj_time,traj_neg);
 csvname=strcat('data/',gen.filename,'/frtest_neg.csv');
 csvwrite(csvname,q_neg);
+
+
+%% Force Ramp test
+
+f(:,1) = linspace(limit_min+0.015,limit_max,length(speeds));
+f(:,2) = linspace(limit_min+0.015,limit_max,length(speeds));
+
+f = reshape(f.',[],1);
+
+max_F = 1;
+num= 500;
+
+for i = 1:length(f)
+    if rem(i,2)==0
+        force(i,:) = linspace(0,max_F,num);
+    else
+        force(i,:) = - linspace(0,max_F,num);
+    end
+    
+end
+
+f_vec = [f,force];
+
+x = 0;
+
+csvname=strcat('data/',gen.filename,'/brtest.csv');
+csvwrite(csvname,f_vec);
 
 end

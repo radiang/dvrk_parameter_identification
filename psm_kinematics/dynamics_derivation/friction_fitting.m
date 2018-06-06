@@ -7,11 +7,39 @@ foldername=strcat('data/',gen.filename,'/');
 csvname = strcat(foldername,'frtest_results.csv');
 q=csvread(csvname);
 
-t = linspace(1,length(q(:,1)'),length(q(:,1)')); 
+csvname = strcat(foldername,'frtest_neg_results.csv');
+
+q = [q; csvread(csvname)];
+
+ %% Delete nonlinear data
+
+ iteration = 241;
+nonlinear = 41;
+A = iteration-nonlinear;
+
+for i = 1:30
+q((i-1)*A+1:(i-1)*A+nonlinear,:) = [];
+%t((i-1)*A+1:(i-1)*A+nonlinear) = [];
+end
+
+
+t = linspace(1,length(q(:,1)'),length(q(:,1)'));
+
+
+
+for i = length(q):-1:1
+   if (q(i,1)==0)
+      q(i,:) = []; 
+   end
+end
+
+
+t = linspace(1,length(q(:,1)'),length(q(:,1)'));
+
 
 %% Filter Velocity
 
- fc = 3.5;
+ fc = 10;
  fss = 200;
 
 %fc = 3;
@@ -57,7 +85,7 @@ x1= ident.tau(:,1).';
 x2= ident.tau(:,2).';
 x3= ident.tau(:,3).';
 
- fc = 3.5;
+ fc = 2;
  fs = 200;
 
 %fc = 2;
@@ -87,6 +115,9 @@ plot(t,x2,t,tauf(:,2)');
 subplot(3,1,3)
 plot(t,x3,t,tauf(:,3)');
 
+
+
+
 %% Delete Non friction Torques
 minus = matlabFunction(ctrl.num_Y);
 N = length(q(:,1))-10;
@@ -99,7 +130,7 @@ plot(t(1:N),tauf(1:N,3)',t(1:N),distortion(3,1:N));
 legend('before','after');
 
 figure()
-scatter(qdf(1:N,3),distortion(3,:));
+scatter(qdf(1:N,3),distortion(3,:),10);
 title('Friction torques')
 xlabel('Velocity [rad/s]')
 ylabel('Torques [N m]')

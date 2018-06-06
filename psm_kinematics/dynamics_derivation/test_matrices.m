@@ -1,6 +1,6 @@
 %% Test Matrices
 clear all
-qn  = [0, 0.1, 0.1];
+qn  = [0, 0, 0.2];
 qdn = [0, 0, 0.1];
 test_num = 4;
 dof_num = 3;
@@ -51,7 +51,6 @@ end
 
 [bull exm.best_test_ls] = min(exm.tot_ls_error);
 [bull exm.best_test_wls] = min(exm.tot_wls_error);
-
 
 savename = strcat('data/',testname,'/comparisons.mat' );
 save(savename);

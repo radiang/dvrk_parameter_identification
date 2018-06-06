@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import datetime
 
 foldername = './data/stribeck_3dof_svd/'
-testname =  'frtest'
+testname =  'frtest_neg'
 
 q  = genfromtxt(foldername+testname+'.csv', delimiter=',')
 qt = q.transpose()

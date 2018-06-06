@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import datetime
 
 foldername = './data/stribeck_3dof_svd/'
-testname =  'frtest'
+testname =  'brtest'
 
 q  = genfromtxt(foldername+testname+'.csv', delimiter=',')
 qt = q.transpose()
@@ -54,8 +54,8 @@ while j<data_cycle and not rospy.is_shutdown():
 			states[j*period_data+i][6:9] = [0, 0, 0]
 
 		else:
-			p.move_joint_some(np.array([0, 0, scale*a[j][i]]),np.array([0,1,2]),False)
-			#p.move_joint_some(np.array([scale*a[0][i], scale*a[1][i], scale*a[2][i]]),np.array([0,1,2]),False)
+			
+			p.set_effort_joint(np.array([0,0,scale*a[j][i],0,0,0]))
 			states[j*period_data+i][0:3] = p.get_current_joint_position()[0:3]
 			states[j*period_data+i][3:6] = p.get_current_joint_velocity()[0:3]
 			states[j*period_data+i][6:9] = p.get_current_joint_effort()[0:3]

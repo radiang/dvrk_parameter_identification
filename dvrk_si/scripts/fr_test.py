@@ -32,36 +32,36 @@ p=dvrk.psm('PSM1')
 r=rospy.Rate(200*speedscale)
 p.home()
 
-period_data = len(a[0][:])
+period_data = len(a)
 data_cycle = len(a)
 
 
-states = np.zeros((len(a)*len(a[1][:]),3*3))
+states = np.zeros((len(a),3*3))
 
 j = 0
-while j<data_cycle and not rospy.is_shutdown():
+while j<1 and not rospy.is_shutdown():
 
-	p.move_joint_some(np.array([0, 0, scale*a[j][0], 0, 0, 0]),np.array([0,1,2,3,4,5]))
+	p.move_joint_some(np.array([0, 0, scale*a[0], 0, 0, 0]),np.array([0,1,2,3,4,5]))
 
 	#p.move_joint_some(np.array([scale*a[0][0], scale*a[1][0], scale*a[2][0]]),np.array([0,1,2]))
 	i = 0
 
 	while  i<period_data and not rospy.is_shutdown():
 
-		if math.isnan(a[j][i]):
+		if math.isnan(a[i]):
 			states[j*period_data+i][0:3] = [0, 0, 0]
 			states[j*period_data+i][3:6] = [0, 0, 0]
 			states[j*period_data+i][6:9] = [0, 0, 0]
 
 		else:
-			p.move_joint_some(np.array([0, 0, scale*a[j][i]]),np.array([0,1,2]),False)
+			p.move_joint_some(np.array([0, 0, scale*a[i]]),np.array([0,1,2]),False)
 			#p.move_joint_some(np.array([scale*a[0][i], scale*a[1][i], scale*a[2][i]]),np.array([0,1,2]),False)
 			states[j*period_data+i][0:3] = p.get_current_joint_position()[0:3]
 			states[j*period_data+i][3:6] = p.get_current_joint_velocity()[0:3]
 			states[j*period_data+i][6:9] = p.get_current_joint_effort()[0:3]
 
 		#print(states[(j)*period_data+i][0:3])
-		print((j)*period_data+i,math.isnan(a[j][i]))		
+		print((j)*period_data+i,math.isnan(a[i]))		
 		r.sleep()
 		i = i +1
 

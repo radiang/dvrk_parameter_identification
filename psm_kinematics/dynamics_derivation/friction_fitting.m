@@ -1,30 +1,45 @@
 % BCD parameter estimation f
 function [gen,ctrl] = friction_fitting(gen,ctrl)
 
+close all 
 
 foldername=strcat('data/',gen.filename,'/');
 %testname = 'PID_data2';
 csvname = strcat(foldername,'frtest_results.csv');
-q=csvread(csvname);
+q1=csvread(csvname);
 
+
+%q1(q1(:,6)<0)=[];
 csvname = strcat(foldername,'frtest_neg_results.csv');
+q2 = csvread(csvname);
+%q2(q2(:,6)>0)=[];
 
-q = [q; csvread(csvname)];
+for i = length(q1):-1:1
+   if(q1(i,6)<0)
+       q1(i,:) = [];
+   end
+  if(q2(i,6)>0)
+        q2(i,:) = [];
+   end
+end
+
+  
+q = [q1; q2];
 
  %% Delete nonlinear data
 
- iteration = 241;
-nonlinear = 41;
-A = iteration-nonlinear;
-
-for i = 1:30
-q((i-1)*A+1:(i-1)*A+nonlinear,:) = [];
-%t((i-1)*A+1:(i-1)*A+nonlinear) = [];
-end
-
-
-t = linspace(1,length(q(:,1)'),length(q(:,1)'));
-
+%  iteration = 241;
+% nonlinear = 41;
+% A = iteration-nonlinear;
+% 
+% for i = 1:30
+% q((i-1)*A+1:(i-1)*A+nonlinear,:) = [];
+% %t((i-1)*A+1:(i-1)*A+nonlinear) = [];
+% end
+% 
+% 
+% t = linspace(1,length(q(:,1)'),length(q(:,1)'));
+% 
 
 
 for i = length(q):-1:1
@@ -39,13 +54,13 @@ t = linspace(1,length(q(:,1)'),length(q(:,1)'));
 
 %% Filter Velocity
 
- fc = 10;
+ fc = 12;
  fss = 200;
 
 %fc = 3;
 %fss = 400;
 
-[b,a] = butter(8,fc/(fss/2));
+[b,a] = butter(10,fc/(fss/2));
 
 x1= q(:,4).';
 x2= q(:,5).';
@@ -85,7 +100,7 @@ x1= ident.tau(:,1).';
 x2= ident.tau(:,2).';
 x3= ident.tau(:,3).';
 
- fc = 2;
+ fc = 4;
  fs = 200;
 
 %fc = 2;

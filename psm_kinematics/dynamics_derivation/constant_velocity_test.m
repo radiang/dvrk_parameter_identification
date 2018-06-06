@@ -14,7 +14,7 @@ speeds = linspace(0, vel_max, data_point); %rad/s ;
 
 speeds(1) = [];
 
-begin = 0.03;
+begin = 0.02;
 sec_limit = 1;
 
 for i = 1:length(speeds)
@@ -25,26 +25,34 @@ for i = 1:length(speeds)
     end
     
     %Ramp Up
-    [x(i,:),v,ac,T] =  Trajectory_quintic([limit_min, begin],[0 speeds(i)], [0,0], 0.2 ,ts,0,0);
+    %[x(i,:),v(i,:),ac,T] =  Trajectory_quintic([limit_min, begin],[0 speeds(i)], [0,0], 1 ,ts,0,0);
     q(i,1) = begin;
-
+    qv(i,1) = speeds(i);
     %Constant Velocity
     for j = 1:round(period*rate)-1
          q(i,j+1) = q(i,j) + speeds(i)*ts;
+         qv(i,j+1) = speeds(i);
     end
+    
     %Ramp down 
-    [x_end(i,:),v,ac,T] =  Trajectory_quintic([max(q(i,:)), limit_min],[0 0], [0,0], 2 ,ts,0,0);
+    [x_end(i,:),v_end(i,:),ac,T] =  Trajectory_quintic([max(q(i,:)), limit_min],[0 0], [0,0], 2 ,ts,0,0);
 end
 
-q = [x,q, x_end];
+q = [q, x_end];
+qv = [qv, v_end];
 
 q(q==0)=nan;
 traj = reshape(q.',1,[]);
 traj_time = 1:length(traj);
 traj_time = traj_time.*ts;
 
+trajv = reshape(qv.',1,[]);
 figure()
 plot(traj_time,traj);
+
+figure()
+plot(traj_time,trajv);
+title('velocities')
 
 csvname=strcat('data/',gen.filename,'/frtest.csv');
 csvwrite(csvname,q);

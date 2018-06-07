@@ -1,30 +1,16 @@
 % BCD parameter estimation f
-function [gen,ctrl] = friction_fitting(gen,ctrl)
+function [gen,ctrl] = br_fitting(gen,ctrl)
 
 close all 
 
 foldername=strcat('data/',gen.filename,'/');
 %testname = 'PID_data2';
-csvname = strcat(foldername,'frtest_results.csv');
+csvname = strcat(foldername,'brtest_results.csv');
 q1=csvread(csvname);
 
 
-%q1(q1(:,6)<0)=[];
-csvname = strcat(foldername,'frtest_neg_results.csv');
-q2 = csvread(csvname);
-%q2(q2(:,6)>0)=[];
-
-for i = length(q1):-1:1
-   if(q1(i,6)<0)
-       q1(i,:) = [];
-   end
-  if(q2(i,6)>0)
-        q2(i,:) = [];
-   end
-end
-
   
-q = [q1; q2];
+q = [q1];
 
  %% Delete nonlinear data
 
@@ -79,7 +65,7 @@ plot(t,x2,t,qdf(:,2)');
 subplot(3,1,3)
 plot(t,x3,t,qdf(:,3)');
 
-savefig = strcat('pictures/fr_test_',gen.fourfilename,'_Velocity_filter.png');
+savefig = strcat('pictures/br_test_',gen.fourfilename,'Velocity_filter.png');
 saveas(gcf,savefig)
 
 %% Get Derivative
@@ -131,7 +117,7 @@ plot(t,x2,t,tauf(:,2)');
 subplot(3,1,3)
 plot(t,x3,t,tauf(:,3)');
 
-savefig = strcat('pictures/fr_test_',gen.fourfilename,'Torque_filter.png');
+savefig = strcat('pictures/br_test_',gen.fourfilename,'torque_filter.png');
 saveas(gcf,savefig)
 
 
@@ -145,11 +131,12 @@ for k = 1:N
     B = gravity(q(k,1),q(k,2),q(k,3));
     distortion(1:3,k) = tauf(k,:).'-(A-B);
 end
+
 %dirty = minus(q
 figure()
 plot(t(1:N),tauf(1:N,3)',t(1:N),distortion(3,1:N));
 legend('before','after');
-savefig = strcat('pictures/fr_test_',gen.fourfilename,'b_a.png');
+savefig = strcat('pictures/br_test_',gen.fourfilename,'b_a.png');
 saveas(gcf,savefig)
 
 figure()
@@ -157,9 +144,9 @@ scatter(qdf(1:N,3),distortion(3,:),10);
 title('Friction torques')
 xlabel('Velocity [rad/s]')
 ylabel('Torques [N m]')
-savefig = strcat('pictures/fr_test_',gen.fourfilename,'Torque_vel.png');
-saveas(gcf,savefig)
 
+savefig = strcat('pictures/br_test_',gen.fourfilename,'Fr_vel.png');
+saveas(gcf,savefig)
 % %%
 % xdata = qdf(1:N,3).';
 % ydata = distortion(3,:);

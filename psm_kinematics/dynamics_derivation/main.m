@@ -112,13 +112,15 @@ save(savename);
  
 %% Curve fitting stribeck third joint
 clear all
-load('data/stribeck_3dof_svd/fourier_test2_results.mat');
+load('data/stribeck_3dof_svd/fourier_test_results.mat');
 
-constant_velocity_test(gen);
+%constant_velocity_test(gen);
 
 %gen.filename = 'stribeck_test_3dof_svd';
 
 [gen,ctrl] = friction_fitting(gen,ctrl);
+
+[gen,ctrl] = br_fitting(gen,ctrl);
 
 %% Test Parameter Identification force 
 eff.traj_p = [0 0.2 0 ; 0 0.2 0; 0 0.1 0.15];

@@ -17,47 +17,43 @@ speeds(1) = [];
 begin = 0.04;
 sec_limit = 0.8;
 
-spd_inc = 60;
+spd_inc = 80;
 
 traj = [];
-trajv = [];
-
 for i = 1:length(speeds)
     
     %Ramp up in velocity
-    ramp = linspace(0,speeds(i),spd_inc+1);
+    ramp = linspace(0,speeds(i),spd_inc);
     
-    q(1) = limit_min;
-    qv(1) = 0;
-    ramp(1) = [];
+    period = (limit_max-limit_min)/speeds(i)-  spd_inc/rate;
+    
+    
 %     if period> sec_limit -spd_inc/rate
 %        period = sec_limit -spd_inc/rate; 
 %     end
-     for j = 1:(spd_inc)
+    
+    %Ramp Up
+    %[x(i,:),v(i,:),ac,T] =  Trajectory_quintic([limit_min, begin],[0 speeds(i)], [0,0], 0.5 ,ts,0,0);
+    
+    q(1) = limit_min;
+    qv(1) = 0;
+    %Constant Velocity
+    for j = 1:(round(period*rate)-1+spd_inc)
+        if(j<spd_inc)
          q(j+1) = q(j) + ramp(j)*ts;
          qv(j+1) = ramp(j);
-     end
-     
-    period = (limit_max-q(end))/speeds(i);
-    
-    for j = spd_inc+1:(round(period*rate)+spd_inc+1)
-    
+        else
          q(j+1) = q(j) + speeds(i)*ts;
          qv(j+1) = speeds(i);
+        end
     end
-    q(end)
+    
     %Ramp down 
     [x_end(1,:),v_end,ac,T] =  Trajectory_quintic([max(q), limit_min],[0 0], [0,0], 2 ,ts,0,0);
     
     traj = [traj, q, x_end];
-    trajv = [ trajv, qv, v_end];
     q = [];
     x_end = [];
-    qv = [];
-    v_end = [];
-    period = [];
-    ramp = [];
-    
 end
 
 % q = [q, x_end];
@@ -68,6 +64,7 @@ end
 traj_time = 1:length(traj);
 traj_time = traj_time.*ts;
 
+trajv = reshape(qv.',1,[]);
 figure()
 plot(traj_time,traj);
 
@@ -76,14 +73,16 @@ plot(traj_time,trajv);
 title('velocities')
 
 csvname=strcat('data/',gen.filename,'/frtest.csv');
-csvwrite(csvname,traj);
+csvwrite(csvname,q);
 
-traj_neg = -traj;
+
+q_neg = -q + (limit_max+offset);
+traj_neg = reshape(q_neg.',1,[]);
 
 figure()
 plot(traj_time,traj_neg);
 csvname=strcat('data/',gen.filename,'/frtest_neg.csv');
-csvwrite(csvname,traj_neg);
+csvwrite(csvname,q_neg);
 
 
 %% Force Ramp test

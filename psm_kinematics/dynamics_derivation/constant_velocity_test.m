@@ -78,7 +78,7 @@ title('velocities')
 csvname=strcat('data/',gen.filename,'/frtest.csv');
 csvwrite(csvname,traj);
 
-traj_neg = -traj;
+traj_neg = -traj+limit_max;
 
 figure()
 plot(traj_time,traj_neg);

@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import datetime
 
 foldername = './data/stribeck_3dof_svd/'
-testname =  'brtest'
+testname =  'brtest2'
 
 q  = genfromtxt(foldername+testname+'.csv', delimiter=',')
 qt = q.transpose()
@@ -28,7 +28,7 @@ else:
 	for i in range(len(qt[1][:])):
 		a[i][:]=np.append(q[i][:],q[i][:])
 
-p=dvrk.psm('PSM1')
+p=dvrk.psm('PSM2')
 r=rospy.Rate(200*speedscale)
 p.home()
 
@@ -69,7 +69,7 @@ while j<data_cycle and not rospy.is_shutdown():
 
 #plt.show()
 
-with open(foldername+testname+'_results.csv', 'wb') as myfile:
+with open(foldername+testname+'_results_psm2.csv', 'wb') as myfile:
     wr = csv.writer(myfile, quoting=csv.QUOTE_NONE)
     for k in range(np.size(states,0)):
       wr.writerow(states[k][:])

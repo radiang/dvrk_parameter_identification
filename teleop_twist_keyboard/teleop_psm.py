@@ -129,7 +129,7 @@ if __name__=="__main__":
 			pub.publish(twist)
 
 			force = Twist()
-			force.linear.x = f*speed; force.linear.y = 0; force.linear.z = 0;
+			force.linear.x = f*speed*100; force.linear.y = 0; force.linear.z = 0;
 			force.angular.x = 0; force.angular.y = 0; force.angular.z = 0
 			pub2.publish(force)
 

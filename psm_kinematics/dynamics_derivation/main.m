@@ -117,7 +117,7 @@ save(savename);
 clear all
 load('data/stribeck_3dof_svd/fourier_test_results.mat');
 
-%constant_velocity_test(gen);
+constant_velocity_test(gen);
 
 %gen.filename = 'stribeck_test_3dof_svd';
 

@@ -93,7 +93,7 @@ f(:,2) = linspace(limit_min+0.015,limit_max,length(speeds));
 
 f = reshape(f.',[],1);
 
-max_F = 1;
+max_F = 2;
 num= 500;
 
 for i = 1:length(f)
@@ -109,7 +109,7 @@ f_vec = [f,force];
 
 x = 0;
 
-csvname=strcat('data/',gen.filename,'/brtest.csv');
+csvname=strcat('data/',gen.filename,'/brtest2.csv');
 csvwrite(csvname,f_vec);
 
 end

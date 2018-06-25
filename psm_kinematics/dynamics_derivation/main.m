@@ -54,7 +54,7 @@ save(savename);
 %% Parameter Identification
 
 clear all
-load('data/test_3dof_svd/fourier_test2.mat');
+load('data/test_3dof_svd_psm2/fourier_test.mat');
 gen.csvfilename=gen.fourfilename;
 
 %gen_fr = gen;

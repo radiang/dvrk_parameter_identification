@@ -10,7 +10,11 @@ can_Y = gen.Ys2; %Lumped 6x32observation matrix
 %Seperate the Friction Matrix
 syms Fco_3 Fso_3 Fc_3
 m = [];
-array = [dyn.Fs(1:gen.dof).', dyn.Fv(1:gen.dof).', dyn.Ke(1:gen.dof-1).', Fc_3, Fco_3+Fso_3];
+%For stribeck
+%array = [dyn.Fs(1:gen.dof).', dyn.Fv(1:gen.dof).', dyn.Ke(1:gen.dof-1).', Fc_3, Fco_3+Fso_3];
+
+%For non stribeck
+array = [dyn.Fs(1:gen.dof).', dyn.Fv(1:gen.dof).', dyn.Ke(1:gen.dof-1).'];
 
 for i = 1:length(array)
 m(end+1)=find(gen.Par2==array(i));

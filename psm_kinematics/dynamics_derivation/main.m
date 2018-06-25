@@ -54,11 +54,14 @@ save(savename);
 %% Parameter Identification
 
 clear all
-load('data/stribeck_3dof_svd/fourier_test2.mat');
+load('data/test_3dof_svd/fourier_test2.mat');
 gen.csvfilename=gen.fourfilename;
 
 %gen_fr = gen;
  
+%---------------------For PSM2 -----------------------
+gen.filename = 'test_3dof_svd_psm2';
+%-----------------------------------------------------
  %% The Par Ident
  
 [gen,traj,ident]=new_par_ident(gen,traj,fs,1);

@@ -1,12 +1,12 @@
 %% Test Matrices
 clear all
-qn  = [0, 0, 0.2];
-qdn = [0, 0, 0.1];
-test_num = 4;
+qn  = [0, 0, 0.1];
+qdn = [0, 0, 0];
+test_num = 6;
 dof_num = 3;
 disp('-------------------------start----------------------------')
 
-testname = 'stribeck_3dof_svd';
+testname = 'test_3dof_svd';
 
 % Matrice values
 for j = 1:test_num
@@ -38,12 +38,14 @@ exm.wls_error(j,:) = test.total_wls;
 
 end 
 
-all
-std_all = std(all.').'
-mean_all = mean(all.').'
+nG 
 
-n_std_G = std(nG.'./range(nG.'))
-n_std_F = std(nF.'./range(nF.'))
+all;
+std_all = std(all.').';
+mean_all = mean(all.').';
+
+n_std_G = std(nG.'./range(nG.'));
+n_std_F = std(nF.'./range(nF.'));
 
 for k = 1:dof_num
     [c(k) ind(k)] = min(abs(mean_all(k)-all(k,:)));

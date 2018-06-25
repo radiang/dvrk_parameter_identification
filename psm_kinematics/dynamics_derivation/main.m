@@ -54,7 +54,7 @@ save(savename);
 %% Parameter Identification
 
 clear all
-load('data/test_3dof_svd_psm2/fourier_test.mat');
+load('data/test_3dof_svd_psm2/fourier_test6.mat');
 gen.csvfilename=gen.fourfilename;
 
 %gen_fr = gen;
@@ -81,13 +81,13 @@ save(savename,'compare');
 savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
 save(savename);
 
-% %% Change to sigmoid function as suggested by Yan
-%  for i = 1:gen.dof
-%     term = sprintf('Fs_%d',i);
-%     m=find(gen.Par2==term);
-%     gen.Ys2(i,m) = -2*sigmf(gen.qd(i),[400 0])+1;
-%  end
-%  
+%% Change to sigmoid function as suggested by Yan
+ for i = 1:gen.dof
+    term = sprintf('Fs_%d',i);
+    m=find(gen.Par2==term);
+    gen.Ys2(i,m) = -2*sigmf(gen.qd(i),[400 0])+1;
+ end
+ 
 %  syms Fco_3 Fso_3 Fc_3 Fs_3  delta_s  vs
 %  m = find (gen.Par2 == 'Fc_3');
 %  gen.Y2(:,:)=[];

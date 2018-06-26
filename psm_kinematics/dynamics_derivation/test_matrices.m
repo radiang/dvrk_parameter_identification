@@ -1,14 +1,14 @@
 %% Test Matrices
 clear all
-qn  = [0, 0, 0.1];
-qdn = [0, 0, 0];
+qn  = [0.5, 0, 0.1];
+qdn = [0.0, 0, 0.0];
 test_num = 6;
 dof_num = 3;
 disp('-------------------------start----------------------------')
 
 testname = 'test_3dof_svd_psm2';
 
-% Matrice values
+% Matrices values
 for j = 1:test_num
     
 if (j==1)
@@ -39,6 +39,12 @@ exm.wls_error(j,:) = test.total_wls;
 end 
 
 nG 
+nN
+nF
+nM(:,:,6)
+
+
+
 
 all;
 std_all = std(all.').';

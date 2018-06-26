@@ -14,7 +14,9 @@ dof_num = gen.dof;
 
 
 %% Hardcode delete first few trajectories
-q(1:280,:)=[];
+%q(1:280,:)=[];
+
+
 t = linspace(1,length(q(:,1)'),length(q(:,1)')); 
 %% Delete close to zero velocity
 % tol = 0.08; 

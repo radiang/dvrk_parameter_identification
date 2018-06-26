@@ -14,7 +14,9 @@ m = [];
 %array = [dyn.Fs(1:gen.dof).', dyn.Fv(1:gen.dof).', dyn.Ke(1:gen.dof-1).', Fc_3, Fco_3+Fso_3];
 
 %For non stribeck
-array = [dyn.Fs(1:gen.dof).', dyn.Fv(1:gen.dof).', dyn.Ke(1:gen.dof-1).'];
+%array = [dyn.Fs(1:gen.dof).', dyn.Fv(1:gen.dof).', dyn.Ke(1:gen.dof-1).'];
+
+array = [dyn.Fs(1:gen.dof).', dyn.Fv(1:gen.dof).'];
 
 for i = 1:length(array)
 m(end+1)=find(gen.Par2==array(i));

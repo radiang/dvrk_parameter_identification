@@ -5,7 +5,7 @@ close all
 
 foldername=strcat('data/',gen.filename,'/');
 %testname = 'PID_data2';
-csvname = strcat(foldername,'brtest_results.csv');
+csvname = strcat(foldername,'brtest2_results_psm2.csv');
 q1=csvread(csvname);
 
 

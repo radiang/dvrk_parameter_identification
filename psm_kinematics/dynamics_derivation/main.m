@@ -64,6 +64,18 @@ gen.filename = 'test_3dof_svd_psm2';
 %-----------------------------------------------------
  %% The Par Ident
  
+ %Try to delete Ke1 _Ke2 ---------------
+  m = find (gen.Par2 == 'Ke_1');
+  gen.Par2(m) = [];
+  gen.Ys2(:,m)=[];
+  
+  m = find (gen.Par2 == 'Ke_2');
+   gen.Par2(m) = [];
+  gen.Ys2(:,m)=[];
+  gen.condfun=matlabFunction(gen.Ys2);
+
+  %--------------------------------------
+  
 [gen,traj,ident]=new_par_ident(gen,traj,fs,1);
 %[gen_fr,traj_fr,ident_fr]=new_par_ident(gen_fr,traj,fs,1);
 
@@ -76,10 +88,10 @@ compare.wls_G = [];
 save(savename,'compare');
 
 %% SDP OLS
-[gen] = SDP_OLS(gen,ident,dyn,map);
-
-savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
-save(savename);
+% [gen] = SDP_OLS(gen,ident,dyn,map);
+% 
+% savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
+% save(savename);
 
 %% Change to sigmoid function as suggested by Yan
  for i = 1:gen.dof
@@ -94,6 +106,9 @@ save(savename);
 %  m = find(gen.Par2 == 'Fs_3');
 %  
 % [gen,traj,ident]=new_par_ident(gen,traj,fs,1);
+
+
+
 %% Compare Simulated Effort Solutions
 scale = 1;
 x=find(gen.Par2=='Fs_3');
@@ -115,7 +130,7 @@ save(savename);
  
 %% Curve fitting stribeck third joint
 clear all
-load('data/stribeck_3dof_svd/fourier_test_results.mat');
+load('data/stribeck_3dof_svd/fourier_test6_results.mat');
 
 constant_velocity_test(gen);
 

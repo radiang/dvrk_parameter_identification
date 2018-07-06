@@ -54,13 +54,14 @@ save(savename);
 %% Parameter Identification
 
 clear all
-load('data/test_3dof_svd_psm2/fourier_test6.mat');
+close all
+load('data/new_test_3dof_svd/fourier_test2.mat');
 gen.csvfilename=gen.fourfilename;
 
 %gen_fr = gen;
  
 %---------------------For PSM2 -----------------------
-gen.filename = 'test_3dof_svd_psm2';
+gen.filename = 'new_test_3dof_svd';
 %-----------------------------------------------------
  %% The Par Ident
  
@@ -130,7 +131,7 @@ save(savename);
  
 %% Curve fitting stribeck third joint
 clear all
-load('data/stribeck_3dof_svd/fourier_test6_results.mat');
+load('data/stribeck_3dof_svd/fourier_test_results.mat');
 
 constant_velocity_test(gen);
 

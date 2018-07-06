@@ -273,6 +273,7 @@ dyn_eqn=simplify(dyn_eqn);
 % F = vpa(F,2);
 % M = vpa(M,2);
 
+
 F=simplify(F);
 Mass=simplify(Mass);
 

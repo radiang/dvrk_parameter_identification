@@ -1,12 +1,12 @@
 %% Test Matrices
 clear all
-qn  = [0.5, 0, 0.1];
-qdn = [0.0, 0, 0.0];
+qn  = [0.0, 0.1, 0.1];
+qdn = [-0.4, 0.3, -0.4];
 test_num = 6;
 dof_num = 3;
 disp('-------------------------start----------------------------')
 
-testname = 'test_3dof_svd_psm2';
+testname = 'new_test_3dof_svd';
 
 % Matrices values
 for j = 1:test_num

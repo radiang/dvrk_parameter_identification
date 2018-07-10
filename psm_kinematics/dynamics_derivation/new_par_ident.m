@@ -226,8 +226,6 @@ Wwtau = G*ident.wtau(1:length(ident.W));
 
 gen.wls_par2 = pinv(G*ident.W)*(Wwtau);
 gen.wls_par2 = P*gen.wls_par2;
-
-
 %ident.wls_G = G;
 end
 

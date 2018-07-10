@@ -45,19 +45,23 @@ P = diag(1./vecnorm(W));
 test.test_cond_weighted=cond(W*P);
 %% plot
 
-figure()
-plot(test.time,test.qi(1,:),test.time,test.qi(2,:),test.time,test.qi(3,:));
-legend('1','2','3')
-title('Joint Positions')
-ylabel('rad')
-xlabel('time')
+c = 3000;
 
 figure()
-plot(test.time,test.qdi(1,:),test.time,test.qdi(2,:),test.time,test.qdi(3,:));
-legend('1','2','3')
+subplot(2,1,1)
+plot(test.time(1:c),test.qi(1,1:c),test.time(1:c),test.qi(2,1:c),test.time(1:c),test.qi(3,1:c));
+legend('q_1','q_2','q_3')
+title('Joint Positions')
+ylabel('[rad]')
+xlabel('time [s]')
+
+%figure()
+subplot(2,1,2)
+plot(test.time(1:c),test.qdi(1,1:c),test.time(1:c),test.qdi(2,1:c),test.time(1:c),test.qdi(3,1:c));
+legend('qv_1','qv_2','qv_3')
 title('Joint Velocities')
-ylabel('rad/s')
-xlabel('time')
+ylabel('[rad/s]')
+xlabel('time [s]')
 
 ass = [test.qi;test.qdi;test.qddi];
 

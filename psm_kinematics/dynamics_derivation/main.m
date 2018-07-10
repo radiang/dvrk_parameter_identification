@@ -12,7 +12,7 @@ traj.limit_vel=[2, 2, 0.4, 0.4, 0.4, 0.4];
 traj.scale_p = 0.7;
 traj.scale_v = 0.4;
 
-gen.filename='stribeck_3dof_svd';
+gen.filename='july_3dof';
 
 %Degrees of Freedom of robot
 gen.dof = 3; 
@@ -55,7 +55,7 @@ save(savename);
 
 clear all
 close all
-load('data/new_test_3dof_svd/fourier_test2.mat');
+load('data/test_3dof_svd/fourier_test2.mat');
 gen.csvfilename=gen.fourfilename;
 
 %gen_fr = gen;
@@ -131,10 +131,9 @@ save(savename);
  
 %% Curve fitting stribeck third joint
 clear all
-load('data/stribeck_3dof_svd/fourier_test_results.mat');
+load('data/stribeck_3dof_svd/fourier_test4_results.mat');
 
 constant_velocity_test(gen);
-
 %gen.filename = 'stribeck_test_3dof_svd';
 
 [gen,ctrl] = friction_fitting(gen,ctrl);

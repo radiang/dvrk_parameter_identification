@@ -2,7 +2,8 @@ function [fs, gen] = fourier_trajectory_run(gen,traj)
 
 %% Options
 fs.Nl = 5; 
-fs.w = 0.14*2*pi() ;%rad/s
+choose = [0.1, 0.13, 0.16, 0.2, 0.14, 0.12];
+fs.w = choose(1)*2*pi() ;%rad/s
 
 fs.ts = 0.02;
 fs.period = 30;%s.

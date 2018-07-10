@@ -33,10 +33,10 @@ dyn.p = sym(pi());
 %My own DH from RViz and DH Paper
 dyn.beta=atan((.072613-.0296)/(.2961-.1524));
 
-dyn.a      =    [ 0         ,                  0,               .150,                      .516,              .2881,     -.0430,               0,      0,     .0091,    .0102,    0];
-dyn.alpha  =    [-dyn.p/2   ,           -dyn.p/2,                  0,                         0,                  0,    dyn.p/2,           0,     dyn.p/2,     -dyn.p/2,        0, -dyn.p/2];
-dyn.d      =    [ 0.1524,                  .0296,                  0,                         0,                  0,          0,  .4162+gen.q(3),       0,        0,        0,    0];
-dyn.tet    =    [ dyn.p/2   ,  -dyn.p/2+gen.q(1), -dyn.beta+gen.q(2), dyn.beta+dyn.p/2-gen.q(2),  -dyn.p/2+gen.q(2),   -dyn.p/2,      dyn.p/2,  dyn.p/2+gen.q(4),   dyn.p/2+gen.q(5),       gen.q(6), -dyn.p/2];
+dyn.a      =    [ 0         ,                  0,               .150,                      .516,              .2881,     -.0430,               0,                 0,              .0091,          .0102,        0];
+dyn.alpha  =    [-dyn.p/2   ,           -dyn.p/2,                  0,                         0,                  0,    dyn.p/2,               0,           dyn.p/2,           -dyn.p/2,              0, -dyn.p/2];
+dyn.d      =    [ 0.1524,                  .0296,                  0,                         0,                  0,          0,  .4162+gen.q(3),                 0,                  0,              0,        0];
+dyn.tet    =    [ dyn.p/2   ,  -dyn.p/2+gen.q(1), -dyn.beta+gen.q(2), dyn.beta+dyn.p/2-gen.q(2),  -dyn.p/2+gen.q(2),   -dyn.p/2,         dyn.p/2,  dyn.p/2+gen.q(4),   dyn.p/2+gen.q(5),       gen.q(6), -dyn.p/2];
 
 %1: Yaw Coordinate Frame
 %2-4: Pitch Coordinate Frames
@@ -210,8 +210,8 @@ end
 
 counter_num = 2;
 dyn.Tee_cg(:,:,1)= dyn.T(:,:,2)*DH(dyn.map(2),0,0,0);
-%dyn.Tee_cg(:,:,2)= dyn.T(:,:,2)*DH(-dyn.p/2-dyn.beta+gen.q(2),dyn.l_cg(11,1),0,-dyn.p/2)*DH(0,0,dyn.map(6),0);
-dyn.Tee_cg(:,:,2)= dyn.T(:,:,2)*DH(-dyn.p/2-dyn.beta+gen.q(2),0,0,-dyn.p/2)*DH(0,0,coeff_travel_11*dyn.map(6),0);
+%dyn.Tee_cg(:,:,2)= dyn.T(:,:,2)*DH(-dyn.p/2-dyn.beta+gen.q(2),0,0,-dyn.p/2)*DH(0,0,coeff_travel_11*dyn.map(6),0); % I believe this is wrong
+dyn.Tee_cg(:,:,2)= dyn.T(:,:,3)*DH(dyn.beta-dyn.p/2,0,0,-dyn.p/2)*DH(0,0,coeff_travel_11*dyn.map(6),0); % I believe this is wrong
 
  dyn.p_cg(end+1,:) = dyn.Tee_cg(:,:,1)*transpose(dyn.l_cg(10,:)); %Pitch Counterweight 
  dyn.p_cg(end+1,:) = dyn.Tee_cg(:,:,2)*transpose(dyn.l_cg(11,:)); %Insertion Counterweight 
@@ -219,7 +219,10 @@ dyn.Tee_cg(:,:,2)= dyn.T(:,:,2)*DH(-dyn.p/2-dyn.beta+gen.q(2),0,0,-dyn.p/2)*DH(0
  
 %% Plot Joint Angles Test
 close all
-q_n = [0, dyn.beta, 0.0, 0, 0, 0];  %Put your numeric values here
+q_n = [0, -0.2, 0, 0, 0, 0];  %Put your numeric values here
+for i = 1:2
+dyn.Tee_cg_num(:,:,i) = subs(dyn.Tee_cg(:,:,i), gen.q,q_n);
+end
 
 figure()
 for i = 1:length(dyn.T)
@@ -543,6 +546,7 @@ check(end+1:end+length(gen.qdd)) = gen.qdd;
  
 %Par(end-17:end)=[]; 
 [gen.Y, tau]=equationsToMatrix(dyn.Dt == gen.Tau(1:gen.dof), gen.Par);
+
 
 %% Stribeck Friction for Joint 3
 syms Fc_3  delta_s  vs

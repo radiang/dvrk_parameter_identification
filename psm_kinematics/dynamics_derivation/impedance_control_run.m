@@ -123,7 +123,7 @@ J3_num = double(J3_num);
 
 %% Seperate Variables to Par2 Force Controller 
 
-[Mt, Nu, gen.can]=seperate_f(gen.Ys2,gen.par_num,gen.Qdd);
+[Mt, Nu, gen.can]=seperate_f(gen,dyn);
 
 %% Make into 3 DOF
 ctrl.Mt3 = subs(Mt(1:3,1:3),[transpose(gen.Q(4:6))], [0 0 0]);

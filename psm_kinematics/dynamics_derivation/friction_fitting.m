@@ -51,6 +51,7 @@ end
 
 t = linspace(1,length(q(:,1)'),length(q(:,1)'));
 
+t = t.*1/200;
 
 %% Filter Velocity
 
@@ -78,6 +79,8 @@ subplot(3,1,2)
 plot(t,x2,t,qdf(:,2)');
 subplot(3,1,3)
 plot(t,x3,t,qdf(:,3)');
+ylabel('Velocity [m/s]')
+xlabel('time [s]')
 
 savefig = strcat('pictures/fr_test_',gen.fourfilename,'_Velocity_filter.png');
 saveas(gcf,savefig)
@@ -130,8 +133,10 @@ subplot(3,1,2)
 plot(t,x2,t,tauf(:,2)');
 subplot(3,1,3)
 plot(t,x3,t,tauf(:,3)');
+ylabel('Force [N]')
+xlabel('time [s]')
 
-savefig = strcat('pictures/fr_test_',gen.fourfilename,'Torque_filter.png');
+savefig = strcat('pictures/fr_test_',gen.fourfilename,'torque_filter.png');
 saveas(gcf,savefig)
 
 
@@ -148,16 +153,19 @@ end
 %dirty = minus(q
 figure()
 plot(t(1:N),tauf(1:N,3)',t(1:N),distortion(3,1:N));
+xlabel('Time [s]')
+ylabel('Force [N]')
+title('Constant Velocity Test: Delete Torque')
 legend('before','after');
 savefig = strcat('pictures/fr_test_',gen.fourfilename,'b_a.png');
 saveas(gcf,savefig)
 
 figure()
 scatter(qdf(1:N,3),distortion(3,:),10);
-title('Friction torques')
-xlabel('Velocity [rad/s]')
-ylabel('Torques [N m]')
-savefig = strcat('pictures/fr_test_',gen.fourfilename,'Torque_vel.png');
+title('Constant Velocity Test')
+xlabel('Velocity [m/s]')
+ylabel('Force [N]')
+savefig = strcat('pictures/fr_test_',gen.fourfilename,'torque_vel.png');
 saveas(gcf,savefig)
 
 % %%

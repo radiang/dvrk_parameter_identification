@@ -6,7 +6,7 @@ test_num = 6;
 dof_num = 3;
 disp('-------------------------start----------------------------')
 
-testname = 'new_test_3dof_svd';
+testname = 'test_3dof_svd';
 
 % Matrices values
 for j = 1:test_num
@@ -36,6 +36,8 @@ exm.ls_error(j,:) = test.total_ls;
 exm.tot_wls_error(j) = test.total2_wls;
 exm.wls_error(j,:) = test.total_wls;
 
+exm.tot_sdp_error(j)=test.total2_sdp;
+exm.sdp_error(j,:) = test.total_sdp;
 end 
 
 nG 

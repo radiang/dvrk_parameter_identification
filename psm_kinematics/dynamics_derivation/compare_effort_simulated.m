@@ -2,10 +2,10 @@ function [test]= compare_effort_simulated(gen,ident,test)
 ident.tau = ident.tauf;
 %% Compare with a different trajectory
 
-ident = [];
-loadname = strcat('data/',gen.filename,'/','fourier_test5','_compare.mat');
-load(loadname);
-ident = compare;
+% ident = [];
+% loadname = strcat('data/',gen.filename,'/','fourier_test5','_compare.mat');
+% load(loadname);
+% ident = compare;
 
 %% Least squares and weights least squares
 for i=1:length(ident.qddi) 

@@ -55,13 +55,13 @@ save(savename);
 
 clear all
 close all
-load('data/test_3dof_svd/fourier_test2.mat');
+load('data/test_3dof_svd/fourier_test.mat');
 gen.csvfilename=gen.fourfilename;
 
 %gen_fr = gen;
  
 %---------------------For PSM2 -----------------------
-gen.filename = 'new_test_3dof_svd';
+%gen.filename = 'new_test_3dof_svd';
 %-----------------------------------------------------
  %% The Par Ident
  
@@ -89,10 +89,10 @@ compare.wls_G = [];
 save(savename,'compare');
 
 %% SDP OLS
-% [gen] = SDP_OLS(gen,ident,dyn,map);
+[gen] = SDP_OLS(gen,ident,dyn,map);
 % 
-% savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
-% save(savename);
+savename=strcat('data/',gen.filename,'/',gen.csvfilename,'_results.mat');
+save(savename);
 
 %% Change to sigmoid function as suggested by Yan
  for i = 1:gen.dof

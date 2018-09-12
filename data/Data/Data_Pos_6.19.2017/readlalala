@@ -1,6 +1,0 @@
-#!/usr/bin/env python
-# http://wiki.ros.org/rospy/Overview/Messages
-from numpy import genfromtxt
-
-q_data1 = genfromtxt('T1.csv', delimiter=',')
-print(q_data1[4])

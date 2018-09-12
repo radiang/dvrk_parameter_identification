@@ -44,10 +44,6 @@ i = 0
 
 
 while  i<len(a[1][:]) and not rospy.is_shutdown():
-
-#while  i<100 and not rospy.is_shutdown():
-#for i in range(len(q[1][:])):
-	#print(qt[1])
 	
 	#Stribeck Test
 	#p.move_joint_some(np.array([0, 0, scale*a[2][i]]),np.array([0,1,2]),False)
@@ -60,10 +56,6 @@ while  i<len(a[1][:]) and not rospy.is_shutdown():
 	r.sleep()
 
 	i = i +1
-#print ' array non transpose:  ' 
-#print states[:,8]
-#print ' array transpose: '  
-#print states[8,:]
 
 #plt.plot(states[:,8])
 #file_str = 'PID_test' + ':' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
